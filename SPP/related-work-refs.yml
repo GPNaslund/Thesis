@@ -1,0 +1,35 @@
+wear-merge:
+  type: article
+  title: "WearMerge: An Interoperable Framework for Self-tracking Data Integration and Standardization"
+  author: ["Dimitrios Panteleimon Giakatos", "Sofia Yfantidou", "Stefanos Efstathiou", "Athena Vakali"]
+  serial-number:
+    doi: 10.1109/PerComWorkshops53856.2022.9767462
+  date: 2022-05-06
+  parent: 
+    type: conference
+    title: "2022 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops)"
+    publisher: IEEE
+
+tasrif:
+  type: article
+  title: "Tasrif: processing wearable data in Python"
+  author: ["Abdulaziz Al Homaid", "Syed Hashim", "Fadhil Abubaker", "Ummar Abbas", "Faisal Farooq", "Joao Palotti"]
+  serial-number:
+    doi: 10.1109/PerComWorkshops53856.2022.9767286
+  date: 2022-05-06
+  parent: 
+    type: conference
+    title: "2022 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops)"
+    publisher: IEEE
+
+big-data-in-healthcare:
+  type: article
+  title: "Big Data in Healthcare for Personalization & Customization of Healthcare Services"
+  author: ["Sumarsono", "Muhammad Anshari", "Mohammad Nabil Almunawar"]
+  serial-number:
+    doi: 10.1109/ICIMTech.2019.8843822
+  date: 2019-09-19
+  parent:
+    type: conference
+    title: "2019 International Conference on Information Management and Technology (ICIMTech)"
+    publisher: IEEE
