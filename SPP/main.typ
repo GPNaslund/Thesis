@@ -66,15 +66,14 @@ Supervision status according to student
 
 Cooperative partners (Optional):
 \ Company: Neurawave
-\ Status: One telephone meeting and follow up e-mails.
+\ Status: Two video meetings and follow up e-mails.
 \ Preliminary Title:
 \ Designing a Crossplatform Mobile Framework for Normalizing and Integrating Wearable Health Data to Support Machine Learning Applications in Migraine Analysis.
 
 \
 == Elevator pitch:
-Write this last… since its a summary of the rest. 
 
-The proliferation of wearable health devices has created a fragmented data landscape where each platform uses different formats and APIs @impact-wearable-technologies, making it challenging for developers to create cross-platform applications that can effectively utilize this health data for several purposes. I intend to develop a mobile framework that standardizes the integration of health data from multiple wearable platforms into the Open mHealth format @open-mHealth-schemas, providing developers with a unified interface for accessing normalized wearable data suitable for their needs. The framework will be evaluated using Design Science methodology, including performance benchmarks and validation of data normalization accuracy across different platforms.
+The proliferation of wearable health devices has created a fragmented data landscape where each platform uses different formats and APIs @impact-wearable-technologies, making it challenging for developers to create cross-platform applications that can effectively utilize health data for migraine monitoring and prediction @migraine-machine-learning-medications. While solutions like Shimmer exist for server-based data aggregation @shimmer, modern health applications require real-time data access and direct platform integration, particularly for continuous monitoring of migraine-related physiological signals. I intend to develop a mobile framework that standardizes the integration of migraine-relevant health data from multiple wearable platforms into the Open mHealth format @open-mHealth-schemas, providing developers with a unified interface for accessing normalized wearable data suitable for migraine analysis and prediction. The framework will be evaluated using Design Science methodology, including performance benchmarks and validation of data normalization accuracy across different platforms, with specific focus on data types relevant to migraine monitoring.
 
 == Steps/Milestones/Actions
 
@@ -193,26 +192,26 @@ Research area: Data integration and interoperability
 
 == Related work
 
-This work positions itself in the area of Data integration and interoperability, specifically focusing on frameworks for normalizing heterogenous health data from wearable devices.
+This work positions itself in the area of Data integration and interoperability, specifically focusing on frameworks for normalizing heterogeneous health data from wearable devices for migraine monitoring applications.
 
-There was an article published in 2022 in IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events about a web based framework called WearMerge with a similar scope as this thesis. The framework processes input from wearables performs several steps towards converting the input data to Open mHealth schemas. This is close to the data aggregation and handling that i intend to implement, with the major difference of my framework being a mobile crossplatform framework. The authors conclusions was centered around the challenges of data transformation due to deprecation on behalf of Open mHealth, and the authors urges researchers to contribute to this open source standard @wear-merge.
+Current approaches to wearable data integration can be categorized into two main types: web-based solutions and data processing frameworks. WearMerge @wear-merge, presented at IEEE International Conference on Pervasive Computing and Communications Workshops in 2022, represents a web-based approach, converting wearable data to Open mHealth schemas. While this framework addresses similar data aggregation challenges, it differs from our proposed solution in its web-based architecture, which limits its applicability for real-time mobile applications.
 
-Another example of a wearable data preprocessing framework is Tasrif @tasrif. Tasrif is a python framework with the purpose of fascilitating the processing of wearable data. The framework has the ability to preprocess large datasets aswell as data from commerical third party device data from for example Apple Health. Tasrif provides functionality to integrate the processed data directly into popular machine learning frameworks. The authors concludes that the propsed system removes the barrier of entry for clinical researchers and practitioners @tasrif. Similarly to WearMerge @wear-merge, Tasrif is not designed to be directly integrated into a multi platform mobile application but still provides many of the similar functions as the framework i plan on implementing.
+In the same year, Tasrif @tasrif was introduced as a Python-based preprocessing framework for wearable data. While it effectively handles data from commercial devices like Apple Health and provides direct integration with machine learning frameworks, it focuses on offline data processing rather than real-time mobile integration. The authors demonstrate its value in reducing barriers for clinical researchers, but like WearMerge, it's not designed for direct integration into mobile applications.
 
-No more articles describing a framework of similar functionality was found, so the research area seems to be quite novel. Both frameworks were presented in the same computer science conference paper published 2022 which leads to the conclusion that its a research area that is active and newly emerging.
+The novelty of our approach lies in addressing the specific challenges of mobile-first, cross-platform data integration, an area that remains unexplored in current literature. The recent publication dates of both WearMerge and Tasrif (2022) indicate this is an active and emerging research area within computer science, with significant opportunities for mobile-specific solutions.
 
 
 == Knowledge Gap/Challenge/Problem
 
-There is a challenge present for mobile developers to be able to collect data obtained from wearable devices from different third party providers in a standardized way within the application itself. This framework will produce a solution to the gap between singular vendor mobile frameworks and the multi vendor data processing applications that is not available as cross platform mobile frameworks. No reference was found describing this specific challenge, but more general issue with uniform collection and processing of the collected data has been described @big-data-in-healthcare.
+There is a significant technical challenge in developing mobile applications that can collect and normalize wearable health data from multiple providers, particularly for continuous monitoring applications like migraine prediction. While single-vendor solutions exist, and server-based platforms like Shimmer @shimmer offer multi-vendor support, there is no cross-platform mobile framework that enables real-time data integration. This gap between single-vendor mobile frameworks and server-based data processing applications has been acknowledged in the context of big data healthcare applications @big-data-in-healthcare, and becomes particularly critical for applications requiring continuous monitoring and real-time data access.
 
 == Knowledge Contribution/Action
-This thesis aims to develop a mobile framework that standardizes the integration and normalization of health data from multiple wearable platforms (Apple HealthKit, Google Heatlh, etc.) into the Open mHealth format, which provides the ability to easier use the data in machine learning. The framework will provide developers with a unified interface for accessing normalized wearable data across platforms while handling the complexity of different data formats and sampling rates. 
+This thesis aims to develop a mobile framework that standardizes the integration and normalization of migraine-relevant health data from multiple wearable platforms (Apple HealthKit, Google Health, etc.) into the Open mHealth format, with particular focus on metrics associated with migraine triggers and symptoms (such as sleep patterns, stress levels, and activity data). The framework will provide developers with a unified interface for accessing normalized wearable data across platforms while handling the complexity of different data formats and sampling rates, specifically optimized for migraine monitoring and prediction applications.
 
 The contribution described as a set of research questions:
-- How can wearable health data from different platforms be effectively normalized into a unified format suitable for machine learning applications?
-- What are the key requirements and challenges in implementing real-time data normalization for wearable health data in a mobile environment?
-- How effective is the Open mHealth schema as a standardized format for representing diverse wearable health data in machine learning applications?
+- How can wearable health data from different platforms be effectively normalized into a unified format suitable for migraine-focused machine learning applications?
+- What are the key requirements and challenges in implementing real-time data normalization for migraine-relevant wearable data in a mobile environment?
+- How effective is the Open mHealth schema as a standardized format for representing migraine-relevant physiological data from diverse wearable devices?
 
 
 == Empirical Evidence/Evaluation
@@ -231,12 +230,14 @@ This thesis will follow the Design Science Research methodology as outlined by P
 - Integration with health platforms
 
 4) Demonstration
-- Development of a proof of concept application
+- Development of a proof of concept application for migraine monitoring
+- Implementation of data collection for key migraine-relevant metrics
 
 5) Evaluation
-- Technical performance assessment
-- Validation of data normalization accuracy
-- Testing with multiple data sources
+- Technical performance assessment (processing time, memory usage)
+- Validation of data normalization accuracy for migraine-relevant metrics
+- Testing with multiple data sources and sampling rates
+- Verification of data consistency for machine learning preparation
 
 Supporting methods will consist of:
 1) Literature review
