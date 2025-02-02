@@ -182,7 +182,9 @@ _The closest solutions_
   [health 12.0.1], [Enables reading and writing health \ data to and from Apple Health and \ Google Health Connect.], [Single provider, non standardization],
   [React Native Health], [Package to interact with Apple HealthKit \ for iOS.], [Single provider, non standardization],
   [React Native Health Connect], [Package to interact with Health Connect \ for Android], [Single provider, non standardization],
-  [Shimmer], [Facade for multiple providers to extract \ normalized data.], [Non mobile multiplatform]
+  [Shimmer], [Facade for multiple providers to extract \ normalized data.], [Non mobile multiplatform],
+  [Tasrif], [Facade for multiple providers to extract \ data with integration to ML libraries.], [Standardized format, non mobile \
+  platform]
 )
 
 Application areas: Healthcare analytics, digital health platforms, machine learning for healthcare.
