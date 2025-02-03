@@ -53,7 +53,7 @@ We want to have projects that are:
 \
 
 
-Your name(s): Gustav Näslund
+Your name(s): Gustav Näslund & Duc Anh Pham
 
 LNU Supervisor:
 
@@ -252,3 +252,5 @@ Supporting methods will consist of:
 
 #let references = ("general-healthcare-data-refs.yml", "migraine-references.yml", "wearable-references.yml", "machine-learning-refs.yml", "current-technical-state-refs.yml", "related-work-refs.yml", "empirical-evidence-refs.yml")
 #bibliography(references, title: "References", style: "ieee")
+#set document(title: "gn222gq-SPP", author: "Gustav Näslund", keywords: "SPP for Thesis")
+
