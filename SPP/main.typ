@@ -73,7 +73,7 @@ Cooperative partners (Optional):
 \
 == Elevator pitch:
 
-The proliferation of wearable health devices has created a fragmented data landscape where each platform uses different formats and APIs @impact-wearable-technologies, making it challenging for developers to create cross-platform applications that can effectively utilize health data for migraine monitoring and prediction @migraine-machine-learning-medications. While solutions like Shimmer exist for server-based data aggregation @shimmer, modern health applications require real-time data access and direct platform integration, particularly for continuous monitoring of migraine-related physiological signals. I intend to develop a mobile framework that standardizes the integration of migraine-relevant health data from multiple wearable platforms into the Open mHealth format @open-mHealth-schemas, providing developers with a unified interface for accessing normalized wearable data suitable for migraine analysis and prediction. The framework will be evaluated using Design Science methodology, including performance benchmarks and validation of data normalization accuracy across different platforms, with specific focus on data types relevant to migraine monitoring.
+The proliferation of wearable health devices has created a fragmented data landscape where each platform uses different formats and APIs @impact-wearable-technologies, making it challenging for developers to create cross-platform applications that can effectively utilize health data for migraine monitoring and prediction @migraine-machine-learning-medications. While solutions like Shimmer exist for server-based data aggregation @shimmer, modern health applications require real-time data access and direct platform integration, particularly for continuous monitoring of migraine-related physiological signals. We intend to develop a mobile framework that standardizes the integration of migraine-relevant health data from multiple wearable platforms into the Open mHealth format @open-mHealth-schemas, providing developers with a unified interface for accessing normalized wearable data suitable for migraine analysis and prediction. The framework will be evaluated using Design Science methodology, including performance benchmarks and validation of data normalization accuracy across different platforms, with specific focus on data types relevant to migraine monitoring.
 
 == Steps/Milestones/Actions
 
@@ -252,5 +252,5 @@ Supporting methods will consist of:
 
 #let references = ("general-healthcare-data-refs.yml", "migraine-references.yml", "wearable-references.yml", "machine-learning-refs.yml", "current-technical-state-refs.yml", "related-work-refs.yml", "empirical-evidence-refs.yml")
 #bibliography(references, title: "References", style: "ieee")
-#set document(title: "gn222gq-SPP", author: "Gustav Näslund", keywords: "SPP for Thesis")
+#set document(title: "SPP-Gustav&Duc", author: "Gustav Näslund & Duc Anh Pham", keywords: "SPP for Thesis")
 
