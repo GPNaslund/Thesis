@@ -1,0 +1,14 @@
+migraine-review-general-practice:
+  type: article
+  title: Migraine review for general practice
+  author:
+    ["Antonio L Aguilar-Shea", "Javier A Membrilla Md", "Javier Diaz-de-Teran"]
+  serial-number:
+    doi: 10.1016/j.aprim.2021.102208
+  date: 2021-11-16
+  parent:
+    - type: periodical
+      title: Aten Primaria
+      volume: 54
+      issue: 2
+      publisher: Elsevier España, S.L.U.

@@ -1,0 +1,1 @@
+enum BatteryLevel { aboveThirtyPercent }
