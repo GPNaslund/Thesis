@@ -1,0 +1,4 @@
+- Frequency of measurements / How often to measure health values?
+- Different frequencies for different measurements?
+- How to handle offline situations? Store data? Skip that data? 
+- 

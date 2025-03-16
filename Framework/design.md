@@ -56,6 +56,11 @@ Start collecting
   healthData.startCollecting();
 ```
 
+Stop collection
+```dart
+    healthData.stopCollecting();
+```
+
 Provide loggin/status stream
 ```dart
   healthData.statusStream.listen((status) {

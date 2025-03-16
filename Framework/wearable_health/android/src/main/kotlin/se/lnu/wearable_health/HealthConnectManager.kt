@@ -1,18 +1,9 @@
 package se.lnu.wearable_health
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.health.connect.client.HealthConnectClient
-import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.Result
-import se.lnu.wearable_health.WearableHealthPlugin.Companion.REQUEST_HEALTH_CONNECT_PERMISSIONS
 
 class HealthConnectManager(private val context: Context?) {
     private var healthConnectClient: HealthConnectClient? = null

@@ -12,7 +12,7 @@ import 'package:wearable_health/services/providers/health_provider.dart';
 import 'package:wearable_health/services/synchronization/sync_config.dart';
 import 'package:wearable_health/wearable_health_data_constants.dart';
 
-enum SyncStatus { idle, collecting, transforming, sending, completed, error }
+enum SyncStatus { idle, collecting, transforming, sending, completed, error, stopping, stopped }
 
 typedef ErrorHandler = void Function(dynamic error);
 
@@ -139,5 +139,24 @@ class WearableHealth {
 
   void dispose() {
     _statusController.close();
+  }
+
+  Future<bool> stopCollecting() async {
+    try {
+      _updateStatus(SyncStatus.stopping);
+      var result = _doStopCollecting();
+      _updateStatus(SyncStatus.stopped);
+      return result;
+    } catch (e) {
+      _updateStatus(SyncStatus.error);
+      errorHandler(e);
+      return false;
+    }
+  }
+
+  Future<bool> _doStopCollecting() async {
+    return await _channel.invokeMethod(
+      WearableHealthDataConstants.methodStopCollecting, {}
+    );
   }
 }
