@@ -1,4 +1,4 @@
 - Frequency of measurements / How often to measure health values?
 - Different frequencies for different measurements?
 - How to handle offline situations? Store data? Skip that data? 
-- 
+- Abandon the whole backend part? Maybe just collect data -> transform -> output from plugin? So user does what ever with it?

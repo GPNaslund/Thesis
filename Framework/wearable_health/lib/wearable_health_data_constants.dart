@@ -10,5 +10,4 @@ class WearableHealthDataConstants {
   static const String methodRequestPermissions = "requestPermissions";
   static const String methodStartCollecting = "startCollecting";
   static const String methodStopCollecting = "stopCollecting";
-  static const String methodGetHealthData = "getHealthData";
 }
