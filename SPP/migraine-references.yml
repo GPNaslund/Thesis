@@ -1,0 +1,69 @@
+migraine-review:
+  type: article
+  title: Migraine review for general practice
+  author: ["Antonio L Aguilar-Shea", "Javier Diaz-de-Teran b,c"]
+  serial-number:
+    pmid: 34798397
+  date: 2021-11-16
+  parent:
+    type: periodical
+    title: Atencion Primaria
+    volume: 54
+    issue: 2
+    publisher: Elsevier
+
+migraine-genetics-pathophysiology-diagnosis:
+  type: article
+  title: "Genetics, pathophysiology, diagnosis, treatment, management, and prevention of migraine"
+  author: ["Johra Khan", "Lubna Ibrahim Al Asoom", "Ahmad Al Sunni", "Nazish Rafique", "Rabia Latif", "Seham Al Saif", "Noor B. Almandil", "Dana Almohazey", "Sayed AbdulAzeez", "J. Francis Borgio"]
+  serial-number:
+    pmid: 34243621
+  date: 2021-07
+  parent:
+    type: periodical
+    title: Biomedicine & Pharmacotherapy
+    volume: 139
+    issue: 1
+    publisher: Elsevier Masson SAS
+
+migraine-triggers:
+  type: article
+  title: "Migraine Triggers: An Overview of the Pharmacology, Biochemistry, Atmospherics, and Their Effects on Neural Networks"
+  author: "Hassan Kesserwani"
+  serial-number:
+    pmid: 33954064
+  date: 2021-04
+  parent:
+    type: periodical
+    title: Cureus
+    volume: 13
+    issue: 4
+    publisher: Cureus Inc
+
+state-of-migraine:
+  type: article
+  title: "The state of migraine: An update on current and emerging treatments"
+  author: ["Jason C Ray", "Caroline Macindoe", "Michael Ginevra", "Elspeth J Hutton"]
+  serial-number:
+    pmid: 34845471
+  date: 2021-12
+  parent:
+    type: periodical
+    title: Australian Journal of General Practice
+    volume: 50
+    issue: 12
+    publisher: The Royal Australian College of General Practitioners
+
+self-reported-triggers:
+  type: article
+  title: "An observational study of self-reported migraine triggers and prospective evaluation of the relationships with occurrence of attacks enabled by a smartphone application (App)"
+  author: ["Amparo Casanova", "Marina Vives-Mestres", "Stephen Donoghue", "Alec Mian", "Paul R Martin"]
+  serial-number:
+    pmid: 35670125
+  date: 2022-06-07
+  parent:
+    type: periodical
+    title: Headache The Journal of Head and Face Pain
+    volume: 62
+    issue: 10
+    publisher: American Headache Society

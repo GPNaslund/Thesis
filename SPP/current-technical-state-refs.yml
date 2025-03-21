@@ -1,0 +1,27 @@
+apple-health:
+  type: web
+  url: https://www.apple.com/health/
+
+google-health:
+  type: web
+  url: https://health.google/
+
+samsung-health:
+  type: web
+  url: https://play.google.com/store/apps/details?id=com.sec.android.app.shealth
+
+shimmer:
+  type: web
+  url: https://www.openmhealth.org/documentation/#/data-providers/shimmer
+
+open-mHealth-schemas:
+  type: web
+  url: https://www.openmhealth.org/documentation/#/schema-docs/overview
+
+shimmer-github:
+  type: web
+  url: https://github.com/openmhealth/shimmer
+
+shim:
+  type: web
+  url: https://www.openmhealth.org/documentation/#/data-providers/about-shims

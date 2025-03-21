@@ -1,0 +1,92 @@
+migraine-classification-ml:
+  type: article
+  title: "Migraine classification by machine learning with functional near-infrared spectroscopy during the mental arithmetic task"
+  author: ["Wei-Ta Chen", "Cing-Yan Hsieh", "Yao-Hong Liu", "Pou-Leng Cheong", "Yi-Min Wang", "Chia-Wei Sun"]
+  serial-number:
+    pmid: 36028633
+  date: 2022-08-26
+  parent:
+    type: periodical
+    title: Scientific Reports
+    volume: 12
+    issue: 1
+    publisher: Nature Publishing Group
+
+
+migraine-detection-ml:
+  type: article
+  title: "Migraine with aura detection and subtype classification using machine learning algorithms and morphometric magnetic resonance imaging data"
+  author: ["Katarina Mitrović", "Igor Petrušić", "Aleksandra Radojičić", "Marko Daković", "Andrej Savić"]
+  serial-number:
+    pmid: 37441607
+  date: 2023-06-23
+  parent:
+    type: periodical
+    title: Frontiers in Neurology
+    volume: 14
+    issue: 1
+
+migraine-classification-ml-data-augmention:
+  type: article
+  title: "Migraine headache (MH) classification using machine learning methods with data augmentation"
+  author: ["Lal Khan", "Moudasra Shahreen", "Atika Qazi", "Syed Jamil Ahmed Shah", "Sabir Hussain", "Hsien-Tsung Chang"]
+  serial-number:
+    pmid: 38431729
+  date: 2024-03-02
+  parent:
+    type: periodical
+    title: Scientific reports
+    volume: 14
+    issue: 1
+
+migraine-machine-learning-medications:
+  type: article
+  title: "Advancing toward precision migraine treatment: Predicting responses to preventive medications with machine learning models based on patient and migraine features"
+  author: ["Chia-Chun Chiang", "Todd J Schwedt", "Gina Dumkrieger", "Liguo Wang", "Chieh-Ju Chao", "Heather A Ouellette", "Imon Banerjee", "Yi-Chieh Chen", "Brandon M Jones", "Krista M Burke", "Han Wang", "Ann M Murray", "Monique M Montenegro", "Jennifer I Stern", "Mark Whealy", "Narayan Kissoon", "Fred M Cutrer"]
+  serial-number:
+    pmid: 3917668
+  date: 2024-10
+  parent:
+    type: periodical
+    title: Headache The Journal of Head and Face Pain
+    volume: 64
+    issue: 9
+
+machine-learning-forecasting:
+  type: article
+  title: "Forecasting migraine with machine learning based on mobile phone diary and wearable data"
+  author: ["Anker Stubberud", "Sigrid Hegna Ingvaldsen", "Eiliv Brenner", "Ingunn Winnberg", "Alexander Olsen", "Gøril Bruvik Gravdahl", "Manjit Singh Matharu", "Parashkev Nachev", "Erling Tronvik"]
+  serial-number:
+    pmid: 37096352
+  date: 2023-05
+  parent:
+    type: periodical
+    title: "Cephalalgia: an international journal of headache"
+    volume: 43
+    issue: 5
+
+challenges-opportunities-beyond-structured-data:
+  type: article
+  title: "Challenges and opportunities beyond structured data in analysis of electronic health records"
+  author: ["Maryam Tayefi", "Phuong Ngo", "Taridzo Chomutare", "Hercules Dalianis", "Elisa Salvi", "Andrius Budrionis", "Fred Godtliebsen"]
+  serial-number:
+    doi: 10.1002/wics.1549
+  date: 2021-02-14
+  parent:
+    type: periodical
+    title: WIREs - Wiley Interdisciplinary Reviews
+    volume: 13
+    issue: 6
+
+combining-structured-and-unstrctured-data:
+  type: article
+  title: "Combining structured and unstructured data for predictive models: a deep learning approach"
+  author: ["Dongdong Zhang", "Changchang Yin", "Jucheng Zeng", "Xiaohui Yuan", "Ping Zhang"]
+  serial-number:
+    doi: 10.1186/s12911-020-01297-6
+  date: 2020-10-29
+  parent:
+    type: periodical
+    title: "BMC Medical Informatics and Decision Making"
+    volume: 20
+    issue: 1

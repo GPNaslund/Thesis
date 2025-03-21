@@ -1,0 +1,16 @@
+
+
+
+digitalization-headache:
+  type: article
+  title: "[Digitalization in headache therapy]"
+  author: ["L Neeb", "R Ruscheweyh", "T Dresler"]
+  serial-number:
+    pmid: 33006064
+  date: 2020-12
+  parent:
+    type: periodical
+    title: Schmerz
+    volume: 34
+    issue: 6
+    publisher: Nature Publishing Group
