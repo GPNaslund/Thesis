@@ -6,6 +6,8 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 
 class HealthConnectPrivacyPolicyActivity : AppCompatActivity() {
@@ -63,9 +65,17 @@ class HealthConnectPrivacyPolicyActivity : AppCompatActivity() {
                 topMargin = 32
             }
             setOnClickListener {
+                setResult(RESULT_OK)
                 finish()
             }
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                setResult(RESULT_OK)
+                finish()
+            }
+        })
 
         scrollView.addView(policyTextView)
         mainLayout.addView(titleTextView)

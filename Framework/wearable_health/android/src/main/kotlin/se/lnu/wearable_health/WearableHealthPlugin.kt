@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.health.connect.client.HealthConnectClient
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -45,7 +43,6 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
       WearableHealthDataConstants.METHOD_GET_PLATFORM_VERSION.value -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
       WearableHealthDataConstants.METHOD_REQUEST_PERMISSIONS.value -> requestPermissions(call, result)
       WearableHealthDataConstants.METHOD_START_COLLECTING.value -> result.notImplemented()
-      WearableHealthDataConstants.METHOD_STOP_COLLECTING.value -> result.notImplemented()
       else -> result.notImplemented()
     }
   }
@@ -73,13 +70,13 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
     Log.d("WearableHealthPlugin", "onActivityResult called: requestCode=$requestCode, resultCode=$resultCode, data=$data")
 
     if (requestCode == REQUEST_HEALTH_CONNECT_PERMISSIONS) {
-      try {
-        val granted = if (data != null && data.hasExtra(HealthConnectPermissionActivity.PERMISSION_RESULT_KEY)) {
-          data.getBooleanExtra(HealthConnectPermissionActivity.PERMISSION_RESULT_KEY, false)
-        } else {
-          resultCode == Activity.RESULT_OK
-        }
+      if (data == null || !data.hasExtra(HealthConnectPermissionActivity.PERMISSION_RESULT_KEY)) {
+        Log.d("WearableHealthPlugin", "Returning from privacy policy, continuing permission flow")
+        return true
+      }
 
+      try {
+        val granted = data.getBooleanExtra(HealthConnectPermissionActivity.PERMISSION_RESULT_KEY, false)
         Log.d("WearableHealthPlugin", "Returning permission result to Flutter: granted=$granted")
         pendingResult?.success(granted)
       } catch (e: Exception) {

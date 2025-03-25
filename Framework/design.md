@@ -17,31 +17,11 @@ Transformer for adding the logic for data transformation.
   );
 ```
 
-Backend connector for providing an endpoint to post the data to.
-```dart
-  final backend = HealthDataBackend.http(
-    endpoint: "https://mybackend.com/api/health",
-    authHeaders: {"Authorization": "Bearer token"},
-  );
-```
-
-Sync configuration for deciding on the interval of posting health data to backend.
-```dart
-  final syncConfig = SyncConfig(
-    interval: Duration(minutes: 15),
-    batchSize: 100,
-    networkRequirement: NetworkType.wifiOnly,
-    batteryRequirement: BatteryLevel.aboveThirtyPercent,
-  );
-```
-
 Create the actual class
 ```dart
   final healthData = WearableHealth(
   provider: provider,
   transformer: transformer,
-  backend: backend,
-  syncConfig: syncConfig,
   errorHandler: (error) => print("Error: $error"),
   );
 ```
@@ -51,19 +31,7 @@ Request permissions
   await healthData.requestPermissions()
 ```
 
-Start collecting
+Collect specified data
 ```dart
-  healthData.startCollecting()
+    await healthData.collectData()
 ```
-
-Stop collection
-```dart
-    healthData.stopCollecting()
-```
-
-Provide logging/status stream
-```dart
-  healthData.statusStream.listen((status) {
-    print("Sync status: $status");
-  });
-``
