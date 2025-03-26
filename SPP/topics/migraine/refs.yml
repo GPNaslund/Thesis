@@ -44,7 +44,18 @@ quantifying-stress-and-relaxation:
   type: article
   title: "Quantifying Stress and Relaxation: A New Measure of Heart Rate Variability as a Reliable Biomarker"
   author:
-    ["Emese Rudics", "András Buzás", "Antónia Pálfi", "Zoltán Szabó", "Ádám Nagy", "Em ˝oke Adrienn Hompoth", "József Dombi", "Vilmos Bilicki", "István Szendi", "András Dér"]
+    [
+      "Emese Rudics",
+      "András Buzás",
+      "Antónia Pálfi",
+      "Zoltán Szabó",
+      "Ádám Nagy",
+      "Em ˝oke Adrienn Hompoth",
+      "József Dombi",
+      "Vilmos Bilicki",
+      "István Szendi",
+      "András Dér",
+    ]
   serial-number:
     doi: https://doi.org/10.3390/biomedicines13010081
   date: 2025-01-01
@@ -58,7 +69,17 @@ heart-rate-variability-percieved-stress:
   type: article
   title: "Alignment Between Heart Rate Variability From Fitness Trackers and Perceived Stress: Perspectives From a Large-Scale In Situ Longitudinal Study of Information Workers"
   author:
-    ["Gonzalo J Martinez", "Ted Grover", "Stephen M Mattingly", "Gloria Mark", "Sidney D’Mello", "Talayeh Aledavood", "Fatema Akbar", "Pablo Robles-Granda", "Aaron Striegel",]
+    [
+      "Gonzalo J Martinez",
+      "Ted Grover",
+      "Stephen M Mattingly",
+      "Gloria Mark",
+      "Sidney D’Mello",
+      "Talayeh Aledavood",
+      "Fatema Akbar",
+      "Pablo Robles-Granda",
+      "Aaron Striegel",
+    ]
   serial-number:
     doi: https://doi.org/10.2196/33754
   date: 2022-02-14
@@ -72,7 +93,13 @@ wearables-measuring-eda-assess-stress-in-care:
   type: article
   title: "Wearables measuring electrodermal activity to assess perceived stress in care: a scoping review"
   author:
-    ["Agata Klimek", "Ittay Mannheim", "Gerard Schouten", "Eveline J M Wouters", "Manon W H Peeters"]
+    [
+      "Agata Klimek",
+      "Ittay Mannheim",
+      "Gerard Schouten",
+      "Eveline J M Wouters",
+      "Manon W H Peeters",
+    ]
   serial-number:
     doi: https://doi.org/10.1017/neu.2023.19
   date: 2023-03-24
@@ -86,7 +113,13 @@ detection-and-monitoring-of-stress-using-wearables:
   type: article
   title: "Detection and monitoring of stress using wearables: a systematic review"
   author:
-    ["Anuja Pinge", "Vinaya Gad", "Dheryta Jaisighani", "Surjya Ghosh", "Sougata Sen"]
+    [
+      "Anuja Pinge",
+      "Vinaya Gad",
+      "Dheryta Jaisighani",
+      "Surjya Ghosh",
+      "Sougata Sen",
+    ]
   serial-number:
     doi: https://doi.org/10.3389/fcomp.2024.1478851
   date: 2024-12-18
@@ -95,3 +128,23 @@ detection-and-monitoring-of-stress-using-wearables:
       title: Frontiers in Computes Science
       volume: 6
       issue: 1
+
+stress-monitoring-using-wearable-sensors:
+  type: article
+  title: "Stress Monitoring Using Wearable Sensors: A Pilot Study and Stress-Predict Dataset"
+  author:
+    [
+      "Talha Iqbal",
+      "Andrew J. Simpkin",
+      "Davood Roshan",
+      "Nicola Glynn",
+      "John Killilea",
+      "Jane Walsh",
+      "Gerard Molloy",
+      "Sandra Ganly",
+      "Hannah Ryman",
+      "Eileen Coen",
+      "Adnan Elahi",
+      "William Wijns",
+      "Atif Shahzad",
+    ]

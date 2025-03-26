@@ -1,0 +1,44 @@
+machine-learning-wearable-technology:
+  type: article
+  title: "Machine Learning and Wearable Technology: Monitoring Changes in Biomedical Signal Patterns during Pre-Migraine Nights"
+  author:
+    [
+      "Viroslava Kapustynska",
+      "Vytautas Abromavičius",
+      "Artūras Serackis",
+      "Šarūnas Paulikas",
+      "Kristina Ryliškienė",
+      "Saulius Andruškevičius",
+    ]
+  serial-number:
+    doi: https://doi.org/10.3390/healthcare12171701
+  date: 2024-08-26
+  parent:
+    - type: periodical
+      title: Healthcare (Basel)
+      volume: 12
+      issue: 17
+
+forecasting-migraine-with-ml-based-on-diary-wearable:
+  type: article
+  title: "Forecasting migraine with machine learning based on mobile phone diary and wearable data"
+  author:
+    [
+      "Anker Stubberud", 
+      "Sigrid Hegna Ingvaldsen", 
+      "Eiliv Brenner", 
+      "Ingunn Winnberg", 
+      "Alexander Olsen", 
+      "Gøril Bruvik Gravdahl", 
+      "Manjit Singh Matharu", 
+      "Parashkev Nachev", 
+      "Erling Tronvik",
+    ]
+  serial-number:
+    doi: https://doi.org/10.1177/03331024231169244
+  date: 2023-05-01
+  parent:
+    - type: periodical
+      title: Cephalgia
+      volume: 43
+      issue: 5 
