@@ -1,0 +1,50 @@
+# Dart/Pub
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+generated_plugin_registrant.dart
+
+# Flutter-specific
+flutter_*.png
+ios/Flutter/Generated.xcconfig
+ios/Flutter/Flutter.podspec
+
+# Android Studio
+*.iml
+.idea/
+android/.gradle/
+android/app/*.iml
+.gradle/
+local.properties
+
+# Xcode
+ios/Pods/
+ios/Runner.xcworkspace/
+xcuserdata/
+DerivedData/
+
+# VS Code
+.vscode/
+
+# macOS & Linux
+.DS_Store
+*.swp
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Test outputs
+coverage/
+test_outputs/
+
+# Logs
+*.log
+
+# Environment & secrets
+.env
+.env.*
