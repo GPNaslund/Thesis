@@ -1,7 +1,7 @@
 // lib/features/home/views/home_page.dart
 
 import 'package:flutter/material.dart';
-import '../../data_fetching/pages/health_metric_selection_page.dart.dart';
+import '../../data_fetching/pages/health_metric_selection_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
