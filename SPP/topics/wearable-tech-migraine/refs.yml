@@ -1,0 +1,61 @@
+sleep-time-data:
+  type: article
+  title: "Using Sleep Time Data from Wearable Sensors for Early Detection of Migraine Attacks"
+  author:
+    [
+      "Pekka Siirtola",
+      "Heli Koskimäki",
+      "Henna Mönttinen",
+      "Juha Röning",
+    ]
+  serial-number:
+    doi: https://doi.org/10.3390/s18051374
+  date: 2018-04-28
+  parent:
+    - type: periodical
+      title: Sensors
+      volume: 18
+      issue: 5
+
+
+feasibility-SMARTER-pediatric-migraine:
+  type: article
+  title: "Feasibility of using “SMARTER” methodology for monitoring precipitating conditions of pediatric migraine episodes"
+  author:
+    [
+      "Mark A. Connelly", 
+      "Madeline E. Boorigie",
+    ]
+  serial-number:
+    doi: https://doi.org/10.1111/head.14028
+  date: 2020-12-31
+  parent: 
+    - type: periodical
+      title: Headache - The journal of Head and face pain
+      volume: 61
+      issue: 3
+
+exploring-associations-collected-tracker-data-and-headache-burden:
+  type: article
+  title: "A Prospective Real-World Study Exploring Associations Between Passively Collected Tracker Data and Headache Burden Among Individuals with Tension-Type Headache and Migraine"
+  author:
+    [
+      "Christian J Cerrada", 
+      "Jae S Min", 
+      "Luminita Constantin",
+      "Simon Hitier", 
+      "Iva Igracki Turudic", 
+      "Caroline Amand-Bourdon", 
+      "Andrew Stewart",
+      "Caty Ebel-Bitoun", 
+      "Peter J Goadsby",
+    ]
+  serial-number:
+    doi: https://doi.org/10.1007/s40122-021-00336-y
+  date: 2021-12-7
+  parent:
+    - type: periodical
+      title: Pain and Therapy
+      volume: 11
+      issue: 1
+

@@ -52,4 +52,7 @@ class DefaultMobileHealthSchemaConverter
       effectiveTimeFrame: timeFrame,
     );
   }
+
+  MobileHealthSchema _convertRrInterval(HealthDataPoint rrIntervalData) {
+
 }

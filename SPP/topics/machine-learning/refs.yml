@@ -24,14 +24,14 @@ forecasting-migraine-with-ml-based-on-diary-wearable:
   title: "Forecasting migraine with machine learning based on mobile phone diary and wearable data"
   author:
     [
-      "Anker Stubberud", 
-      "Sigrid Hegna Ingvaldsen", 
-      "Eiliv Brenner", 
-      "Ingunn Winnberg", 
-      "Alexander Olsen", 
-      "Gøril Bruvik Gravdahl", 
-      "Manjit Singh Matharu", 
-      "Parashkev Nachev", 
+      "Anker Stubberud",
+      "Sigrid Hegna Ingvaldsen",
+      "Eiliv Brenner",
+      "Ingunn Winnberg",
+      "Alexander Olsen",
+      "Gøril Bruvik Gravdahl",
+      "Manjit Singh Matharu",
+      "Parashkev Nachev",
       "Erling Tronvik",
     ]
   serial-number:
@@ -41,4 +41,4 @@ forecasting-migraine-with-ml-based-on-diary-wearable:
     - type: periodical
       title: Cephalgia
       volume: 43
-      issue: 5 
+      issue: 5
