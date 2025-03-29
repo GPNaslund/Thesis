@@ -1,7 +1,7 @@
-// lib/features/home/views/home_page.dart
+// lib/features/home/pages/home_page.dart
 
 import 'package:flutter/material.dart';
-import '../../data_fetching/pages/health_metric_selection_page.dart';
+import '../../permissions/pages/permission_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -45,7 +45,7 @@ class HomeButton extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HealthMetricSelectionPage()),
+          MaterialPageRoute(builder: (context) => const PermissionPage()),
         );
       },
       child: Text("Choose Health Metric"),

@@ -1,10 +1,9 @@
-// lib/features/data_fetching/pages/data_display_page.dart
-
 import 'package:flutter/material.dart';
 import '../controllers/data_fetching_controller.dart';
+import '../../../constants/metrics.dart';
 
 class DataDisplayPage extends StatefulWidget {
-  final String dataType;
+  final HealthMetric dataType;
 
   const DataDisplayPage({super.key, required this.dataType});
 
@@ -16,29 +15,30 @@ class DataDisplayPageState extends State<DataDisplayPage> {
   String dataFormat = "Choose a data format";
   String dataBoxOutput = "Waiting for data...";
   final DataFetchingController _dataFetchingController = DataFetchingController();
-  bool isLoading = false; // Loading indicator flag
+  bool isLoading = false;
 
-  // Function to fetch data when a format is selected
+  // Only support these for now based on plugin capability
+  final List<String> supportedFormats = ["Raw", "Open mHealth"];
+
   void updateFormat(String newFormat) async {
     setState(() {
-      dataFormat = "Displaying ${widget.dataType} data in $newFormat format";
-      dataBoxOutput = "Loading..."; // Temporary text while fetching
-      isLoading = true; // Show loading
+      dataFormat = "Displaying ${widget.dataType.displayName} data in $newFormat format";
+      dataBoxOutput = "Loading...";
+      isLoading = true;
     });
 
-    // Fetching data asynchronously
-    String fetchedData = await _dataFetchingController.getHealthData(widget.dataType, newFormat);
+    final fetchedData = await _dataFetchingController.getHealthData(widget.dataType, newFormat);
 
     setState(() {
-      dataBoxOutput = fetchedData; // Update with fetched data
-      isLoading = false; // Hide loading
+      dataBoxOutput = fetchedData;
+      isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("${widget.dataType} Data")),
+      appBar: AppBar(title: Text("${widget.dataType.displayName} Data")),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -49,13 +49,13 @@ class DataDisplayPageState extends State<DataDisplayPage> {
             SizedBox(height: 20),
             DataResultBox(dataOutput: dataBoxOutput, isLoading: isLoading),
             SizedBox(height: 10),
-            DataFormatChoiceButton(dataFormat: "Raw", onSelected: updateFormat),
-            SizedBox(height: 10),
-            DataFormatChoiceButton(dataFormat: "Open mHealth", onSelected: updateFormat),
-            SizedBox(height: 10),
-            DataFormatChoiceButton(dataFormat: "JSON", onSelected: updateFormat),
-            SizedBox(height: 10),
-            DataFormatChoiceButton(dataFormat: "FHIR", onSelected: updateFormat),
+            ...supportedFormats.map((format) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: DataFormatChoiceButton(
+                dataFormat: format,
+                onSelected: updateFormat,
+              ),
+            )),
           ],
         ),
       ),
@@ -63,7 +63,6 @@ class DataDisplayPageState extends State<DataDisplayPage> {
   }
 }
 
-// Label/Heading for result box
 class DataFormatLabel extends StatelessWidget {
   final String text;
 
@@ -84,7 +83,6 @@ class DataFormatLabel extends StatelessWidget {
   }
 }
 
-// Result box
 class DataResultBox extends StatelessWidget {
   final String dataOutput;
   final bool isLoading;
@@ -117,7 +115,6 @@ class DataResultBox extends StatelessWidget {
   }
 }
 
-// Buttons
 class DataFormatChoiceButton extends StatelessWidget {
   final String dataFormat;
   final Function(String) onSelected;
@@ -127,9 +124,7 @@ class DataFormatChoiceButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        onSelected(dataFormat);
-      },
+      onPressed: () => onSelected(dataFormat),
       child: Text(dataFormat),
     );
   }
