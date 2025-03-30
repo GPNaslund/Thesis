@@ -131,7 +131,7 @@ packages:
     source: sdk
     version: "0.0.0"
   health:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: health
       sha256: fce29d93359e09b42e9231339be83dabd20baf5dc50c7ff2723bdf79ba6cfc9d

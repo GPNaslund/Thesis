@@ -51,7 +51,7 @@ android {
 
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-core:5.0.0")
+        testImplementation("org.mockito:mockito-services:5.0.0")
         implementation "androidx.health.connect:connect-client:1.1.0-alpha12"
         implementation "androidx.activity:activity:1.6.1"
         implementation "androidx.appcompat:appcompat:1.6.1"
