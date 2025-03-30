@@ -1,26 +1,24 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/services/providers/apple_health_provider.dart';
 import 'package:wearable_health/services/auth/auth_config.dart';
 import 'package:wearable_health/services/enums/health_data_type.dart';
 import 'package:wearable_health/services/providers/health_connect_provider.dart';
-import 'package:wearable_health/services/backend/health_data_backend.dart';
 import 'package:wearable_health/services/data_transformer/health_data_transformer.dart';
 import 'package:wearable_health/services/providers/health_provider.dart';
-import 'package:wearable_health/services/synchronization/sync_config.dart';
 import 'package:wearable_health/wearable_health_data_constants.dart';
 
-enum SyncStatus { idle, collecting, transforming, sending, completed, error, stopping, stopped }
+enum SyncStatus { idle, collecting, transforming, completed, error}
 
 typedef ErrorHandler = void Function(dynamic error);
 
 class WearableHealth {
   final HealthProvider provider;
   final HealthDataTransformer transformer;
-  final HealthDataBackend backend;
-  final SyncConfig syncConfig;
   final ErrorHandler errorHandler;
   final List<HealthDataType> scope;
   final StreamController<SyncStatus> _statusController =
@@ -34,8 +32,6 @@ class WearableHealth {
   WearableHealth._({
     required this.provider,
     required this.transformer,
-    required this.backend,
-    required this.syncConfig,
     required this.errorHandler,
     required this.scope,
   });
@@ -44,8 +40,6 @@ class WearableHealth {
     AuthConfig authConfig,
     List<HealthDataType> scope,
     HealthDataTransformer transformer,
-    HealthDataBackend backend,
-    SyncConfig syncConfig,
     ErrorHandler errorHandler,
   ) {
     if (!Platform.isAndroid) {
@@ -55,8 +49,6 @@ class WearableHealth {
     return WearableHealth._(
       provider: HealthConnectProvider(authConfig, scope),
       transformer: transformer,
-      backend: backend,
-      syncConfig: syncConfig,
       errorHandler: errorHandler,
       scope: scope,
     );
@@ -66,8 +58,6 @@ class WearableHealth {
     AuthConfig authConfig,
     List<HealthDataType> scope,
     HealthDataTransformer transformer,
-    HealthDataBackend backend,
-    SyncConfig syncConfig,
     ErrorHandler errorHandler,
   ) {
     if (!Platform.isIOS) {
@@ -77,8 +67,6 @@ class WearableHealth {
     return WearableHealth._(
       provider: AppleHealthProvider(authConfig, scope),
       transformer: transformer,
-      backend: backend,
-      syncConfig: syncConfig,
       errorHandler: errorHandler,
       scope: scope,
     );
@@ -102,11 +90,29 @@ class WearableHealth {
     }
   }
 
-  Future<bool> _doRequestPermissions() async {
-    return await _channel.invokeMethod(
-      WearableHealthDataConstants.methodRequestPermissions,
-      _scopesToStringList(),
-    );
+  Future<bool> _doRequestPermissions(BuildContext context) async {
+    while (true) {
+      final result = await _channel.invokeMethod(WearableHealthDataConstants.methodRequestPermissions);
+      if (result == "SHOW_PRIVACY_POLICY") {
+        await _showPrivacyPolicy(context);
+        continue;
+      }
+      return result == true;
+    }
+  }
+
+  Future<void> _showPrivacyPolicy(BuildContext context) async {
+    if (provider.privacyPolicy != null) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: provider.privacyPolicy!),
+      );
+    } else {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DefaultPrivacyPolicyScreen())
+      );
+    }
   }
 
   List<String> _scopesToStringList() {
@@ -141,22 +147,4 @@ class WearableHealth {
     _statusController.close();
   }
 
-  Future<bool> stopCollecting() async {
-    try {
-      _updateStatus(SyncStatus.stopping);
-      var result = _doStopCollecting();
-      _updateStatus(SyncStatus.stopped);
-      return result;
-    } catch (e) {
-      _updateStatus(SyncStatus.error);
-      errorHandler(e);
-      return false;
-    }
-  }
-
-  Future<bool> _doStopCollecting() async {
-    return await _channel.invokeMethod(
-      WearableHealthDataConstants.methodStopCollecting, {}
-    );
-  }
 }

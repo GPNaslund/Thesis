@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wearable_health/services/auth/auth_config.dart';
-import 'package:wearable_health/services/backend/health_data_backend.dart';
 import 'package:wearable_health/services/data_transformer/health_data_transformer.dart';
-import 'package:wearable_health/services/enums/battery_level.dart';
 import 'package:wearable_health/services/enums/health_data_type.dart';
-import 'package:wearable_health/services/enums/network_type.dart';
-import 'package:wearable_health/services/synchronization/sync_config.dart';
 import 'package:wearable_health/wearable_health.dart';
 import 'package:wearable_health_example/android/permission_test_widget.dart';
 
@@ -23,17 +19,6 @@ class _AndroidWearableHealthState extends State<AndroidWearableHealth> {
     AuthConfig.automaticAuth(),
     [HealthDataType.heartRate, HealthDataType.steps],
     HealthDataTransformer.openMHealth(),
-    HealthDataBackend.http(
-      endpoint: 'https://example.com',
-      authHeaders: {'Authorization': 'Bearer your_token'},
-      retryAttempts: 3,
-    ),
-    SyncConfig(
-      networkType: NetworkType.wifiOnly,
-      batchSize: 100,
-      interval: Duration(minutes: 5),
-      batteryLevel: BatteryLevel.aboveThirtyPercent,
-    ),
         (error) => print(error),
   );
 

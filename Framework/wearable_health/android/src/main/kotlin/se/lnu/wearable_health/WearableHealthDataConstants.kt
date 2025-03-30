@@ -9,5 +9,4 @@ enum class WearableHealthDataConstants(val value: String) {
     METHOD_GET_PLATFORM_VERSION("getPlatformVersion"),
     METHOD_REQUEST_PERMISSIONS("requestPermissions"),
     METHOD_START_COLLECTING("startCollecting"),
-    METHOD_STOP_COLLECTING("stopCollecting")
 }

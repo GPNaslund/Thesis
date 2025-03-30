@@ -10,12 +10,12 @@ class DataCollectionWidget extends StatefulWidget {
   final Function(bool isCollecting) onCollectionStateChange;
 
   const DataCollectionWidget({
-    Key? key,
+    super.key,
     required this.wearableHealthPlugin,
     required this.isEnabled,
     required this.isCollecting,
     required this.onCollectionStateChange,
-  }) : super(key: key);
+  });
 
   @override
   State<DataCollectionWidget> createState() => _DataCollectionWidgetState();
@@ -23,7 +23,7 @@ class DataCollectionWidget extends StatefulWidget {
 
 class _DataCollectionWidgetState extends State<DataCollectionWidget> {
   String _collectionStatus = 'Not started';
-  List<String> _collectedData = [];
+  final List<String> _collectedData = [];
   StreamSubscription? _dataSubscription;
 
   Future<void> _startDataCollection() async {
@@ -54,21 +54,11 @@ class _DataCollectionWidgetState extends State<DataCollectionWidget> {
               case SyncStatus.transforming:
                 _collectionStatus = 'Transforming collected data...';
                 break;
-              case SyncStatus.sending:
-                _collectionStatus = 'Sending data to backend...';
-                break;
               case SyncStatus.completed:
                 _collectionStatus = 'Collection cycle completed';
                 break;
               case SyncStatus.error:
                 _collectionStatus = 'Error during collection';
-                break;
-              case SyncStatus.stopping:
-                _collectionStatus = 'Stopping collection...';
-                break;
-              case SyncStatus.stopped:
-                _collectionStatus = 'Collection stopped';
-                widget.onCollectionStateChange(false);
                 break;
               default:
                 _collectionStatus = 'Status: $status';
@@ -102,30 +92,6 @@ class _DataCollectionWidgetState extends State<DataCollectionWidget> {
     }
   }
 
-  Future<void> _stopDataCollection() async {
-    try {
-      // Stop the data collection first
-      final bool stopped = await widget.wearableHealthPlugin.stopCollecting();
-
-      // Then cancel the subscription
-      await _dataSubscription?.cancel();
-      _dataSubscription = null;
-
-      setState(() {
-        if (stopped) {
-          _collectionStatus = 'Collection stopped';
-        } else {
-          _collectionStatus = 'Failed to stop collection';
-        }
-        widget.onCollectionStateChange(false);
-      });
-    } catch (e) {
-      setState(() {
-        _collectionStatus = 'Error stopping collection: $e';
-        widget.onCollectionStateChange(false);
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -159,10 +125,6 @@ class _DataCollectionWidgetState extends State<DataCollectionWidget> {
                   child: const Text('Start Collecting'),
                 ),
                 const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: widget.isCollecting ? _stopDataCollection : null,
-                  child: const Text('Stop Collecting'),
-                ),
               ],
             ),
             const SizedBox(height: 20),

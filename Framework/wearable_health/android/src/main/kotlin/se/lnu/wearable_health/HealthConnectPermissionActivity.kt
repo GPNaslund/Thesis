@@ -21,6 +21,7 @@ class HealthConnectPermissionActivity : ComponentActivity() {
     companion object {
         const val PERMISSION_RESULT_KEY = "permission_result"
 
+
         val PERMISSIONS = setOf(
             HealthPermission.getReadPermission(StepsRecord::class),
             HealthPermission.getReadPermission(HeartRateRecord::class),
