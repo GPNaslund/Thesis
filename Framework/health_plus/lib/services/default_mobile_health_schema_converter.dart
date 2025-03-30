@@ -53,6 +53,6 @@ class DefaultMobileHealthSchemaConverter
     );
   }
 
-  MobileHealthSchema _convertRrInterval(HealthDataPoint rrIntervalData) {
+  // MobileHealthSchema _convertRrInterval(HealthDataPoint rrIntervalData) {
 
 }

@@ -5,6 +5,8 @@ import 'package:health_plus/schemas/mobile_health_schema/mobile_health_schema.da
 import 'package:health_plus/services/mobile_health_schema_converter.dart';
 
 abstract class HealthProvider {
+  Future<void> initialize();
+
   Future<bool?> checkPermissions();
 
   Future<bool> requestPermissions();
@@ -26,4 +28,5 @@ abstract class HealthProvider {
   ) {
     return GoogleHealthConnect(types, schemaConverter);
   }
+
 }
