@@ -1,0 +1,4 @@
+enum ProviderType {
+  appleHealthKit,
+  googleHealthConnect,
+}
