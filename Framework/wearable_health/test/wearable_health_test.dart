@@ -19,4 +19,11 @@ void main() {
     expect(initialPlatform, isInstanceOf<MethodChannelWearableHealth>());
   });
 
+  test('getPlatformVersion', () async {
+    WearableHealth wearableHealthPlugin = WearableHealth();
+    MockWearableHealthPlatform fakePlatform = MockWearableHealthPlatform();
+    WearableHealthPlatform.instance = fakePlatform;
+
+    expect(await wearableHealthPlugin.getPlatformVersion(), '42');
+  });
 }

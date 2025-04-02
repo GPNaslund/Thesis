@@ -14,4 +14,6 @@ class MethodChannelWearableHealth extends WearableHealthPlatform {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
+  
 }

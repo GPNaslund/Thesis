@@ -1,5 +1,4 @@
-package se.lnu.wearable_health
-/*
+package se.lnu.thesis.wearable_health
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -26,4 +25,3 @@ internal class WearableHealthPluginTest {
     Mockito.verify(mockResult).success("Android " + android.os.Build.VERSION.RELEASE)
   }
 }
-*/

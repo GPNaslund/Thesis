@@ -4,7 +4,7 @@ version: 0.0.1
 homepage:
 
 environment:
-  sdk: ^3.7.0
+  sdk: ^3.7.2
   flutter: '>=3.3.0'
 
 dependencies:
@@ -35,7 +35,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: se.lnu.wearable_health
+        package: se.lnu.thesis.wearable_health
         pluginClass: WearableHealthPlugin
       ios:
         pluginClass: WearableHealthPlugin

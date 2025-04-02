@@ -1,4 +1,4 @@
-group = "se.lnu.wearable_health"
+group = "se.lnu.thesis.wearable_health"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -11,7 +11,6 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.7.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-
     }
 }
 
@@ -26,7 +25,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "se.lnu.wearable_health"
+    namespace = "se.lnu.thesis.wearable_health"
 
     compileSdk = 35
 
@@ -45,16 +44,14 @@ android {
     }
 
     defaultConfig {
-        minSdk = 26
-
+        minSdk = 21
     }
 
     dependencies {
+        implementation "androidx.health.connect:connect-client:1.1.0-beta01"
+        implementation("androidx.activity:activity-ktx:1.10.1")
         testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-services:5.0.0")
-        implementation "androidx.health.connect:connect-client:1.1.0-alpha12"
-        implementation "androidx.activity:activity:1.6.1"
-        implementation "androidx.appcompat:appcompat:1.6.1"
+        testImplementation("org.mockito:mockito-core:5.0.0")
     }
 
     testOptions {
@@ -68,7 +65,4 @@ android {
             }
         }
     }
-}
-dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.0'
 }
