@@ -1,2 +1,19 @@
 # REFERENCES ARE ADDED HERE
 # FORMAT GUIDE: https://github.com/typst/hayagriva/blob/main/docs/file-format.md
+
+neurawave:
+  type: web
+  title: Neurawave's website
+  author: Neurawave
+  url: https://www.neurawave.se
+
+introduction-to-design-research:
+  type: chapter
+  page-range: 1-13
+  parent:
+    type: book
+    title: Design Science Research Cases
+    author: ["Jan vom Brocke", "Alan Hevner", "Alexander Maedche"]
+    date: 2020-08-01
+    serial-number:
+      doi: http://dx.doi.org/10.1007/978-3-030-46781-4_1

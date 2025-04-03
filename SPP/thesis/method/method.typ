@@ -1,0 +1,6 @@
+= 2. Method
+The applied method for this thesis is design science research (DSR). We choose DSR because of its natural fit when creating an software artefact. DSR is described by vom Brocke et al @introduction-to-design-research as a paradigm which seeks to enhance knowledge through the creation of an innovative artefact. vom Brock et al @introduction-to-design-research explains further that the aim of DSR is to generate knowledge about how things can and should be constructed, this knowledge is referred to as design knowledge within the DSR paradigm.
+== 2.1 Research project
+Neurawave @neurawave presented the need for being able to collect health metrics that could be used for migraine prediction using machine learning. The requirements provided by Neurawave was that the data collection mechanism had to be integrated into their cross platform mobile application. We started by precisely defining the problem, and came to the conclusion that implementing design science would be the most suitable method to use when creating this software artefact. 
+
+#bibliography("refs.yml")
