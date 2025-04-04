@@ -31,3 +31,42 @@ design-science-research-methodology:
     title: "Journal of Management Information Systems"
     volume: 24
     issue: 3
+
+interviewing-as-a-data-collection-method:
+  type: article
+  tite: "Interviewing as a data collection method: A critical review"
+  author: ["Hamza Alshenqeeti"]
+  serial-number: 
+    doi: 10.5430/elr.v3n1p39
+  date: 2014-03-31
+  parent:
+    type: periodical
+    title: "English Linguistics Research"
+    volume: 3
+    issue: 1
+
+questionnaire-designing-for-a-survey:
+  type: article
+  title: "Questionnaire designing for a survey"
+  author: ["S Roopa", "MS Rani"]
+  serial-number:
+    doi: 10.5005/jp-journals-10021-1104
+  date: 2012-10-01
+  parent:
+    type: periodical
+    title: "Journal of Indian Orthodontic Society"
+    volume: 46
+    issue: 4
+
+literature-reviews-vs-systematic-reviews:
+  type: article
+  title: "Literature reviews vs systematic reviews"
+  author: ["Priscilla Robinson", "John Lowe"]
+  serial-number:
+    doi: 10.1111/1753-6405.12393
+  date: 2015-04-01
+  parent:
+    type: periodical
+    title: "Australian and New Zealand Journal of Public Health"
+    volume: 39
+    issue: 2
