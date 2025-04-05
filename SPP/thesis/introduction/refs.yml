@@ -1,2 +1,81 @@
 # REFERENCES ARE ADDED HERE
 # FORMAT GUIDE: https://github.com/typst/hayagriva/blob/main/docs/file-format.md
+
+impact-wearable-technologies:
+  type: article
+  title: "The Impact of Wearable Technologies in Health Research: Scoping Review"
+  author:
+    [
+      "Sophie Huhn",
+      "Miriam Axt",
+      "Hanns-Christian Gunga",
+      "Martina Anna Maggioni",
+      "Stephen Munga",
+      "David Obor",
+      "Ali Sié",
+      "Valentin Boudo",
+      "Aditi Bunker",
+      "Rainer Sauerborn",
+      "Till Bärnighausen",
+      "Sandra Barteit",
+    ]
+  serial-number:
+    pmid: 35076409
+  date: 2022-01-25
+  parent:
+    type: periodical
+    title: JMIR Mhealth Uhealth
+    volume: 10
+    issue: 1
+    publisher: JMIR Publications Inc.
+
+wearable-sales-statistics:
+  type: report
+  title: "Wearable Technology Market Size, Share & Trends Analysis Report By Product (Head & Eyewear, Wristwear), By Application (Consumer Electronics, Healthcare), By Region (Asia Pacific, Europe), And Segment Forecasts, 2023 - 2030"
+  author: Grand View Research
+  serial-number: 978-1-68038-165-8
+
+wearable-devices-healthcare:
+  type: article
+  title: "Wearable Devices: Implications for Precision Medicine and the Future of Health Care"
+  author:
+    [
+      "Mohan Babu",
+      "Ziv Lautman",
+      "Xiangping Lin",
+      "Milan H B Sobota",
+      "Michael P Snyder",
+    ]
+  serial-number:
+    pmid: 37983384
+  date: 2023-11-20
+  parent:
+    type: periodical
+    title: Annual Review of Medicine
+    volume: 1
+    issue: 1
+    publisher: Annual Reviews
+
+migraine-triggers:
+  type: article
+  title: "Migraine Triggers: An Overview of the Pharmacology, Biochemistry, Atmospherics, and Their Effects on Neural Networks"
+  author: "Hassan Kesserwani"
+  serial-number:
+    pmid: 33954064
+  date: 2021-04
+  parent:
+    type: periodical
+    title: Cureus
+    volume: 13
+    issue: 4
+    publisher: Cureus Inc
+
+react-native-health:
+  type: web
+  title: React Native Health
+  url: https://www.npmjs.com/package/react-native-health
+
+health-package:
+  type: web
+  title: Health Package
+  url: https://pub.dev/packages/health
