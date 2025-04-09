@@ -1,9 +1,28 @@
 = 2. Method
 The applied method for this thesis is Design Science Research (DSR). DSR was chosen due to its natural fit for projects involved in creation of a software artifact. It is described by vom Brocke et al @introduction-to-design-research as a paradigm that seeks to enhance knowledge through the creation of an innovative artifacts. They further explain that the aim of DSR is to generate knowledge about how things can and should be constructed, knowledge that is referred to as design knowledge within the DSR paradigm.
-
+Within the scope of this thesis, several research methods are used in combination. These include literature review to understand the theoretical background, artifact construction through iterative development and experimentation to evaluate the artifacts ability to meet the defined objectives. Together these methods form a multimethod approach aligned with the DSR process model.
 
 == 2.1 Research project
-The company Neurawave @neurawave presented a need for collecting health metrics that could be used for migraine prediction using machine learning. One of the key requirements was that the data collection mechanism had to be integrated into their existing cross-platform mobile application. We began by clearly defining the problem and concluded that the Design Science Research methodology would be the most appropriate method for addressing it. In this work, we follow the DSR methodology outlined by Peffers et al @design-science-research-methodology. 
+The company Neurawave @neurawave presented a need for collecting health metrics that could be used for migraine prediction with machine learning. In this work, we follow the DSR methodology outlined by Peffers et al @design-science-research-methodology.
+
+=== Phase 1 - Problem identification and insight gathering
+We began our research project by conducting open-ended interviews with the founders of neurawave @neurawave. This approach helps us build a deeper understanding of both stakeholder needs and the problem domain. One of the key requirements was that the data collection mechanism had to be integrated into their existing cross-platform mobile application. The main reason for this requirement is the ability for the existing application to act upon realtime health data. Additionally, we conducted literature review to gather insights regarding the state of the art available solutions, and which health data is commonly used in migraine prediction.
+
+=== Phase 2 - Objective formulation
+Based on the analysis of identified requirements gather in open-ended interviews and resarch gap found in the literature review, we have defined the projects objectives.
+
+=== Phase 3 - Design and implementation
+Based on the formulated objectives, the software artifact which is the data collection framework for mobile platforms was developed and refined iteratively.
+
+=== Phase 4 - Demonstrating efficacy
+Once the artifact has been developed, we will demonstrate its capabilities in addressing the defined problem through system testing. This will be followed by rigarous testing of how well the artifact meets the objectives, likely by comparing the implemented functionality with the stakeholder-defined goals.
+
+=== Phase 5 - Critical evaluation and feedback integration
+The quantitative assessments using controlled experiment is applied to measure the accuracy and reliability of the data collection framework in different scenarios or use-cases.
+
+=== Phase 6 - Dissemination and community engagement
+Our findings and its implications are articulated in this thesis work for dissemination among AI researchers and developers.
+
 
 The next step in the project involved defining the objectives of a solution, which had to be closely aligned with the problem identified and the needs expressed by the stakeholders. During this phase, we will also conduct a literature review to gather insights into existing solutions and to better understand the current state of the problem domain. 
 
@@ -24,6 +43,33 @@ During the design and development phase, we followed the artifact creation proce
 To evaluate the developed solution, we will use experimentation as the primary method of validating functionality. According to Basili et al. @experimentation-in-software-engineering, experimentation is an iterative process of hypothesizing and testing. In our case, this involves defining (or redefining) software requirements, implementing them (the hypothesis), and verifying wether those requirements are fulfilled (the test).
 
 Additionally, we will perform validation to ensure tha the plugin's software requirements align with the original stakeholder expectation @the-role-of-software-verification. As an alternative to experimentation, we considered survey-based research to gather stakeholder opinions on desired functionality. However, we ultimately decided against this due to our limited timeframe. We also believed that the iterative loop supported by experimentation would be hindered by the time required to create, distribute and analyze a survey. In our context, experimentation offers more immediate feedback and supports rapid iteration, which we viewed as essential for effective development.
+
+== 2.3 Data for migraine prediction using machine learning
+
+During the literature review of previous studies investigating migraine prediction using machine learning, we found only two studies @machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable. The health metrics used in both studies are outlined below. It is worth noting that several health metrics was included in either study, such as hours of working @forecasting-migraine-with-ml-based-on-diary-wearable out and step count @machine-learning-wearable-technology. We also found some studies @migraine-review-general-practice, @triggers-protectors-predictors, @forecasting-migraine that examined different triggers (internal and external factors) such as weather, diet, hormonal changes that could be valuable in predicting migraine episodes, but none of those were included in the studies that combined migraine prediction with machine learning.
+
+#table(
+  columns: (1fr, auto, auto, auto),
+  inset: 10pt,
+  align: horizon,
+  table.header(
+    [], [*Health metric*], [*Description*], [*Refs*],
+  ),
+  /* HEART RATE */
+  [], [*Heart rate*], [The rate of heart beats per minute.], [@machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable],
+  /* HEART RATE VARIABILITY */
+  [], [*Heart rate variability*], [Variation in time between heartbeats], [@machine-learning-wearable-technology],
+  /* SKIN TEMPERATURE */
+  [], [*Skin temperature*], [The temperature of the skin, preferably measured at finger or wrist], [@machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable],
+  /* SKIN CONDUCTANCE */
+  [], [*Skin conductance*], [Measurement of how good the skin conducts electricity. Has been shown to increase due to sweating, as a response to stress], [@machine-learning-wearable-technology],
+  /* RESPIRATORY RATE */
+  [], [*Respiratory rate*], [Measurement of the rate of breathing. Measured as breaths per minute.], [@machine-learning-wearable-technology],
+  /* SLEEP TIME */
+  [], [*Sleep time*], [Measurement the amount of hours slept], [@machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable],
+)
+
+We have decided to include heart rate and skin temperature in our data processing. The selection is based on a combination on what data is available from regular wearables and what health metrics have been shown in previous studies to be of high value.
 
 == 2.3 Reliability and validity
 === Validity
@@ -60,7 +106,7 @@ The component is designed to collect health metrics that are sensitive by nature
 
 To address this, all test data used during development and experimentation will be anonymized. No user names, contact information, or device IDs linked to individuals will be stored or processed in any way that could allow for re-identification. No data will be stored within the component, only processing of the data. No data will be shared externally or stored in the cloud.
 
-== Sampling an bias
+== Sampling bias
 The testing of the component will be done with using a limited number of wearable devices and datasets related to migraine prediction. As a result, the dataset is narrow in scope which may introduce selection bias. This poses a limitation upon the generalizability of the results to other conditions such as other devices or populations. Since the primary objective is to develop and evaluate a working prototype in a focused context, this tradeoff is considered acceptable for the scope of the project. 
 
 == Participation and consent
@@ -68,5 +114,7 @@ If any real user data is collected (for example, if Neurawave employees or exter
 
 == Risk of harm
 This project poses minimal risk of harm. as it does not involve any physical or psychological intervention. However, improper handling of sensitive data could lead to privacy breaches. To minimize this risk, the component itself will not store any data.
+
+
 
 #bibliography("refs.yml")
