@@ -48,3 +48,6 @@ test_outputs/
 # Environment & secrets
 .env
 .env.*
+
+# Todo document
+todo.md
