@@ -24,18 +24,12 @@ The quantitative assessments using controlled experiment is applied to measure t
 === Phase 6 - Dissemination and community engagement
 Our findings and its implications are articulated in this thesis work for dissemination among AI researchers and developers.
 
-
-The next step in the project involved defining the objectives of a solution, which had to be closely aligned with the problem identified and the needs expressed by the stakeholders. During this phase, we will also conduct a literature review to gather insights into existing solutions and to better understand the current state of the problem domain. 
-
-Subsequently, we will proceed to develop the artifact, in our case the data collection component for mobile platforms. The development will be carried out in an iterative manner, including both the creation of the software and the refinement of its functionality based on the defined objectives.
-Once the artifact has been developed, we will demonstrate its capabilities in addressing aspects of the defined problem through experimentation or simulation. This will be followed by rigorous evaluation of how well the artifact meets the objectives, likely by comparing the implemented functionality with the stakeholder-defined goals.
-
 == 2.2 Research methods
-We began our research project by conducting open-ended interviews with the founders of Neurawave @neurawave. Open-ended interviewing allows for a flexible, free-flowing conversation and is considered a qualitative method of data collection @interviewing-as-a-data-collection-method. This method was chosen because the stakeholders possessed significantly more domain knowledge than us, making them essential in framing the problem accurately. As described by Alshenqeeti @interviewing-as-a-data-collection-method, the purpose of open-ended interviews is to "broaden the scope of understanding of investigated phenomena". We believed this approach would help us build a deeper understanding of both stakeholder needs and the problem domain. 
+We began our research project by conducting open-ended interviews with the founders of Neurawave @neurawave. Open-ended interviewing allows for a flexible, free-flowing conversation and is considered a qualitative method of data collection @interviewing-as-a-data-collection-method. This method was chosen because the stakeholders possessed significantly more domain knowledge than us, making them essential in framing the problem accurately. As described by Alshenqeeti @interviewing-as-a-data-collection-method, the purpose of open-ended interviews is to "broaden the scope of understanding of investigated phenomena". We believed this approach would help us build a deeper understanding of both stakeholder needs and the problem domain.
 
-Open-ended interviews fall within the broader category of qualitative methods, which are generally holistic and aimed at answering "what" questions. In contrast, structured interviews are more quantitative, relying on closed-ended questions, such as those with yes/no responses @interviewing-as-a-data-collection-method. As Lakshman et al. @quantitative-vs-qualitative-research-methods explain, quantitative methods focus on examining the effect of an independent variable on a dependent variable in a measurable, numerical way. However, at this early stage in the project, a qualitative approach was better suited to developing our understanding and framing our objectives. 
+Open-ended interviews fall within the broader category of qualitative methods, which are generally holistic and aimed at answering "what" questions. In contrast, structured interviews are more quantitative, relying on closed-ended questions, such as those with yes/no responses @interviewing-as-a-data-collection-method. As Lakshman et al. @quantitative-vs-qualitative-research-methods explain, quantitative methods focus on examining the effect of an independent variable on a dependent variable in a measurable, numerical way. However, at this early stage in the project, a qualitative approach was better suited to developing our understanding and framing our objectives.
 
-Following the interviews, we conducted litterature research to expand our contextual understanding of the problem area. Literature research involves exploring a broad body of work related to a topic and is typically less rigid than a systematic literature review @literature-reviews-vs-systematic-reviews. A systematic review, by contrast, targets a specific research question and is intended to gather empirical evidence to support conclusions. We chose a narrative-style literature review to ground our work theoretically and better understand the current landscape of data collection for health-related machine learning applications. 
+Following the interviews, we conducted litterature research to expand our contextual understanding of the problem area. Literature research involves exploring a broad body of work related to a topic and is typically less rigid than a systematic literature review @literature-reviews-vs-systematic-reviews. A systematic review, by contrast, targets a specific research question and is intended to gather empirical evidence to support conclusions. We chose a narrative-style literature review to ground our work theoretically and better understand the current landscape of data collection for health-related machine learning applications.
 
 Alternative approaches, such as expert interviews could also have been employed to gather real-world insights. As described by Döringer @the-problem-centered-expert-interview, expert interviews are valuable for problem-centered exploration and knowledge gathering. However, due to the time and resource constraints, this method was not feasible within the scope of this thesis. Nonetheless, it represents a promising avenue for future research and validation.
 
@@ -48,6 +42,10 @@ Additionally, we will perform validation to ensure tha the plugin's software req
 == 2.3 Data for migraine prediction using machine learning
 
 During the literature review of previous studies investigating migraine prediction using machine learning, we found only two studies @machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable. The health metrics used in both studies are outlined below. It is worth noting that several health metrics was included in either study, such as hours of working @forecasting-migraine-with-ml-based-on-diary-wearable out and step count @machine-learning-wearable-technology. We also found some studies @migraine-review-general-practice, @triggers-protectors-predictors, @forecasting-migraine that examined different triggers (internal and external factors) such as weather, diet, hormonal changes that could be valuable in predicting migraine episodes, but none of those were included in the studies that combined migraine prediction with machine learning.
+
+== 2.4 Wearables and datastores
+
+We decided that the framework should target the native health data stores due to the fact that they provide a unified API for extracting health data that is not affected by the third party wearable. Since Android has 71.9% of the global market share and IoS having 27.68% @mobile-os-market, thus making Google Health Connect and Apple Health Kit the native data stores we mainly target. During the validation of the framework we will perform experiments using Apple Watch, Google Fitbit and Garmin smart watches as providers of health data to the native datastores. The selection of wearables are based on available resources and a reasonable coverage of the most common wearables.
 
 #table(
   columns: (1fr, auto, auto, auto),
@@ -72,21 +70,21 @@ During the literature review of previous studies investigating migraine predicti
 
 We have decided to include heart rate and skin temperature in our data processing. The selection is based on a combination on what data is available from regular wearables and what health metrics have been shown in previous studies to be of high value.
 
-== 2.3 Reliability and validity
+== 2.5 Reliability and validity
 === Validity
-One limitation related to validity stems from the scope of the evaluation. The developed component will be tested by two individuals in controlled, but limited, settings. As such, the generalizability of the findings to a broader user base or different use cases is uncertain. Furthermore, the component is validated exclusively on migraine related health data. While it may be adaptable to other domains within health monitoring, such applicability remains untested and therefore unknown. 
+One limitation related to validity stems from the scope of the evaluation. The developed component will be tested by two individuals in controlled, but limited, settings. As such, the generalizability of the findings to a broader user base or different use cases is uncertain. Furthermore, the component is validated exclusively on migraine related health data. While it may be adaptable to other domains within health monitoring, such applicability remains untested and therefore unknown.
 
-Another validity concern involves the integration of the component with the datastores and/or wearable devices. The component will initially be tested using two or three specific health data providers. Its performance and compatibility with other, non integrated wearables remain unverified, and thus it cannot be assumed that the framework will function the equally well across other health data providers. 
+Another validity concern involves the integration of the component with the datastores and/or wearable devices. The component will initially be tested using two or three specific health data providers. Its performance and compatibility with other, non integrated wearables remain unverified, and thus it cannot be assumed that the framework will function the equally well across other health data providers.
 
 Additionally the component rely on third party API's for data collection. Any inaccuracies or failure in those APIs could directly compromise the integrity of the data and therefore the validity of the results. This is particularly concerning given that the quality and frequency of data vary significantly between high cost devices (e.g, Apple Watch, Fitbit) and low cost alternatives (e.g, Bangle.js, EmotiBit). The component might perform well in high quality data environments but underperform in cases where the input data is sparse, noisy or unreliable.
 
 === Reliability
-A significant threat to reliability is the dynamic nature of third party wearable health data provider APIs. These APIs are frequently updated, and changes in their structure or functionality may break the integration with out framework. This implies that future researchers attempting to replicate this study might need to adapt the codebase to updated APIs. To mitigate this risk, we will document the integration process thoroughly and provide implementation guides to facilitate replication. 
+A significant threat to reliability is the dynamic nature of third party wearable health data provider APIs. These APIs are frequently updated, and changes in their structure or functionality may break the integration with out framework. This implies that future researchers attempting to replicate this study might need to adapt the codebase to updated APIs. To mitigate this risk, we will document the integration process thoroughly and provide implementation guides to facilitate replication.
 
-On the other hand, the controlled experiments conducted as a part of this project will be carefully designed and well documented. This will support the reproducibility of results and allow others to validate the findings under similar conditions. 
+On the other hand, the controlled experiments conducted as a part of this project will be carefully designed and well documented. This will support the reproducibility of results and allow others to validate the findings under similar conditions.
 
 === Risks and mitigations strategies
-A number of general risks may impact both the reliability and validity of the project outcomes: 
+A number of general risks may impact both the reliability and validity of the project outcomes:
 
 - Lack of access to wearable data may hinder testing or validation of the component under real world conditions. To address this, we prioritize using devices with public or open APIs and ensure local caching of test data were possible.
 - Complexity of data normalization and integration may result in inconsistent behavior across devices. This will be mitigated by adopting standardized data formats and implementing preprocessing checks.
@@ -98,20 +96,20 @@ A number of general risks may impact both the reliability and validity of the pr
 
 By identifying these threats and planning accordingly, this project strives to maintain both reliability and validity, despite the challenges inherent in working with third-party hardware and health data.
 
-== 2.4 Ethical considerations
+== 2.6 Ethical considerations
 While this project doest not involve direct interaction with human participants outside of the stakeholders in the initial interviews, it does involve collecting and processing of health related data via wearable devices. This introduces several ethical considerations, particular around privacy, data confidentiality and data ownership.
 
 
 === Confidentiality
-The component is designed to collect health metrics that are sensitive by nature, such as heart rate, heart rate variability and skin temperature. Even though no personally identifiable information is intended to be handled, care must be taken to ensure that the processing of data is in accordance with privacy regulations such as GDPR. 
+The component is designed to collect health metrics that are sensitive by nature, such as heart rate, heart rate variability and skin temperature. Even though no personally identifiable information is intended to be handled, care must be taken to ensure that the processing of data is in accordance with privacy regulations such as GDPR.
 
 To address this, all test data used during development and experimentation will be anonymized. No user names, contact information, or device IDs linked to individuals will be stored or processed in any way that could allow for re-identification. No data will be stored within the component, only processing of the data. No data will be shared externally or stored in the cloud.
 
 == Sampling bias
-The testing of the component will be done with using a limited number of wearable devices and datasets related to migraine prediction. As a result, the dataset is narrow in scope which may introduce selection bias. This poses a limitation upon the generalizability of the results to other conditions such as other devices or populations. Since the primary objective is to develop and evaluate a working prototype in a focused context, this tradeoff is considered acceptable for the scope of the project. 
+The testing of the component will be done with using a limited number of wearable devices and datasets related to migraine prediction. As a result, the dataset is narrow in scope which may introduce selection bias. This poses a limitation upon the generalizability of the results to other conditions such as other devices or populations. Since the primary objective is to develop and evaluate a working prototype in a focused context, this tradeoff is considered acceptable for the scope of the project.
 
 == Participation and consent
-If any real user data is collected (for example, if Neurawave employees or external users voluntarily contribute data for evaluation), explicit informed consent will be obtained in written form. Participants will be made aware of what data is being collected for processing and how it will be used. Participation will be strictly voluntary, and participants will have the right to withdraw at any time without any consequence. 
+If any real user data is collected (for example, if Neurawave employees or external users voluntarily contribute data for evaluation), explicit informed consent will be obtained in written form. Participants will be made aware of what data is being collected for processing and how it will be used. Participation will be strictly voluntary, and participants will have the right to withdraw at any time without any consequence.
 
 == Risk of harm
 This project poses minimal risk of harm. as it does not involve any physical or psychological intervention. However, improper handling of sensitive data could lead to privacy breaches. To minimize this risk, the component itself will not store any data.
