@@ -21,7 +21,13 @@ introduction-to-design-research:
 design-science-research-methodology:
   type: article
   title: "A Design Science Research Methodology for Information Systems Research"
-  author: ["Ken Peffers", "Tuure Tuunanen", "Marcus A. Rothenberger", "Samir Chatterjee"]
+  author:
+    [
+      "Ken Peffers",
+      "Tuure Tuunanen",
+      "Marcus A. Rothenberger",
+      "Samir Chatterjee",
+    ]
   serial-number:
     doi: 10.2753/MIS0742-1222240302
   date: 2007
@@ -86,7 +92,14 @@ the-problem-centered-expert-interview:
 quantitative-vs-qualitative-research-methods:
   type: article
   title: "Quantitative vs Qualitative research methods"
-  author: ["M. Lakshman", "Leena Sinha", "Moumita Biswas", "Maryann Charles", "N.K. Arora"]
+  author:
+    [
+      "M. Lakshman",
+      "Leena Sinha",
+      "Moumita Biswas",
+      "Maryann Charles",
+      "N.K. Arora",
+    ]
   serial-number:
     doi: https://doi.org/10.1007/BF02820690
   date: 2000-05-01
@@ -195,7 +208,6 @@ triggers-protectors-predictors:
       volume: 12
       issue: 81
 
-
 forecasting-migraine:
   type: article
   title: Forecasting Migraine Attacks and the Utility of Identifying Triggers
@@ -209,3 +221,9 @@ forecasting-migraine:
       title: Current pain and headache reports
       volume: 22
       issue: 9
+
+mobile-os-market:
+  type: web
+  title: Mobile os market share
+  author: Statcounter
+  url: https://gs.statcounter.com/os-market-share/mobile/worldwide
