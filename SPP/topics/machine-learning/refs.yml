@@ -42,3 +42,45 @@ forecasting-migraine-with-ml-based-on-diary-wearable:
       title: Cephalgia
       volume: 43
       issue: 5
+
+migraine-review-general-practice:
+  type: article
+  title: Migraine review for general practice
+  author:
+    ["Antonio L Aguilar-Shea", "Javier A Membrilla Md", "Javier Diaz-de-Teran"]
+  serial-number:
+    doi: 10.1016/j.aprim.2021.102208
+  date: 2021-11-16
+  parent:
+    - type: periodical
+      title: Aten Primaria
+      volume: 54
+      issue: 2
+      publisher: Elsevier España, S.L.U.
+
+triggers-protectors-predictors:
+  type: article
+  title: Triggers, Protectors, and Predictors in Episodic Migraine
+  author: ["Michael J Marmura"]
+  serial-number:
+    doi: 10.1007/s11916-018-0734-0
+  date: 2018-10-05
+  parent:
+    - type: periodical
+      title: Current pain and headache reports
+      volume: 12
+      issue: 81
+
+forecasting-migraine:
+  type: article
+  title: Forecasting Migraine Attacks and the Utility of Identifying Triggers
+  author:
+    ["Dana P Turner", "Adriana D Lebowitz", "Ivana Chtay", "Timothy T Houle"]
+  serial-number:
+    doi: 10.1007/s11916-018-0715-3
+  date: 2018-07-16
+  parent:
+    - type: periodical
+      title: Current pain and headache reports
+      volume: 22
+      issue: 9

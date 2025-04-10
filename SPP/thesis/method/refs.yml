@@ -17,3 +17,195 @@ introduction-to-design-research:
     date: 2020-08-01
     serial-number:
       doi: http://dx.doi.org/10.1007/978-3-030-46781-4_1
+
+design-science-research-methodology:
+  type: article
+  title: "A Design Science Research Methodology for Information Systems Research"
+  author: ["Ken Peffers", "Tuure Tuunanen", "Marcus A. Rothenberger", "Samir Chatterjee"]
+  serial-number:
+    doi: 10.2753/MIS0742-1222240302
+  date: 2007
+  parent:
+    type: periodical
+    title: "Journal of Management Information Systems"
+    volume: 24
+    issue: 3
+
+interviewing-as-a-data-collection-method:
+  type: article
+  tite: "Interviewing as a data collection method: A critical review"
+  author: ["Hamza Alshenqeeti"]
+  serial-number:
+    doi: 10.5430/elr.v3n1p39
+  date: 2014-03-31
+  parent:
+    type: periodical
+    title: "English Linguistics Research"
+    volume: 3
+    issue: 1
+
+questionnaire-designing-for-a-survey:
+  type: article
+  title: "Questionnaire designing for a survey"
+  author: ["S Roopa", "MS Rani"]
+  serial-number:
+    doi: 10.5005/jp-journals-10021-1104
+  date: 2012-10-01
+  parent:
+    type: periodical
+    title: "Journal of Indian Orthodontic Society"
+    volume: 46
+    issue: 4
+
+literature-reviews-vs-systematic-reviews:
+  type: article
+  title: "Literature reviews vs systematic reviews"
+  author: ["Priscilla Robinson", "John Lowe"]
+  serial-number:
+    doi: 10.1111/1753-6405.12393
+  date: 2015-04-01
+  parent:
+    type: periodical
+    title: "Australian and New Zealand Journal of Public Health"
+    volume: 39
+    issue: 2
+
+the-problem-centered-expert-interview:
+  type: article
+  title: "The problem-centered expert interview. Combining qualitative interviewing approaches for investigating implicit expert knowledge"
+  author: ["Stefanie Döringer"]
+  serial-number:
+    doi: 10.1080/13645579.2020.1766777
+  date: 2020-05-24
+  parent:
+    type: periodical
+    title: "International Journal of Social Research Methodology"
+    volume: 24
+    issue: 3
+
+quantitative-vs-qualitative-research-methods:
+  type: article
+  title: "Quantitative vs Qualitative research methods"
+  author: ["M. Lakshman", "Leena Sinha", "Moumita Biswas", "Maryann Charles", "N.K. Arora"]
+  serial-number:
+    doi: https://doi.org/10.1007/BF02820690
+  date: 2000-05-01
+  parent:
+    type: periodical
+    title: "The Indian Journal of Pediatrics"
+    volume: 67
+    issue: 1
+
+experimentation-in-software-engineering:
+  type: article
+  title: "Experimentation in software engineering"
+  author: ["Victor R. Basili", "Richard W. Selby", "David H. Hutchens"]
+  serial-number:
+    doi: 10.1109/TSE.1986.6312975
+  date: 2012-09-12
+  parent:
+    type: periodical
+    title: "IEEE Transactions on Software Engineering"
+    volume: 12
+    issue: 7
+
+the-role-of-software-verification:
+  type: article
+  title: "The Role of Software Verification and Validation in Software Development Process"
+  author: ["Sujatha, P.", "Sankar, G. V.", "Rao, A. S.", "Satyanarayana, T."]
+  serial-number:
+    doi: 10.1080/02564602.2001.11416938
+  date: 2015-03-26
+  parent:
+    type: periodical
+    title: "IETE Technical Review"
+    volume: 18
+    issue: 1
+
+machine-learning-wearable-technology:
+  type: article
+  title: "Machine Learning and Wearable Technology: Monitoring Changes in Biomedical Signal Patterns during Pre-Migraine Nights"
+  author:
+    [
+      "Viroslava Kapustynska",
+      "Vytautas Abromavičius",
+      "Artūras Serackis",
+      "Šarūnas Paulikas",
+      "Kristina Ryliškienė",
+      "Saulius Andruškevičius",
+    ]
+  serial-number:
+    doi: https://doi.org/10.3390/healthcare12171701
+  date: 2024-08-26
+  parent:
+    - type: periodical
+      title: Healthcare (Basel)
+      volume: 12
+      issue: 17
+
+forecasting-migraine-with-ml-based-on-diary-wearable:
+  type: article
+  title: "Forecasting migraine with machine learning based on mobile phone diary and wearable data"
+  author:
+    [
+      "Anker Stubberud",
+      "Sigrid Hegna Ingvaldsen",
+      "Eiliv Brenner",
+      "Ingunn Winnberg",
+      "Alexander Olsen",
+      "Gøril Bruvik Gravdahl",
+      "Manjit Singh Matharu",
+      "Parashkev Nachev",
+      "Erling Tronvik",
+    ]
+  serial-number:
+    doi: https://doi.org/10.1177/03331024231169244
+  date: 2023-05-01
+  parent:
+    - type: periodical
+      title: Cephalgia
+      volume: 43
+      issue: 5
+
+migraine-review-general-practice:
+  type: article
+  title: Migraine review for general practice
+  author:
+    ["Antonio L Aguilar-Shea", "Javier A Membrilla Md", "Javier Diaz-de-Teran"]
+  serial-number:
+    doi: 10.1016/j.aprim.2021.102208
+  date: 2021-11-16
+  parent:
+    - type: periodical
+      title: Aten Primaria
+      volume: 54
+      issue: 2
+      publisher: Elsevier España, S.L.U.
+
+triggers-protectors-predictors:
+  type: article
+  title: Triggers, Protectors, and Predictors in Episodic Migraine
+  author: ["Michael J Marmura"]
+  serial-number:
+    doi: 10.1007/s11916-018-0734-0
+  date: 2018-10-05
+  parent:
+    - type: periodical
+      title: Current pain and headache reports
+      volume: 12
+      issue: 81
+
+
+forecasting-migraine:
+  type: article
+  title: Forecasting Migraine Attacks and the Utility of Identifying Triggers
+  author:
+    ["Dana P Turner", "Adriana D Lebowitz", "Ivana Chtay", "Timothy T Houle"]
+  serial-number:
+    doi: 10.1007/s11916-018-0715-3
+  date: 2018-07-16
+  parent:
+    - type: periodical
+      title: Current pain and headache reports
+      volume: 22
+      issue: 9
