@@ -26,11 +26,11 @@ In addition to web and data processing frameworks, there are also several librar
 
 == 1.3 Problem formulation
 
-While wearable devices have become increasingly capable of capturing health related metrics, there are still room for growth and gaps that can be filled. This is primarily due to the fragmented landscape of health data platforms, where most provider offers its own proprietary data format and API. As discussed in the previous sections, although some server based frameworks like Shimmer support multi-provider integration, but they are not designed for mobile environments or real time use.
+While wearable devices have become increasingly capable of capturing health related metrics, there are still room for growth and gaps that can be filled. This is primarily due to the fragmented landscape of health data platforms, where most provider offers its own proprietary data format and API. As discussed in the previous sections, although some server based frameworks like Shimmer support multi-provider integration, they are not designed for mobile environments or real time use.
 
 Existing solutions like WearMerge and Tasrif focus on data aggregation and preprocessing but either lack mobile compatibility or do not address data normalization. Furthermore, platform specific libraries such as React Native Health and Health Connect provide access to raw data but without standardization. This leaves a significant technical gap, which can be summarized as the lack of a unified, mobile based framework capable of collecting and normalizing wearable health data from multiple providers. This gap between single platform solutions and server based frameworks has been identified as a significant barrier in the context of big data healthcare solutions. @big-data-in-healthcare.
 
-To explore this gap, the thesis is guided by the following research questions:
+To explore this gap, the thesis is structured by the following research questions:
 
 1. How can wearable health data from different platforms be effectively normalized into a unified format suitable for migraine-focused machine learning applications?
 2. What are the key requirements and challenges in implementing real-time data normalization for migraine-relevant wearable data in a mobile environment?
@@ -42,7 +42,7 @@ From a scientific perspective, by unifying heterogeneous data from wearable devi
 
 Additionally from a societal perspective, by enabling and effectively using wearable health data, wearables can be used to improve health monitoring and also be a tool for early detection and prevention of possible health issues. One of the areas that the thesis aims to focus on is migraine, which is a condition that can possibly be predicted and prevented due to the fact that migraine can be triggered by physiological and environmental factors @migraine-triggers. By enabling these insights through wearable devices, the project can potentially support better health outcomes and quality of life for individuals suffering from migraines or any other predictable health conditions.
 
-Furthermore, from an industry standpoint, the proposed framework provides a robust and reusable solution for developers and potential healthtech companies. By building a framework which has built in supports for multiplatform integration, including mobile support along with data normalization. This greatly contributes to effective development in the field of health data management and machine learning. The framework can be used as a foundation for future applications, enabling developers to focus on building their solutions rather than dealing with the complexities of data integration and normalization. 
+Furthermore, from an industry standpoint, the proposed framework provides a robust and reusable solution for developers and potential healthtech companies by building a framework which has built in support for multiplatform integration along with data normalization. This greatly contributes to effective development in the field of health data management and machine learning. The framework can be used as a foundation for future applications, enabling developers to focus on building their solutions rather than dealing with the complexities of data integration and normalization. 
 
 == 1.5 Results
 
