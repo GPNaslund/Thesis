@@ -1,2 +1,127 @@
 # REFERENCES ARE ADDED HERE
 # FORMAT GUIDE: https://github.com/typst/hayagriva/blob/main/docs/file-format.md
+#
+#
+
+impact-wearable-technologies:
+  type: article
+  title: "The Impact of Wearable Technologies in Health Research: Scoping Review"
+  author:
+    [
+      "Sophie Huhn",
+      "Miriam Axt",
+      "Hanns-Christian Gunga",
+      "Martina Anna Maggioni",
+      "Stephen Munga",
+      "David Obor",
+      "Ali Sié",
+      "Valentin Boudo",
+      "Aditi Bunker",
+      "Rainer Sauerborn",
+      "Till Bärnighausen",
+      "Sandra Barteit",
+    ]
+  serial-number:
+    pmid: 35076409
+  date: 2022-01-25
+  parent:
+    type: periodical
+    title: JMIR Mhealth Uhealth
+    volume: 10
+    issue: 1
+    publisher: JMIR Publications Inc.
+
+wearable-devices-healthcare:
+  type: article
+  title: "Wearable Devices: Implications for Precision Medicine and the Future of Health Care"
+  author:
+    [
+      "Mohan Babu",
+      "Ziv Lautman",
+      "Xiangping Lin",
+      "Milan H B Sobota",
+      "Michael P Snyder",
+    ]
+  serial-number:
+    pmid: 37983384
+  date: 2023-11-20
+  parent:
+    type: periodical
+    title: Annual Review of Medicine
+    volume: 1
+    issue: 1
+    publisher: Annual Reviews
+
+wearable-sales-statistics:
+  type: report
+  title: "Wearable Technology Market Size, Share & Trends Analysis Report By Product (Head & Eyewear, Wristwear), By Application (Consumer Electronics, Healthcare), By Region (Asia Pacific, Europe), And Segment Forecasts, 2023 - 2030"
+  author: Grand View Research
+  serial-number: 978-1-68038-165-8
+
+apple-healthkit-hkquantitytype:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitytype
+
+google-health-step-record:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/StepsRecord
+
+fhir:
+  type: web
+  url: https://hl7.org/fhir/
+
+openmhealth:
+  type: web
+  url: https://www.openmhealth.org/
+
+ieeep1752:
+  type: web
+  url: https://standards.ieee.org/ieee/1752.1/6982/
+
+health-connect:
+  type: web
+  url: https://developer.android.com/health-and-fitness/guides/health-connect
+
+apple-healthkit:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit
+
+health-connect-record-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/Record
+
+health-connect-step-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/StepsRecord
+
+health-connect-heart-rate-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/HeartRateRecord
+
+apple-healthkit-quantity-type:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitytype
+
+apple-healthkit-workout-type:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkworkouttype
+
+apple-healthkit-quantity-sample:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitysample
+
+react-native:
+  type: web
+  url: https://reactnative.dev/
+
+flutter:
+  type: web
+  url: https://flutter.dev/
+
+lynx-js:
+  type: web
+  url: https://lynxjs.org/
+
+kotlin-multi-platform:
+  type: web
+  url: https://kotlinlang.org/docs/multiplatform.html
