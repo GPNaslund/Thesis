@@ -1,2 +1,27 @@
 # REFERENCES ARE ADDED HERE
 # FORMAT GUIDE: https://github.com/typst/hayagriva/blob/main/docs/file-format.md
+#
+#
+health-connect-heart-rate-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/HeartRateRecord
+
+health-connect-skin-temperature-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/SkinTemperatureRecord
+
+health-kit-heart-rate-type:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitytypeidentifier/heartrate
+
+health-kit-body-temperature-type:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitytypeidentifier/bodytemperature
+
+openmhealth-heart-rate-schema:
+  type: web
+  url: https://www.openmhealth.org/documentation/#/schema-docs/schema-library/schemas/omh_heart-rate
+
+openmhealth-body-temperature-schema:
+  type: web
+  url: https://www.openmhealth.org/documentation/#/schema-docs/schema-library/schemas/omh_body-temperature
