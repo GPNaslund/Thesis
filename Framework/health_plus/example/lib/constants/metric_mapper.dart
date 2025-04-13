@@ -10,5 +10,7 @@ HealthDataType? mapToHealthDataType(HealthMetric metric) {
       return HealthDataType.HEART_RATE;
     case HealthMetric.steps:
       return HealthDataType.STEPS;
+    //case HealthMetric.heartVariability:
+      //return HealthDataTypeHEART_VARIABILITY;
   }
 }

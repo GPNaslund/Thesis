@@ -14,6 +14,8 @@ extension HealthMetricExtension on HealthMetric {
         return "Heart Rate";
       case HealthMetric.steps:
         return "Steps";
+      //case HealthMetric.heartVariability:
+        //return "Heart Variability";
     }
   }
 
