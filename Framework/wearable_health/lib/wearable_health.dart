@@ -11,7 +11,7 @@ class WearableHealth {
     return WearableHealthPlatform.instance.getPlatformVersion();
   }
 
-  Provider getDataProvider(ProviderType type) {
+  static Provider getDataProvider(ProviderType type) {
     switch (type) {
       case ProviderType.appleHealthKit:
         return AppleHealthKit();

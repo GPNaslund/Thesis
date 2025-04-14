@@ -1,0 +1,450 @@
+impact-wearable-technologies:
+  type: article
+  title: "The Impact of Wearable Technologies in Health Research: Scoping Review"
+  author:
+    [
+      "Sophie Huhn",
+      "Miriam Axt",
+      "Hanns-Christian Gunga",
+      "Martina Anna Maggioni",
+      "Stephen Munga",
+      "David Obor",
+      "Ali Sié",
+      "Valentin Boudo",
+      "Aditi Bunker",
+      "Rainer Sauerborn",
+      "Till Bärnighausen",
+      "Sandra Barteit",
+    ]
+  serial-number:
+    pmid: 35076409
+  date: 2022-01-25
+  parent:
+    type: periodical
+    title: JMIR Mhealth Uhealth
+    volume: 10
+    issue: 1
+    publisher: JMIR Publications Inc.
+
+wearable-sales-statistics:
+  type: report
+  title: "Wearable Technology Market Size, Share & Trends Analysis Report By Product (Head & Eyewear, Wristwear), By Application (Consumer Electronics, Healthcare), By Region (Asia Pacific, Europe), And Segment Forecasts, 2023 - 2030"
+  author: Grand View Research
+  serial-number: 978-1-68038-165-8
+
+wearable-devices-healthcare:
+  type: article
+  title: "Wearable Devices: Implications for Precision Medicine and the Future of Health Care"
+  author:
+    [
+      "Mohan Babu",
+      "Ziv Lautman",
+      "Xiangping Lin",
+      "Milan H B Sobota",
+      "Michael P Snyder",
+    ]
+  serial-number:
+    pmid: 37983384
+  date: 2023-11-20
+  parent:
+    type: periodical
+    title: Annual Review of Medicine
+    volume: 1
+    issue: 1
+    publisher: Annual Reviews
+
+migraine-triggers:
+  type: article
+  title: "Migraine Triggers: An Overview of the Pharmacology, Biochemistry, Atmospherics, and Their Effects on Neural Networks"
+  author: "Hassan Kesserwani"
+  serial-number:
+    pmid: 33954064
+  date: 2021-04
+  parent:
+    type: periodical
+    title: Cureus
+    volume: 13
+    issue: 4
+    publisher: Cureus Inc
+
+react-native-health:
+  type: web
+  title: React Native Health
+  url: https://www.npmjs.com/package/react-native-health
+
+health-package:
+  type: web
+  title: Health Package
+  url: https://pub.dev/packages/health
+
+react-native-health-connect:
+  type: web
+  title: React Native Health Connect
+  url: https://www.npmjs.com/package/react-native-health-connect
+
+wear-merge:
+  type: article
+  title: "WearMerge: An Interoperable Framework for Self-tracking Data Integration and Standardization"
+  author:
+    [
+      "Dimitrios Panteleimon Giakatos",
+      "Sofia Yfantidou",
+      "Stefanos Efstathiou",
+      "Athena Vakali",
+    ]
+  serial-number:
+    doi: 10.1109/PerComWorkshops53856.2022.9767462
+  date: 2022-05-06
+  parent:
+    type: conference
+    title: "2022 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops)"
+    publisher: IEEE
+
+tasrif:
+  type: article
+  title: "Tasrif: processing wearable data in Python"
+  author:
+    [
+      "Abdulaziz Al Homaid",
+      "Syed Hashim",
+      "Fadhil Abubaker",
+      "Ummar Abbas",
+      "Faisal Farooq",
+      "Joao Palotti",
+    ]
+  serial-number:
+    doi: 10.1109/PerComWorkshops53856.2022.9767286
+  date: 2022-05-06
+  parent:
+    type: conference
+    title: "2022 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops)"
+    publisher: IEEE
+
+big-data-in-healthcare:
+  type: article
+  title: "Big Data in Healthcare for Personalization & Customization of Healthcare Services"
+  author: ["Sumarsono", "Muhammad Anshari", "Mohammad Nabil Almunawar"]
+  serial-number:
+    doi: 10.1109/ICIMTech.2019.8843822
+  date: 2019-09-19
+  parent:
+    type: conference
+    title: "2019 International Conference on Information Management and Technology (ICIMTech)"
+    publisher: IEEE
+
+structured-data:
+  type: article
+  title: "Challenges and opportunities beyond structured data in analysis of electronic health records"
+  author:
+    [
+      "Maryam Tayefi",
+      "Phuong Ngo",
+      "Taridzo Chomutare",
+      "Hercules Dalianis",
+      "Elisa Salvi",
+      "Andrius Budrionis",
+      "Fred Godtliebsen",
+    ]
+  serial-number:
+    doi: 10.1002/wics.1549
+  date: 2021-02-14
+  parent:
+    type: periodical
+    title: WIREs - Wiley Interdisciplinary Reviews
+    volume: 13
+    issue: 6
+
+neurawave:
+  type: web
+  title: Neurawave's website
+  author: Neurawave
+  url: https://www.neurawave.se
+
+introduction-to-design-research:
+  type: chapter
+  page-range: 1-13
+  parent:
+    type: book
+    title: Design Science Research Cases
+    author: ["Jan vom Brocke", "Alan Hevner", "Alexander Maedche"]
+    date: 2020-08-01
+    serial-number:
+      doi: http://dx.doi.org/10.1007/978-3-030-46781-4_1
+
+design-science-research-methodology:
+  type: article
+  title: "A Design Science Research Methodology for Information Systems Research"
+  author:
+    [
+      "Ken Peffers",
+      "Tuure Tuunanen",
+      "Marcus A. Rothenberger",
+      "Samir Chatterjee",
+    ]
+  serial-number:
+    doi: 10.2753/MIS0742-1222240302
+  date: 2007
+  parent:
+    type: periodical
+    title: "Journal of Management Information Systems"
+    volume: 24
+    issue: 3
+
+interviewing-as-a-data-collection-method:
+  type: article
+  tite: "Interviewing as a data collection method: A critical review"
+  author: ["Hamza Alshenqeeti"]
+  serial-number:
+    doi: 10.5430/elr.v3n1p39
+  date: 2014-03-31
+  parent:
+    type: periodical
+    title: "English Linguistics Research"
+    volume: 3
+    issue: 1
+
+questionnaire-designing-for-a-survey:
+  type: article
+  title: "Questionnaire designing for a survey"
+  author: ["S Roopa", "MS Rani"]
+  serial-number:
+    doi: 10.5005/jp-journals-10021-1104
+  date: 2012-10-01
+  parent:
+    type: periodical
+    title: "Journal of Indian Orthodontic Society"
+    volume: 46
+    issue: 4
+
+literature-reviews-vs-systematic-reviews:
+  type: article
+  title: "Literature reviews vs systematic reviews"
+  author: ["Priscilla Robinson", "John Lowe"]
+  serial-number:
+    doi: 10.1111/1753-6405.12393
+  date: 2015-04-01
+  parent:
+    type: periodical
+    title: "Australian and New Zealand Journal of Public Health"
+    volume: 39
+    issue: 2
+
+the-problem-centered-expert-interview:
+  type: article
+  title: "The problem-centered expert interview. Combining qualitative interviewing approaches for investigating implicit expert knowledge"
+  author: ["Stefanie Döringer"]
+  serial-number:
+    doi: 10.1080/13645579.2020.1766777
+  date: 2020-05-24
+  parent:
+    type: periodical
+    title: "International Journal of Social Research Methodology"
+    volume: 24
+    issue: 3
+
+quantitative-vs-qualitative-research-methods:
+  type: article
+  title: "Quantitative vs Qualitative research methods"
+  author:
+    [
+      "M. Lakshman",
+      "Leena Sinha",
+      "Moumita Biswas",
+      "Maryann Charles",
+      "N.K. Arora",
+    ]
+  serial-number:
+    doi: https://doi.org/10.1007/BF02820690
+  date: 2000-05-01
+  parent:
+    type: periodical
+    title: "The Indian Journal of Pediatrics"
+    volume: 67
+    issue: 1
+
+experimentation-in-software-engineering:
+  type: article
+  title: "Experimentation in software engineering"
+  author: ["Victor R. Basili", "Richard W. Selby", "David H. Hutchens"]
+  serial-number:
+    doi: 10.1109/TSE.1986.6312975
+  date: 2012-09-12
+  parent:
+    type: periodical
+    title: "IEEE Transactions on Software Engineering"
+    volume: 12
+    issue: 7
+
+the-role-of-software-verification:
+  type: article
+  title: "The Role of Software Verification and Validation in Software Development Process"
+  author: ["Sujatha, P.", "Sankar, G. V.", "Rao, A. S.", "Satyanarayana, T."]
+  serial-number:
+    doi: 10.1080/02564602.2001.11416938
+  date: 2015-03-26
+  parent:
+    type: periodical
+    title: "IETE Technical Review"
+    volume: 18
+    issue: 1
+
+machine-learning-wearable-technology:
+  type: article
+  title: "Machine Learning and Wearable Technology: Monitoring Changes in Biomedical Signal Patterns during Pre-Migraine Nights"
+  author:
+    [
+      "Viroslava Kapustynska",
+      "Vytautas Abromavičius",
+      "Artūras Serackis",
+      "Šarūnas Paulikas",
+      "Kristina Ryliškienė",
+      "Saulius Andruškevičius",
+    ]
+  serial-number:
+    doi: https://doi.org/10.3390/healthcare12171701
+  date: 2024-08-26
+  parent:
+    - type: periodical
+      title: Healthcare (Basel)
+      volume: 12
+      issue: 17
+
+forecasting-migraine-with-ml-based-on-diary-wearable:
+  type: article
+  title: "Forecasting migraine with machine learning based on mobile phone diary and wearable data"
+  author:
+    [
+      "Anker Stubberud",
+      "Sigrid Hegna Ingvaldsen",
+      "Eiliv Brenner",
+      "Ingunn Winnberg",
+      "Alexander Olsen",
+      "Gøril Bruvik Gravdahl",
+      "Manjit Singh Matharu",
+      "Parashkev Nachev",
+      "Erling Tronvik",
+    ]
+  serial-number:
+    doi: https://doi.org/10.1177/03331024231169244
+  date: 2023-05-01
+  parent:
+    - type: periodical
+      title: Cephalgia
+      volume: 43
+      issue: 5
+
+migraine-review-general-practice:
+  type: article
+  title: Migraine review for general practice
+  author:
+    ["Antonio L Aguilar-Shea", "Javier A Membrilla Md", "Javier Diaz-de-Teran"]
+  serial-number:
+    doi: 10.1016/j.aprim.2021.102208
+  date: 2021-11-16
+  parent:
+    - type: periodical
+      title: Aten Primaria
+      volume: 54
+      issue: 2
+      publisher: Elsevier España, S.L.U.
+
+triggers-protectors-predictors:
+  type: article
+  title: Triggers, Protectors, and Predictors in Episodic Migraine
+  author: ["Michael J Marmura"]
+  serial-number:
+    doi: 10.1007/s11916-018-0734-0
+  date: 2018-10-05
+  parent:
+    - type: periodical
+      title: Current pain and headache reports
+      volume: 12
+      issue: 81
+
+forecasting-migraine:
+  type: article
+  title: Forecasting Migraine Attacks and the Utility of Identifying Triggers
+  author:
+    ["Dana P Turner", "Adriana D Lebowitz", "Ivana Chtay", "Timothy T Houle"]
+  serial-number:
+    doi: 10.1007/s11916-018-0715-3
+  date: 2018-07-16
+  parent:
+    - type: periodical
+      title: Current pain and headache reports
+      volume: 22
+      issue: 9
+
+mobile-os-market:
+  type: web
+  title: Mobile os market share
+  author: Statcounter
+  url: https://gs.statcounter.com/os-market-share/mobile/worldwide
+
+apple-healthkit-hkquantitytype:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitytype
+
+google-health-step-record:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/StepsRecord
+
+fhir:
+  type: web
+  url: https://hl7.org/fhir/
+
+openmhealth:
+  type: web
+  url: https://www.openmhealth.org/
+
+ieeep1752:
+  type: web
+  url: https://standards.ieee.org/ieee/1752.1/6982/
+
+health-connect:
+  type: web
+  url: https://developer.android.com/health-and-fitness/guides/health-connect
+
+apple-healthkit:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit
+
+health-connect-record-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/Record
+
+health-connect-step-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/StepsRecord
+
+health-connect-heart-rate-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/HeartRateRecord
+
+apple-healthkit-quantity-type:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitytype
+
+apple-healthkit-workout-type:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkworkouttype
+
+apple-healthkit-quantity-sample:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitysample
+
+react-native:
+  type: web
+  url: https://reactnative.dev/
+
+flutter:
+  type: web
+  url: https://flutter.dev/
+
+lynx-js:
+  type: web
+  url: https://lynxjs.org/
+
+kotlin-multi-platform:
+  type: web
+  url: https://kotlinlang.org/docs/multiplatform.html

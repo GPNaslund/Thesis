@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-
 import 'package:flutter/services.dart';
+import 'package:wearable_health/provider/google_health_connect.dart';
+import 'package:wearable_health/provider/provider.dart';
+import 'package:wearable_health/provider/provider_type.dart';
 import 'package:wearable_health/wearable_health.dart';
 
 void main() {
@@ -10,14 +12,15 @@ void main() {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  final _wearableHealthPlugin = WearableHealth();
+  bool? _hasPermissions;
+  final _wearableHealthPlugin = WearableHealth.getDataProvider(ProviderType.googleHealthConnect);
+
 
   @override
   void initState() {
@@ -25,26 +28,32 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
     try {
-      platformVersion =
-          await _wearableHealthPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      final platformVersion = await _wearableHealthPlugin.getPlatformVersion();
+      setState(() {
+        _platformVersion = platformVersion ?? 'Unknown';
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _checkAndRequestPermissions() async {
+    const stepsPermission = 'androidx.health.permission.STEPS_READ';
+    try {
+      final hasPermissions = await _wearableHealthPlugin.hasPermissions(
+        permissions: [stepsPermission],
+      );
+      setState(() => _hasPermissions = hasPermissions);
+
+      if (!hasPermissions) {
+        final granted = await _wearableHealthPlugin.getPermissions(
+          permissions: [stepsPermission],
+        );
+        setState(() => _hasPermissions = granted);
+      }
+    } on PlatformException catch (e) {
+      debugPrint('PlatformException: ${e.message}');
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
@@ -52,12 +61,25 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Wearable Health Plugin Example'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Running on: $_platformVersion\n'),
+              if (_hasPermissions != null)
+                Text('Permissions granted: $_hasPermissions'),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _checkAndRequestPermissions,
+                child: const Text('Request Steps Permission'),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
