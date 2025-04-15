@@ -38,7 +38,7 @@ class HealthMetricSelectionButton extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DataDisplayPage(dataType: healthMetric)),
+            MaterialPageRoute(builder: (context) => DataDisplayPage(key: ValueKey(healthMetric), dataType: healthMetric)),
           );
         },
         child: Text(healthMetric.displayName),

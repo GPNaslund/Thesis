@@ -92,12 +92,12 @@ class DataResultBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300,
-      height: 150,
+      width: MediaQuery.of(context).size.width * 0.9,
+      height: 450,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black, width: 3),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.black, width: 2),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(2, 2)),
         ],
@@ -105,11 +105,12 @@ class DataResultBox extends StatelessWidget {
       padding: EdgeInsets.all(16),
       alignment: Alignment.center,
       child: isLoading
-          ? CircularProgressIndicator()
-          : Text(
-        dataOutput,
-        style: TextStyle(fontSize: 16, color: Colors.black54),
-        textAlign: TextAlign.center,
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        child: Text(
+          dataOutput,
+          style: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
       ),
     );
   }
