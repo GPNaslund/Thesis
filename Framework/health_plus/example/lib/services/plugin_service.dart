@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:health/health.dart';
 import 'package:health_plus/health_plus.dart';
 import 'package:health_plus/provider/health_provider.dart';
@@ -74,15 +75,24 @@ class PluginService {
         if (filtered.isEmpty) return "No data found for ${metric.displayName}.";
 
         return filtered
-            .map((e) => "${e.type.name}: ${e.value}")
-            .join("\n");
+            .map((e) => const JsonEncoder.withIndent('  ').convert(e.toJson()))
+            .join("\n\n");
       } else {
         final formatted = await _provider.getDataInMobileHealthSchemaFormat();
         print("Formatted (Open mHealth) data fetched: ${formatted.length} entries");
-        final filtered = formatted.where((e) =>
-            e.toJson().toString().toLowerCase().contains(
-                metric.name.toLowerCase())
-        ).toList();
+        final filtered = formatted.where((e) {
+            final json = e.toJson();
+            print("🔍 Entry: $json");
+
+            final topLevelKey = json.keys.first;
+            print("➡️ Top-level key: $topLevelKey");
+
+            return topLevelKey
+            .replaceAll('_', '') // Normalize
+            .toLowerCase()
+            .contains(metric.name.toLowerCase()); // Compare with metric
+        }).toList();
+
 
         print("Filtered ${filtered.length} entries for '${metric.name.toLowerCase()}'");
 
@@ -91,7 +101,7 @@ class PluginService {
         }
 
         return filtered
-            .map((e) => e.toJson().toString())
+            .map((e) => const JsonEncoder.withIndent('  ').convert(e.toJson()))
             .join("\n\n");
       }
     } catch (e) {
