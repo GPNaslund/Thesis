@@ -7,6 +7,9 @@ class DataFetchingController {
   final PluginService _pluginService = PluginService();
 
   Future<String> getHealthData(HealthMetric metric, String format) async {
-    return await _pluginService.fetchHealthData(metric, format);
+    print("Calling plugin service for $metric in $format format...");
+    final result = await _pluginService.fetchHealthData(metric, format);
+    print("Final result returned to UI:\n$result");
+    return result;
   }
 }

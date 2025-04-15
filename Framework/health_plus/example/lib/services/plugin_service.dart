@@ -56,9 +56,11 @@ class PluginService {
   // Fetch data for a specific metric in raw or formatted format
   Future<String> fetchHealthData(HealthMetric metric, String format) async {
     final type = mapToHealthDataType(metric); // uses metric_mapper.dart
+    print("Requested Metric: $metric → Mapped to HealthDataType: $type");
     if (type == null) return "Unsupported metric: ${metric.displayName}";
 
     if (!_initialized || _currentType != type) {
+      print("Reinitializing provider for $type");
       await _initProvider([type]);
       _currentType = type;
     }
@@ -66,6 +68,7 @@ class PluginService {
     try {
       if (format.toLowerCase().contains("raw")) {
         final rawData = await _provider.getData();
+        print("Raw data fetched: ${rawData.length} entries");
         final filtered = rawData.where((e) => e.type == type).toList();
 
         if (filtered.isEmpty) return "No data found for ${metric.displayName}.";
@@ -75,10 +78,13 @@ class PluginService {
             .join("\n");
       } else {
         final formatted = await _provider.getDataInMobileHealthSchemaFormat();
+        print("Formatted (Open mHealth) data fetched: ${formatted.length} entries");
         final filtered = formatted.where((e) =>
             e.toJson().toString().toLowerCase().contains(
                 metric.name.toLowerCase())
         ).toList();
+
+        print("Filtered ${filtered.length} entries for '${metric.name.toLowerCase()}'");
 
         if (filtered.isEmpty) {
           return "No formatted data found for ${metric.displayName}.";
