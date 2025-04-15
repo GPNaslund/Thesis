@@ -12,7 +12,7 @@ class GoogleHealthConnect implements Provider {
 
   @override
   Future<bool> getPermissions({ required List<String> permissions }) async {
-    final result = await methodChannel.invokeMethod<bool>("getPermissions", {
+    final result = await methodChannel.invokeMethod<bool>("requestPermissions", {
       'permissions': permissions
     },);
     return result ?? false;

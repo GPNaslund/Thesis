@@ -38,19 +38,17 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkAndRequestPermissions() async {
-    const stepsPermission = 'androidx.health.permission.STEPS_READ';
+    const stepsPermission = 'android.permission.health.READ_STEPS';
     try {
       final hasPermissions = await _wearableHealthPlugin.hasPermissions(
         permissions: [stepsPermission],
       );
       setState(() => _hasPermissions = hasPermissions);
 
-      if (!hasPermissions) {
         final granted = await _wearableHealthPlugin.getPermissions(
           permissions: [stepsPermission],
         );
         setState(() => _hasPermissions = granted);
-      }
     } on PlatformException catch (e) {
       debugPrint('PlatformException: ${e.message}');
     }
