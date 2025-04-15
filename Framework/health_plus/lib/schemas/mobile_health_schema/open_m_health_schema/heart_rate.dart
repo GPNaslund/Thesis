@@ -24,7 +24,7 @@ class HeartRate extends OpenMHealthSchema {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> result = {};
     result["heart_rate"] = heartRate.toJson();
-    result["time_frame"] = effectiveTimeFrame.toJson();
+    result["effective_time_frame"] = effectiveTimeFrame.toJson();
     if (descriptiveStatistic != null) {
       result["descriptive_statistic"] = descriptiveStatistic;
     }

@@ -48,7 +48,7 @@ class DefaultMobileHealthSchemaConverter
     NumericHealthValue healthValue = hrData.value as NumericHealthValue;
     num heartRate = healthValue.numericValue;
     return HeartRate(
-      heartRate: UnitValue(value: heartRate, unit: "heart_rate"),
+      heartRate: UnitValue(value: heartRate, unit: "beats/min"),
       effectiveTimeFrame: timeFrame,
     );
   }
