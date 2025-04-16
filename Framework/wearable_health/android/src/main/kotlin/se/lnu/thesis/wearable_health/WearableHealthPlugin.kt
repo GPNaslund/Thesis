@@ -16,7 +16,13 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** WearableHealthPlugin */
 class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -31,6 +37,9 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private var activityPluginBinding: ActivityPluginBinding? = null
   private var requestPermissionLauncher: ActivityResultLauncher<Set<String>>? = null
   private var pendingPermissionsResult: Result? = null
+
+  private val pluginJob = SupervisorJob()
+  private val pluginScope = CoroutineScope(Dispatchers.Main.immediate + pluginJob)
 
   private val permissions = setOf(
     HealthPermission.getReadPermission(StepsRecord::class),
@@ -53,9 +62,29 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun handleHasPermissions(call: MethodCall, result: Result) {
-    runBlocking {
-      val hasPermissions = healthConnectClient.permissionController.getGrantedPermissions().containsAll(permissions)
-      result.success(hasPermissions)
+    Log.d("WearableHealthPlugin","handleHasPermissions called")
+
+    pluginScope.launch {
+      Log.d("WearableHealthPlugin","Coroutine started in pluginScope for hasPermissions")
+      try {
+        val granted = withContext(Dispatchers.IO) {
+          Log.d("WearableHealthPlugin","Checking permissions on IO dispatcher")
+
+          if (!::healthConnectClient.isInitialized) {
+            throw IllegalStateException("HealthConnectClient not initialized")
+          }
+          healthConnectClient.permissionController.getGrantedPermissions()
+        }
+
+        val hasPermissions = granted.containsAll(permissions)
+        Log.d("WearableHealthPlugin","Has permissions: $hasPermissions")
+        result.success(hasPermissions)
+      } catch (e: CancellationException) {
+        Log.d("WearableHealthPlugin","Coroutine cancelled")
+      } catch (e: Exception) {
+        Log.e("WearableHealthPlugin","Error checking permissions", e)
+        result.error("ERROR", e.message, null)
+      }
     }
   }
 
@@ -85,7 +114,14 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    Log.d("WearableHealthPlugin","onDetachedFromEngine")
     channel.setMethodCallHandler(null)
+    try {
+      pluginJob.cancel()
+      Log.d("WearableHealthPlugin","Plugin job cancelled")
+    } catch (e: Exception) {
+      Log.e("WearableHealthPlugin","Error cancelling plugin job", e)
+    }
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -123,6 +159,10 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivity() {
+    Log.d("WearableHealthPlugin","onDetachedFromActivity")
+    activityPluginBinding = null
+    requestPermissionLauncher = null
+    pendingPermissionsResult = null
   }
 
 }
