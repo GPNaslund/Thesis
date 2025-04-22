@@ -19,6 +19,11 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+    dependencies {
+        implementation("androidx.appcompat:appcompat:1.7.0")
+        implementation("com.google.android.material:material:1.12.0")
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "se.lnu.thesis.wearable_health_example"

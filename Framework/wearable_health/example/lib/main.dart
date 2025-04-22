@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:wearable_health/provider/google_health_connect.dart';
-import 'package:wearable_health/provider/provider.dart';
 import 'package:wearable_health/provider/provider_type.dart';
 import 'package:wearable_health/wearable_health.dart';
 
@@ -19,8 +17,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   bool? _hasPermissions;
-  final _wearableHealthPlugin = WearableHealth.getDataProvider(ProviderType.googleHealthConnect);
-
+  final _wearableHealthPlugin = WearableHealth.getDataProvider(
+    ProviderType.googleHealthConnect,
+  );
 
   @override
   void initState() {
@@ -45,10 +44,10 @@ class _MyAppState extends State<MyApp> {
       );
       setState(() => _hasPermissions = hasPermissions);
 
-        final granted = await _wearableHealthPlugin.getPermissions(
-          permissions: [stepsPermission],
-        );
-        setState(() => _hasPermissions = granted);
+      final granted = await _wearableHealthPlugin.requestPermissions(
+        permissions: [stepsPermission],
+      );
+      setState(() => _hasPermissions = granted);
     } on PlatformException catch (e) {
       debugPrint('PlatformException: ${e.message}');
     }
@@ -58,9 +57,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Wearable Health Plugin Example'),
-        ),
+        appBar: AppBar(title: const Text('Wearable Health Plugin Example')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -80,4 +77,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-

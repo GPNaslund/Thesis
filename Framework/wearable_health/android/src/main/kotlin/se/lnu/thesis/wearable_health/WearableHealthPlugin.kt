@@ -23,6 +23,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import se.lnu.thesis.wearable_health.enums.DataStoreAvailabilityResult
+import se.lnu.thesis.wearable_health.enums.MethodCallType
+import se.lnu.thesis.wearable_health.enums.ResultError
 
 /** WearableHealthPlugin */
 class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -37,13 +40,11 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private var activityPluginBinding: ActivityPluginBinding? = null
   private var requestPermissionLauncher: ActivityResultLauncher<Set<String>>? = null
   private var pendingPermissionsResult: Result? = null
+  private var requestedPermissions: List<String> = listOf()
 
   private val pluginJob = SupervisorJob()
   private val pluginScope = CoroutineScope(Dispatchers.Main.immediate + pluginJob)
 
-  private val permissions = setOf(
-    HealthPermission.getReadPermission(StepsRecord::class),
-  )
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "wearable_health")
@@ -53,11 +54,22 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
-    when (call.method) {
-      "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
-      "hasPermissions" -> handleHasPermissions(call, result)
-      "requestPermissions" -> handleRequestPermissions(call, result)
-      else -> result.notImplemented()
+    val callType = MethodCallType.fromString(call.method)
+    when (callType) {
+      MethodCallType.GET_PLATFORM_VERSION -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
+      MethodCallType.HAS_PERMISSIONS -> handleHasPermissions(call, result)
+      MethodCallType.REQUEST_PERMISSIONS -> handleRequestPermissions(call, result)
+      MethodCallType.DATA_STORE_AVAILABILITY -> checkDataStoreAvailability(call, result)
+      MethodCallType.UNDEFINED -> result.notImplemented()
+    }
+  }
+
+  private fun checkDataStoreAvailability(call: MethodCall, result: Result) {
+    val availabilityStatus = HealthConnectClient.getSdkStatus(context)
+    when (availabilityStatus) {
+      HealthConnectClient.SDK_AVAILABLE -> result.success(DataStoreAvailabilityResult.AVAILABLE.result)
+      HealthConnectClient.SDK_UNAVAILABLE -> result.success(DataStoreAvailabilityResult.UNAVAILABLE.result)
+      HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> result.success(DataStoreAvailabilityResult.NEEDS_UPDATE.result)
     }
   }
 
@@ -71,12 +83,15 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           Log.d("WearableHealthPlugin","Checking permissions on IO dispatcher")
 
           if (!::healthConnectClient.isInitialized) {
-            throw IllegalStateException("HealthConnectClient not initialized")
+            val err = ResultError.HEALTH_CONNECT_CLIENT_NOT_INITIALIZED
+            result.error(err.errorCode, err.errorMessage, null)
           }
           healthConnectClient.permissionController.getGrantedPermissions()
         }
 
-        val hasPermissions = granted.containsAll(permissions)
+        assignRequestedPermissions(call)
+
+        val hasPermissions = granted.containsAll(requestedPermissions)
         Log.d("WearableHealthPlugin","Has permissions: $hasPermissions")
         result.success(hasPermissions)
       } catch (e: CancellationException) {
@@ -89,10 +104,9 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun handleRequestPermissions(call: MethodCall, result: Result) {
-    val arguments = call.arguments<Map<String, List<String>>>()
-    val permissions = arguments?.get("permissions") ?: emptyList()
+    assignRequestedPermissions(call)
 
-    Log.d("WearableHealthPlugin", "permissions $permissions")
+    Log.d("WearableHealthPlugin", "permissions $requestedPermissions")
     Log.d("WearableHealthPlugin","handleRequestPermissions called")
     if (pendingPermissionsResult != null) {
       result.error("ALREADY_REQUESTING", "A permission request is already in progress.", null)
@@ -108,7 +122,7 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     pendingPermissionsResult = result
 
     Log.d("WearableHealthPlugin","Launching Health Connect permission request")
-    val permissionSet = permissions.toSet()
+    val permissionSet = requestedPermissions.toSet()
     requestPermissionLauncher?.launch(permissionSet)
   }
 
@@ -137,7 +151,7 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         pendingPermissionsResult = null
 
         if (resultToSend != null) {
-          val allGranted = grantedPermissions.containsAll(permissions)
+          val allGranted = grantedPermissions.containsAll(requestedPermissions)
           Log.d("WearableHealthPlugin","All requested permissions granted: $allGranted")
           resultToSend.success(allGranted)
         } else {
@@ -148,6 +162,11 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     } else {
       Log.e("WearableHealthPlugin","Activity is not a ComponentActivity, cannot register for result.")
     }
+  }
+
+  private fun assignRequestedPermissions(call: MethodCall) {
+    val arguments = call.arguments<Map<String, List<String>>>()
+    requestedPermissions = arguments?.get("permissions") ?: emptyList()
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
@@ -163,6 +182,7 @@ class WearableHealthPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     activityPluginBinding = null
     requestPermissionLauncher = null
     pendingPermissionsResult = null
+    requestedPermissions = listOf()
   }
 
 }
