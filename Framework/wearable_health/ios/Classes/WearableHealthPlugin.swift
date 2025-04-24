@@ -4,7 +4,7 @@ import UIKit
 
 public class WearableHealthPlugin: NSObject, FlutterPlugin {
     let healthStore = HKHealthStore()
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
             name: "wearable_health", binaryMessenger: registrar.messenger())
@@ -13,6 +13,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        print("Got call: \(call.method)")
         let callType: CallType = CallType.fromString(val: call.method)
 
         switch callType {
@@ -31,20 +32,27 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
 
     private func requestPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
         let typesToProcess = extractHKDataTypesFromCall(call: call)
-        
-        if (typesToProcess == nil) {
-            result(FlutterError(code: "INVALID_ARGUMENT_TYPE", message: "Invalid argument type. Must be a list of String", details: nil))
+
+        if typesToProcess == nil {
+            result(
+                FlutterError(
+                    code: "INVALID_ARGUMENT_TYPE",
+                    message: "Invalid argument type. Must be a list of String", details: nil))
             return
         }
-        
+
         if typesToProcess!.isEmpty {
-            result(FlutterError(code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to request permission for", details: nil))
+            result(
+                FlutterError(
+                    code: "NO_TYPES_TO_CHECK",
+                    message: "No valid types were provided to request permission for", details: nil)
+            )
             return
         }
-        
-        
+
         if HKHealthStore.isHealthDataAvailable() {
-            healthStore.requestAuthorization(toShare: Set<HKSampleType>(), read: typesToProcess) { (success: Bool, error: Error?) in
+            healthStore.requestAuthorization(toShare: Set<HKSampleType>(), read: typesToProcess) {
+                (success: Bool, error: Error?) in
                 if success {
                     print("HealthKit authorization request succeeded")
                     result(true)
@@ -56,32 +64,38 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
                 }
             }
         }
-        
+
     }
 
     private func checkHasPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
         let typesToProcess = extractHKDataTypesFromCall(call: call)
-        
+
         if typesToProcess == nil {
-            result(FlutterError(code: "INVALID_ARGUMENT_TYPE", message: "Invalid argument type. Must be List of String", details: nil))
+            result(
+                FlutterError(
+                    code: "INVALID_ARGUMENT_TYPE",
+                    message: "Invalid argument type. Must be List of String", details: nil))
             return
         }
-        
+
         if typesToProcess!.isEmpty {
-            result(FlutterError(code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to check", details: nil))
+            result(
+                FlutterError(
+                    code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to check",
+                    details: nil))
             return
         }
-        
+
         var allIsPermitted = true
         typesToProcess!.forEach { type in
-            if (allIsPermitted) {
+            if allIsPermitted {
                 let authStatus = healthStore.authorizationStatus(for: type)
-                if (authStatus != .sharingAuthorized ) {
+                if authStatus != .sharingAuthorized {
                     allIsPermitted = false
                 }
             }
         }
-        
+
         result(allIsPermitted)
     }
 
