@@ -58,7 +58,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initPlatformState();
 
     if (Platform.isAndroid) {
       _wearableHealthPlugin = WearableHealth.getDataProvider(
@@ -69,6 +68,8 @@ class _MyAppState extends State<MyApp> {
         ProviderType.appleHealthKit,
       );
     }
+
+    initPlatformState();
   }
 
   Future<void> _checkAndRequestPermissions() async {
