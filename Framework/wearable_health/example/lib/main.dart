@@ -73,7 +73,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkAndRequestPermissions() async {
-    const stepsPermission = 'android.permission.health.READ_STEPS';
+    String stepsPermission;
+    if (Platform.isAndroid) {
+      stepsPermission = 'android.permission.health.READ_STEPS';
+    } else {
+      stepsPermission = "stepCount";
+    }
     try {
       final hasPermissions = await _wearableHealthPlugin.hasPermissions(
         permissions: [stepsPermission],
