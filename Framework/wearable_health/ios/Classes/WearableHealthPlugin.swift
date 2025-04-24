@@ -74,16 +74,13 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func extractHKDataTypesFromCall(call: FlutterCall) -> [HKObjectType] {
+    private func extractHKDataTypesFromCall(call: FlutterCall) -> [HKObjectType]? {
         guard let healthValueStrings = call.arguments as? [String] else {
-            result(
-                FlutterError(
-                    code: "INVALID_ARGUMENTS", message: "Argument must be a list of strings",
-                    details: nil))
-            return
+            return nil
         }
+
         print("Recieved health values: \(healthValueStrings)")
-        var typesToProcess: [HKObjectType] = []
+        var typesToProcess = Set<HKObjectType>()
 
         for valueString in healthValueStrings {
             print("Handling: \(valueString)")
