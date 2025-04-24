@@ -77,7 +77,7 @@ class _MyAppState extends State<MyApp> {
     if (Platform.isAndroid) {
       stepsPermission = 'android.permission.health.READ_STEPS';
     } else {
-      stepsPermission = "stepCount";
+      stepsPermission = "HKQuantityTypeIdentifierStepCount";
     }
     try {
       final hasPermissions = await _wearableHealthPlugin.hasPermissions(
