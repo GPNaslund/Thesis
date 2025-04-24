@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wearable_health/provider/provider.dart';
 import 'package:wearable_health/provider/provider_type.dart';
 import 'package:wearable_health/wearable_health.dart';
 
@@ -17,41 +20,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   bool? _hasPermissions;
-  final _wearableHealthPlugin = WearableHealth.getDataProvider(
-    ProviderType.googleHealthConnect,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  Future<void> initPlatformState() async {
-    try {
-      final platformVersion = await _wearableHealthPlugin.getPlatformVersion();
-      setState(() {
-        _platformVersion = platformVersion ?? 'Unknown';
-      });
-    } catch (_) {}
-  }
-
-  Future<void> _checkAndRequestPermissions() async {
-    const stepsPermission = 'android.permission.health.READ_STEPS';
-    try {
-      final hasPermissions = await _wearableHealthPlugin.hasPermissions(
-        permissions: [stepsPermission],
-      );
-      setState(() => _hasPermissions = hasPermissions);
-
-      final granted = await _wearableHealthPlugin.requestPermissions(
-        permissions: [stepsPermission],
-      );
-      setState(() => _hasPermissions = granted);
-    } on PlatformException catch (e) {
-      debugPrint('PlatformException: ${e.message}');
-    }
-  }
+  late Provider _wearableHealthPlugin;
 
   @override
   Widget build(BuildContext context) {
@@ -75,5 +44,47 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  Future<void> initPlatformState() async {
+    try {
+      final platformVersion = await _wearableHealthPlugin.getPlatformVersion();
+      setState(() {
+        _platformVersion = platformVersion ?? 'Unknown';
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+
+    if (Platform.isAndroid) {
+      _wearableHealthPlugin = WearableHealth.getDataProvider(
+        ProviderType.googleHealthConnect,
+      );
+    } else {
+      _wearableHealthPlugin = WearableHealth.getDataProvider(
+        ProviderType.appleHealthKit,
+      );
+    }
+  }
+
+  Future<void> _checkAndRequestPermissions() async {
+    const stepsPermission = 'android.permission.health.READ_STEPS';
+    try {
+      final hasPermissions = await _wearableHealthPlugin.hasPermissions(
+        permissions: [stepsPermission],
+      );
+      setState(() => _hasPermissions = hasPermissions);
+
+      final granted = await _wearableHealthPlugin.requestPermissions(
+        permissions: [stepsPermission],
+      );
+      setState(() => _hasPermissions = granted);
+    } on PlatformException catch (e) {
+      debugPrint('PlatformException: ${e.message}');
+    }
   }
 }
