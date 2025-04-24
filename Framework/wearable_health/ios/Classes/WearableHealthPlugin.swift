@@ -3,6 +3,8 @@ import HealthKit
 import UIKit
 
 public class WearableHealthPlugin: NSObject, FlutterPlugin {
+    let healthStore = HKHealthStore()
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
             name: "wearable_health", binaryMessenger: registrar.messenger())
@@ -19,7 +21,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         case .hasPermissions:
             checkHasPermissions(call: call, result: result)
         case .requestPermissions:
-            requestPermissions(call, method)
+            requestPermissions(call: call, result: result)
         case .dataStoreAvailability:
             checkDataStoreAvailability(result: result)
         case .unkown:
@@ -29,52 +31,61 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
 
     private func requestPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
         let typesToProcess = extractHKDataTypesFromCall(call: call)
-
-        if typesToProcess.isEmpty {
-            result(
-                FlutterError(
-                    code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to check",
-                    details: nil))
-        } else {
-            HKHealthStore().requestAuthorization(toShare: typesToProcess, read: typesToProcess) {
-                success, error in
+        
+        if (typesToProcess == nil) {
+            result(FlutterError(code: "INVALID_ARGUMENT_TYPE", message: "Invalid argument type. Must be a list of String", details: nil))
+            return
+        }
+        
+        if typesToProcess!.isEmpty {
+            result(FlutterError(code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to request permission for", details: nil))
+            return
+        }
+        
+        
+        if HKHealthStore.isHealthDataAvailable() {
+            healthStore.requestAuthorization(toShare: Set<HKSampleType>(), read: typesToProcess) { (success: Bool, error: Error?) in
                 if success {
+                    print("HealthKit authorization request succeeded")
                     result(true)
                 } else {
-                    result(
-                        FlutterError(
-                            code: "AUTHORIZATION_FAILED", message: "Failed to request permissions",
-                            details: error?.localizedDescription))
+                    print(
+                        "HealthKit authorization failed: \(error?.localizedDescription ?? "by User action")"
+                    )
+                    result(false)
                 }
             }
         }
+        
     }
 
     private func checkHasPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
         let typesToProcess = extractHKDataTypesFromCall(call: call)
-
-        if typesToProcess.isEmpty {
-            result(
-                FlutterError(
-                    code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to check",
-                    details: nil))
-        } else {
-            let authStatus = HKHealthStore().authorizationStatus(for: typesToProcess)
-            switch authStatus {
-            case .notDetermined:
-                print("Authorization status not determined")
-                result(false)
-            case .sharingDenied:
-                print("Sharing denied")
-                result(false)
-            case .sharingAuthorized:
-                print("Sharing authorized")
-                result(true)
+        
+        if typesToProcess == nil {
+            result(FlutterError(code: "INVALID_ARGUMENT_TYPE", message: "Invalid argument type. Must be List of String", details: nil))
+            return
+        }
+        
+        if typesToProcess!.isEmpty {
+            result(FlutterError(code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to check", details: nil))
+            return
+        }
+        
+        var allIsPermitted = true
+        typesToProcess!.forEach { type in
+            if (allIsPermitted) {
+                let authStatus = healthStore.authorizationStatus(for: type)
+                if (authStatus != .sharingAuthorized ) {
+                    allIsPermitted = false
+                }
             }
         }
+        
+        result(allIsPermitted)
     }
 
-    private func extractHKDataTypesFromCall(call: FlutterCall) -> [HKObjectType]? {
+    private func extractHKDataTypesFromCall(call: FlutterMethodCall) -> Set<HKObjectType>? {
         guard let healthValueStrings = call.arguments as? [String] else {
             return nil
         }
@@ -87,7 +98,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
             let type = hkObjectConverter(rawValue: valueString)
             if type != nil {
                 print("Type found: \(type!)")
-                typesToProcess.append(type!)
+                typesToProcess.insert(type!)
             } else {
                 print("Unknown type: \(valueString)")
             }
@@ -105,11 +116,6 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         let categoryType = hkCategoryTypeConverter(rawValue: rawValue)
         if categoryType != nil {
             return categoryType
-        }
-
-        let workoutType = hkWorkoutTypeConverter(rawValue: String)
-        if workoutType != nil {
-            return workoutType
         }
 
         print("Unknown type: \(rawValue)")
@@ -130,16 +136,6 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         if let categoryType = HKCategoryType.categoryType(forIdentifier: categoryIdentifier) {
             print("CategoryType identified: \(rawValue)")
             return categoryType
-        }
-
-        return nil
-    }
-
-    private func hkWorkoutTypeConverter(rawValue: String) -> HKWorkoutType? {
-        let workoutIdentifier = HKWorkoutTypeIdentifier(rawValue: rawValue)
-        if let workoutType = HKWorkoutType.workoutType(forIdentifier: workoutIdentifier) {
-            print("WorkoutType identified: \(rawValue)")
-            return workoutType
         }
 
         return nil
