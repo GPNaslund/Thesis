@@ -1,21 +1,22 @@
-public enum CallType: String {
+enum CallType: String {
     case getPlatformVersion = "getPlatformVersion"
-    case hasPermission = "hasPermission"
-    case requestPermission = "requestPermissions"
+    case hasPermissions = "hasPermissions"
+    case requestPermissions = "requestPermissions"
     case dataStoreAvailability = "dataStoreAvailability"
+    case unkown = "unkown"
 
-    static func fromString(val: String) -> CallType? {
+    static func fromString(val: String) -> CallType {
         switch val {
         case "getPlatformVersion":
             return .getPlatformVersion
-        case "hasPermission":
-            return .hasPermission
+        case "hasPermissions":
+            return .hasPermissions
         case "requestPermissions":
-            return .requestPermission
+            return .requestPermissions
         case "dataStoreAvailability":
             return .dataStoreAvailability
         default:
-            return nil
+            return .unkown
         }
     }
 }
