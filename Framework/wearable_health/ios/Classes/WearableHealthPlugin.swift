@@ -122,6 +122,8 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
     }
 
     private func hkObjectConverter(rawValue: String) -> HKObjectType? {
+        print("Processing raw value: \(rawValue)")
+
         let quantityType = hkQuantityTypeConverter(rawValue: rawValue)
         if quantityType != nil {
             return quantityType
