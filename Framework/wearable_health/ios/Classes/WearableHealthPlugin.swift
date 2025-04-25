@@ -103,7 +103,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         print("Trying to extract data types from: \(call.arguments)")
 
         guard let argumentsDict = call.arguments as? [String: Any],
-            let permissionsValue = argumentsDic["permissions"],
+            let permissionsValue = argumentsDict["permissions"],
             let healthValueStrings = permissionsValue as? [String]
         else {
             if !(call.arguments is [String: Any]) {
