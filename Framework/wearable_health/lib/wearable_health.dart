@@ -1,4 +1,4 @@
-import 'package:wearable_health/provider/apple_health_kit.dart';
+import 'package:wearable_health/provider/health_kit/apple_health_kit.dart';
 import 'package:wearable_health/provider/health_connect/google_health_connect.dart';
 import 'package:wearable_health/provider/provider.dart';
 import 'package:wearable_health/provider/provider_type.dart';

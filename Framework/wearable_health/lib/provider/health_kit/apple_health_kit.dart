@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:wearable_health/provider/enums/datastore_availability.dart';
-import 'package:wearable_health/provider/health_connect/enums/method_type.dart';
+import 'package:wearable_health/provider/health_kit/enums/method_types.dart';
 import 'package:wearable_health/provider/provider.dart';
 
-class GoogleHealthConnect implements Provider {
+class AppleHealthKit implements Provider {
   final methodChannel = MethodChannel("wearable_health");
 
   @override
