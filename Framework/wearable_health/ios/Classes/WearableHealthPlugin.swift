@@ -102,7 +102,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
     private func extractHKDataTypesFromCall(call: FlutterMethodCall) -> Set<HKObjectType>? {
         print("Trying to extract data types from: \(call.arguments)")
 
-        guard let healthValueStrings = call.arguments as? [String] else {
+        guard let healthValueStrings = call.arguments.permissions as? [String] else {
             return nil
         }
 
