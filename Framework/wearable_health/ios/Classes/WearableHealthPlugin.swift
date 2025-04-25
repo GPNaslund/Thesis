@@ -102,7 +102,25 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
     private func extractHKDataTypesFromCall(call: FlutterMethodCall) -> Set<HKObjectType>? {
         print("Trying to extract data types from: \(call.arguments)")
 
-        guard let healthValueStrings = call.arguments.permissions as? [String] else {
+        guard let argumentsDict = call.arguments as? [String: Any],
+            let permissionsValue = argumentsDic["permissions"],
+            let healthValueStrings = permissionsValue as? [String]
+        else {
+            if !(call.arguments is [String: Any]) {
+                print(
+                    "Error: call.arguments was not a dictionary [String: Any]. Actual type: \(type(of: call.arguments))"
+                )
+            } else if (call.arguments as! [String: Any])["permissions"] == nil {
+                print("Error: Dictionary did not contain the key 'permissions'.")
+            } else if !((call.arguments as! [String: Any])["permissions"] is [String]) {
+                print(
+                    "Error: Value for key 'permissions' was not an array of Strings [String]. Actual type: \(type(of: (call.arguments as! [String: Any])["permissions"]))"
+                )
+            } else {
+                print(
+                    "Error: Failed to extract 'permissions' array of strings for an unknown reason."
+                )
+            }
             return nil
         }
 
