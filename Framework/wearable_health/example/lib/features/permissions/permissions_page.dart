@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
+import '../../../constants/metrics.dart'; // <-- Important to import this!
 
 class PermissionsPage extends StatefulWidget {
   const PermissionsPage({super.key});
@@ -22,7 +23,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
   }
 
   Future<void> _checkAndRequestPermissions() async {
-    final hasPermission = await _wearableHealthService.hasStepsPermission();
+    final hasPermission = await _wearableHealthService.hasPermission(HealthMetric.heartRate);
     if (!mounted) return;
 
     if (hasPermission) {
@@ -31,7 +32,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
         _loading = false;
       });
     } else {
-      final granted = await _wearableHealthService.requestStepsPermission();
+      final granted = await _wearableHealthService.requestPermission(HealthMetric.heartRate);
       if (!mounted) return;
 
       if (granted) {

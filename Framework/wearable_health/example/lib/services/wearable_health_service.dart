@@ -1,16 +1,17 @@
 // lib/services/wearable_health_service.dart
 
-import 'dart:io';
-
 import 'package:wearable_health/wearable_health.dart';
 import 'package:wearable_health/provider/provider.dart';
 import 'package:wearable_health/provider/provider_type.dart';
+import 'package:flutter/foundation.dart';
+import '../constants/metrics.dart';
+import '../constants/metric_mapper.dart';
 
 class WearableHealthService {
   late final Provider _provider;
 
   WearableHealthService() {
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       _provider = WearableHealth.getDataProvider(ProviderType.googleHealthConnect);
     } else {
       _provider = WearableHealth.getDataProvider(ProviderType.appleHealthKit);
@@ -26,12 +27,10 @@ class WearableHealthService {
     }
   }
 
-  Future<bool> hasStepsPermission() async {
-    String permission;
-    if (Platform.isAndroid) {
-      permission = 'android.permission.health.READ_STEPS';
-    } else {
-      permission = 'HKQuantityTypeIdentifierStepCount';
+  Future<bool> hasPermission(HealthMetric metric) async {
+    final permission = mapMetricToPermission(metric);
+    if (permission == null) {
+      return false;
     }
 
     try {
@@ -41,12 +40,10 @@ class WearableHealthService {
     }
   }
 
-  Future<bool> requestStepsPermission() async {
-    String permission;
-    if (Platform.isAndroid) {
-      permission = 'android.permission.health.READ_STEPS';
-    } else {
-      permission = 'HKQuantityTypeIdentifierStepCount';
+  Future<bool> requestPermission(HealthMetric metric) async {
+    final permission = mapMetricToPermission(metric);
+    if (permission == null) {
+      return false;
     }
 
     try {
