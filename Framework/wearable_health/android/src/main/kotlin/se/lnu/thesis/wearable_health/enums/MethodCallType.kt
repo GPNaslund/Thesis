@@ -5,6 +5,7 @@ enum class MethodCallType(val value: String) {
     HAS_PERMISSIONS("hasPermissions"),
     REQUEST_PERMISSIONS("requestPermissions"),
     DATA_STORE_AVAILABILITY("dataStoreAvailability"),
+    GET_DATA("getData"),
     UNDEFINED("undefined");
 
     companion object {
