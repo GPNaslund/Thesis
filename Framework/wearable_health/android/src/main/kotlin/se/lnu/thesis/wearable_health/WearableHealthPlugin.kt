@@ -10,6 +10,8 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SkinTemperatureRecord
+import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.time.TimeRangeFilter
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -17,17 +19,18 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import java.time.Instant
 import kotlin.reflect.KClass
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import se.lnu.thesis.wearable_health.enums.DataStoreAvailabilityResult
 import se.lnu.thesis.wearable_health.enums.MethodCallType
 import se.lnu.thesis.wearable_health.enums.ResultError
+import se.lnu.thesis.wearable_health.record_extension.serialize
 
 /** WearableHealthPlugin */
 class WearableHealthPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -139,12 +142,69 @@ class WearableHealthPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun getData(call: MethodCall, result: Result) {
         val arguments = call.arguments<Map<String, String>>()
-        val start = arguments?.get("start") ?: ""
-        val end = arguments?.get("end") ?: ""
+        val start: String?
+        val end: String?
+        val startInstant: Instant?
+        val endInstant: Instant?
 
         try {
-            for (dataType in dataTypes) {}
-        } catch (e: Exception) {}
+            start = requireNotNull(arguments?.get("start")) { "Missing 'start' argument" }
+            end = requireNotNull(arguments?.get("end")) { "Missing 'end' argument" }
+            startInstant = Instant.parse(start)
+            endInstant = Instant.parse(end)
+        } catch (e: Exception) {
+            Log.e("WearableHealthPlugin", "Failed to parse arguments", e)
+            result.error("INVALID_ARGS", "Failed to parse arguments: ${e.message}", null)
+            return
+        }
+
+        pluginScope.launch {
+            try {
+                Log.d("WearableHealthPlugin", "Coroutine launched for getData")
+                val serializedListResult: List<Map<String, String>> = withContext(Dispatchers.IO) {
+                    Log.d("WearableHealthPlugin", "Executing read operations on IO dispatcher")
+                    val dataList: MutableList<Map<String, String>> = mutableListOf()
+
+                    if (dataTypes.isEmpty()) {
+                        Log.w("WearableHealthPlugin", "No data types requested.")
+                    }
+
+                    for (dataType in dataTypes) {
+                        Log.d("WearableHealthPlugin", "Reading data for ${dataType.simpleName}")
+                        val response = healthConnectClient.readRecords(
+                            ReadRecordsRequest(
+                                recordType = dataType,
+                                timeRangeFilter = TimeRangeFilter.between(startInstant, endInstant)
+                            )
+                        )
+                        Log.d("WearableHealthPlugin", "Read ${response.records.size} records for ${dataType.simpleName}")
+
+                        for (record in response.records) {
+                            val serializedRecord: Map<String, String>? = when (record) {
+                                is HeartRateRecord -> record.serialize()
+                                is SkinTemperatureRecord -> record.serialize()
+                                else -> {
+                                    Log.w("WearableHealthPlugin", "Unsupported record type encountered: ${record::class.simpleName}")
+                                    null
+                                }
+                            }
+                            serializedRecord?.let { dataList.add(it) }
+                        }
+                    }
+                    dataList
+                }
+
+                Log.d("WearableHealthPlugin", "Data fetch complete, sending ${serializedListResult.size} records to Flutter.")
+                result.success(serializedListResult)
+
+            } catch (e: CancellationException) {
+                Log.i("WearableHealthPlugin", "Data fetch job was cancelled", e)
+                result.error("CANCELLED", "Data fetch cancelled", null)
+            } catch (e: Exception) {
+                Log.e("WearableHealthPlugin", "Error during data fetch coroutine", e)
+                result.error("GET_DATA_FAIL", "Failed to get data: ${e.message}", e.toString())
+            }
+        }
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
