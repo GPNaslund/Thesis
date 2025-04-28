@@ -260,6 +260,7 @@ class WearableHealthPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private fun assignRequestedPermissions(call: MethodCall) {
         val arguments = call.arguments<Map<String, List<String>>>()
         val dataTypeList = arguments?.get("dataTypes") ?: emptyList()
+        Log.d("WearableHealthPlugin", "assignRequestedPermissions received: ${dataTypeList.toString()} dataTypes")
 
         for (dataType in dataTypeList) {
             when (dataType) {

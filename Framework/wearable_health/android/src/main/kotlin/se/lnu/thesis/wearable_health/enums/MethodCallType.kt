@@ -15,6 +15,7 @@ enum class MethodCallType(val value: String) {
                 "hasPermissions" -> HAS_PERMISSIONS
                 "requestPermissions" -> REQUEST_PERMISSIONS
                 "dataStoreAvailability" -> DATA_STORE_AVAILABILITY
+                "getData" -> GET_DATA
                 else -> UNDEFINED
             }
         }
