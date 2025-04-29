@@ -43,13 +43,13 @@ class _MyAppState extends State<MyApp> {
     if (Platform.isAndroid) {
       List<HealthConnectDataType> dataTypes = [
         HealthConnectHeartRate(),
-        HealthConnectSkinTemperature()
+        HealthConnectSkinTemperature(),
       ];
       _wearableHealthPlugin = WearableHealth.getGoogleHealthConnect(dataTypes);
     } else if (Platform.isIOS) {
       List<HealthKitDataType> dataTypes = [
         HealthKitHeartRate(),
-        HealthKitBodyTemperature()
+        HealthKitBodyTemperature(),
       ];
       _wearableHealthPlugin = WearableHealth.getAppleHealthKit(dataTypes);
     } else {
@@ -63,7 +63,6 @@ class _MyAppState extends State<MyApp> {
     await initPlatformState();
     await _checkPermissions();
   }
-
 
   Future<void> initPlatformState() async {
     if (_wearableHealthPlugin == null) return;
@@ -113,7 +112,6 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-
   Future<void> _requestPermissions() async {
     if (_wearableHealthPlugin == null) return;
     _appendToConsole('Requesting permissions...');
@@ -161,7 +159,11 @@ class _MyAppState extends State<MyApp> {
       final now = DateTime.now();
       final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
       final startOfWeek = endOfDay.subtract(const Duration(days: 6));
-      final midnightStartOfWeek = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+      final midnightStartOfWeek = DateTime(
+        startOfWeek.year,
+        startOfWeek.month,
+        startOfWeek.day,
+      );
 
       final range = DateTimeRange(start: midnightStartOfWeek, end: endOfDay);
 
@@ -169,8 +171,10 @@ class _MyAppState extends State<MyApp> {
       _appendToConsole('Start: ${range.start.toIso8601String()}');
       _appendToConsole('End:  ${range.end.toIso8601String()}');
 
-
-      final List<HealthData>? data = await _wearableHealthPlugin!.getData(range, null);
+      final List<HealthData> data = await _wearableHealthPlugin!.getData(
+        range,
+        null,
+      );
 
       if (mounted) {
         if (data == null || data.isEmpty) {
@@ -186,7 +190,9 @@ class _MyAppState extends State<MyApp> {
       }
     } on PlatformException catch (e) {
       if (mounted) {
-        _appendToConsole('PlatformException when getting the data: ${e.message}\n${e.details}\n${e.stacktrace}');
+        _appendToConsole(
+          'PlatformException when getting the data: ${e.message}\n${e.details}\n${e.stacktrace}',
+        );
       }
     } catch (e, stacktrace) {
       if (mounted) {
@@ -204,7 +210,8 @@ class _MyAppState extends State<MyApp> {
   void _appendToConsole(String text) {
     if (mounted) {
       setState(() {
-        _consoleOutput = '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
+        _consoleOutput =
+            '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
       });
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -218,13 +225,11 @@ class _MyAppState extends State<MyApp> {
 
   final ScrollController _scrollController = ScrollController();
 
-
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -245,20 +250,30 @@ class _MyAppState extends State<MyApp> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: _wearableHealthPlugin == null ? null : _requestPermissions,
+                    onPressed:
+                        _wearableHealthPlugin == null
+                            ? null
+                            : _requestPermissions,
                     child: const Text('Request permissions'),
                   ),
                   ElevatedButton(
-                    onPressed: (_hasPermissions == true && !_isLoadingData && _wearableHealthPlugin != null)
-                        ? _fetchData
-                        : null,
-                    child: _isLoadingData
-                        ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                    )
-                        : const Text('Get data (1 week)'),
+                    onPressed:
+                        (_hasPermissions == true &&
+                                !_isLoadingData &&
+                                _wearableHealthPlugin != null)
+                            ? _fetchData
+                            : null,
+                    child:
+                        _isLoadingData
+                            ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                            : const Text('Get data (1 week)'),
                   ),
                 ],
               ),

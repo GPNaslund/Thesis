@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/provider/data_converter.dart';
@@ -22,25 +21,26 @@ abstract class NativeProvider<T extends HealthDataType> implements Provider {
   }
 
   @override
-  Future<List<HealthData>> getData(DateTimeRange timeRange, DataConverter? converter) async {
+  Future<List<HealthData>> getData(
+    DateTimeRange timeRange,
+    DataConverter? converter,
+  ) async {
     List<HealthData> healthDataList = [];
     debugPrint("[getData] Method started.");
     debugPrint(
-        "[getData] Calling invokeMethod for interval: ${timeRange.start
-            .toUtc()
-            .toIso8601String()} - ${timeRange.end
-            .toUtc()
-            .toIso8601String()}");
+      "[getData] Calling invokeMethod for interval: ${timeRange.start.toUtc().toIso8601String()} - ${timeRange.end.toUtc().toIso8601String()}",
+    );
 
     try {
-      final dynamic rawData = await methodChannel.invokeMethod<dynamic>(
-          MethodType.getData.value, {
-        'start': timeRange.start.toUtc().toIso8601String(),
-        'end': timeRange.end.toUtc().toIso8601String(),
-      });
+      final dynamic rawData = await methodChannel
+          .invokeMethod<dynamic>(MethodType.getData.value, {
+            'start': timeRange.start.toUtc().toIso8601String(),
+            'end': timeRange.end.toUtc().toIso8601String(),
+          });
 
-      debugPrint("[getData] Received rawData: Type=${rawData
-          ?.runtimeType}, Value=$rawData");
+      debugPrint(
+        "[getData] Received rawData: Type=${rawData?.runtimeType}, Value=$rawData",
+      );
 
       if (rawData == null) {
         debugPrint("[getData] MethodChannel returned null.");
@@ -50,7 +50,8 @@ abstract class NativeProvider<T extends HealthDataType> implements Provider {
       debugPrint("[getData] Checking if rawData is a List ('is List')...");
       bool isListCheckResult = rawData is List;
       debugPrint(
-          "[GoogleHealthConnect.getData] Result of 'rawData is List': $isListCheckResult");
+        "[GoogleHealthConnect.getData] Result of 'rawData is List': $isListCheckResult",
+      );
 
       if (isListCheckResult) {
         debugPrint("[getData] OK: rawData is a List. Attempting to iterate...");
@@ -61,24 +62,26 @@ abstract class NativeProvider<T extends HealthDataType> implements Provider {
           if (item is Map) {
             try {
               final Map<String, String> dataPoint = item.map(
-                    (key, value) => MapEntry(key.toString(), value.toString()),
+                (key, value) => MapEntry(key.toString(), value.toString()),
               );
               healthDataList.add(dataPoint);
             } catch (e, stackTrace) {
               debugPrint(
-                  "[getData] ERROR: Could not convert Map element: $item. Error: $e\n$stackTrace");
+                "[getData] ERROR: Could not convert Map element: $item. Error: $e\n$stackTrace",
+              );
               continue;
             }
           } else {
             debugPrint(
-                "[getData] WARNING: Element in list is not a Map: $item (${item
-                    .runtimeType})");
+              "[getData] WARNING: Element in list is not a Map: $item (${item.runtimeType})",
+            );
           }
         }
 
         if (converter != null) {
-          debugPrint("[getData] Applying converter to ${healthDataList
-              .length} valid data points.");
+          debugPrint(
+            "[getData] Applying converter to ${healthDataList.length} valid data points.",
+          );
           try {
             List<HealthData> converted = [];
             for (final dataPoint in healthDataList) {
@@ -88,12 +91,14 @@ abstract class NativeProvider<T extends HealthDataType> implements Provider {
             return converted;
           } catch (e, stackTrace) {
             debugPrint(
-                "[getData] ERROR: Error during data conversion: $e\n$stackTrace");
+              "[getData] ERROR: Error during data conversion: $e\n$stackTrace",
+            );
             throw Exception("Error applying data converter: $e");
           }
         } else {
-          debugPrint("[getData] Returning ${healthDataList
-              .length} processed data points (no converter).");
+          debugPrint(
+            "[getData] Returning ${healthDataList.length} processed data points (no converter).",
+          );
           return healthDataList;
         }
       } else {
@@ -101,12 +106,13 @@ abstract class NativeProvider<T extends HealthDataType> implements Provider {
         debugPrint("[getData] rawData.runtimeType is: ${rawData.runtimeType}");
         debugPrint("[getData] rawData.toString() is: ${rawData.toString()}");
         throw Exception(
-            "[getData] Unexpected data type received (is List == false): ${rawData
-                .runtimeType}");
+          "[getData] Unexpected data type received (is List == false): ${rawData.runtimeType}",
+        );
       }
     } on PlatformException catch (e, stackTrace) {
-      debugPrint("[getData] ERROR: PlatformException: ${e.message}\n${e
-          .details}\n$stackTrace");
+      debugPrint(
+        "[getData] ERROR: PlatformException: ${e.message}\n${e.details}\n$stackTrace",
+      );
       rethrow;
     } catch (e, stackTrace) {
       debugPrint("[getData] ERROR: Unexpected error: $e\n$stackTrace");

@@ -4,6 +4,13 @@ import UIKit
 
 public class WearableHealthPlugin: NSObject, FlutterPlugin {
     let healthStore = HKHealthStore()
+    let dataTypes = Set<HKObjectType>()
+
+    let dateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
@@ -13,43 +20,164 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        print("Got call: \(call.method)")
-        let callType: CallType = CallType.fromString(val: call.method)
+        do {        
+            print("Got call: \(call.method)")
+            let callType: CallType = CallType.fromString(val: call.method)
 
-        switch callType {
-        case .getPlatformVersion:
-            result("iOS " + UIDevice.current.systemVersion)
-        case .hasPermissions:
-            checkHasPermissions(call: call, result: result)
-        case .requestPermissions:
-            requestPermissions(call: call, result: result)
-        case .dataStoreAvailability:
-            checkDataStoreAvailability(result: result)
-        case .unkown:
-            fatalError("Not implemented")
+            switch callType {
+            case .getPlatformVersion:
+                result("iOS " + UIDevice.current.systemVersion)
+            case .hasPermissions:
+                try checkHasPermissions(call: call, result: result)
+            case .requestPermissions:
+                try requestPermissions(call: call, result: result)
+            case .dataStoreAvailability:
+                checkDataStoreAvailability(result: result)
+            case .unkown:
+                fatalError("Not implemented")
+            }
+        } catch InvalidArgument.wrongType(let message) {
+            print(message)
+            result(
+                FlutterError(
+                    code: "INVALID_ARGUMENT_ERROR",
+                    message: message,
+                    details: nil
+                )
+            )
+            return
+        } catch InvalidState.permissionValidationMissing(let message) {
+            print(message)
+            result(
+                FlutterError(
+                    code: "INVALID_STATE_ERROR",
+                    message: message,
+                    details: nil
+                )
+            )
+            return
+        } catch error {
+            print("An unexpected error occured: \(error.localizedDescription)")
+            result(
+                FlutterError(
+                    code: "UNEXPECTED_ERROR",
+                    message: error.localizedDescription,
+                    details: nil
+                )
+            )
         }
     }
 
-    private func requestPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let typesToProcess = extractHKDataTypesFromCall(call: call)
+    private func getData(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
+        guard let args = call.arguments as? [String: Any],
+            let startString = args["start"] as? String,
+            let endString = args["end"] as? String else {
+                throw InvalidArgument.wrongType(message: "[getData] Missing 'start' and/or 'end' as arguments to method")
+            }
 
-        if typesToProcess == nil {
-            result(
-                FlutterError(
-                    code: "INVALID_ARGUMENT_TYPE",
-                    message: "Invalid argument type. Must be a list of String", details: nil))
-            return
+        guard let startDate = dateFormatter.date(from: startString),
+            let endDate = dateFormatter.date(from: endString) else {
+                throw InvalidArgument.wrongType(message: "[getData] Could not parse date strings")
+            }
+
+        if dataTypes.isEmpty {
+            throw InvalidState.permissionValidationMissing(message: "[getData] No datatypes are set which means checkPermissions and/or requestPermissions has not been called")
         }
 
-        if typesToProcess!.isEmpty {
-            result(
-                FlutterError(
-                    code: "NO_TYPES_TO_CHECK",
-                    message: "No valid types were provided to request permission for", details: nil)
-            )
-            return
+        var collectedData: [[String: String]] = []
+        let group = DispatchGroup()
+
+        for objectType in dataTypes {
+            guard let sampleType = objectType as? HKSampleType else {
+                print("[getData] Skipping non-sample type: \(objectType.identifier)")
+                continue
+            }
+
+            print("[getData] Querying for type: \(sampleType.identifier) between \(startDate) and \(endDate)")
+            group.enter()
+
+            let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
+            let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+
+            let query = HKSampleQuery(
+                sampleType: sampleType,
+                pedicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sortDescriptor]
+            ) { _, samples, error in 
+                defer { group.leave() }
+
+                if let error = error {
+                    print("[getData] Error fetching \(sampleType.identifier): \(error.localizedDescription)")
+                    return
+                }
+
+                guard let validSamples = samples, !validSamples.isEmpty else {
+                    print("[getData] No samples found for \(sampleType.identifier) in the given range")
+                    return
+                }
+
+                print("[getData] Found \(validSamples.count) samples for \(sampleType.identifier)")
+
+                DispatchQueue.main.async {
+                    for sample in validSamples {
+                        var dataPoint: [String: String] = [:]
+                        dataPoint["uuid"] = sample.uuid.uuidString
+                        dataPoint["startDate"] = self.dateFormatter.string(from: sample.startDate)
+                        dataPoint["endDate"] = self.dateFormatter.string(from: sample.endDate)
+                        dataPoint["sourceBundleId"] = sample.sourceRevision.source.bundleIdentifier
+                        dataPoint["sourceName"] = sample.sourceRevision.source.name
+
+                        if let quantitySample = sample as? HKQuantitySample {
+                            let quantityTypeIdentifier = quantitySample.quantityType.identifier
+                            var unit: HKUnit? = nil
+                            var typeString: String? = nil
+
+                            switch quantityTypeIdentifier {
+                                case HKQuantityTypeIdentifier.heartRate.rawValue:
+                                    unit = HKUnit.count().unitDivided(by: HKUnit.minute())
+                                    typeString = "heartRate"
+                                case HKQuantityTypeIdentifier.bodyTemperature.rawValue:
+                                    unit = HKUnit.degreeCelsius()
+                                    typeString = "bodyTemperature"
+                                default:
+                                    print("[getData] Skipping unsupported quantity type: \(quantityTypeIdentifier)")
+                                    continue
+                            }
+
+                            if let validUnit = unit, let validTypestring = typeString {
+                                dataPoint["value"] = String(quantitySample.quantity.doubleValue(for: validUnit))
+                                dataPoint["unit"] = validUnit.unitString
+                                dataPoint["dataType"] = validTypestring
+                            }
+                        }
+
+                        else {
+                            print("[getData] Skipping sample type that is not supported \(type(of: sample))")
+                            continue
+                        }
+
+                        if dataPoint["value"] != nil && dataPoint["dataType"] != nil {
+                            allCollectedData.append(dataPoint)
+                        } else {
+                            print("[getData] Error: Failed to extract value/dataType for sample: \(sample.uuid)")
+                        }
+                    }
+                }
+            }
+
+            healthStore.execute(query)
         }
 
+        group.notify(queue: .main) {
+            print("[getData] All queries finished. Returning \(allCollectedData.count) data points")
+            result(allCollectedData)
+        }
+    }
+
+    private func requestPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
+        assignHKDataTypes(call: call)
+        
         if HKHealthStore.isHealthDataAvailable() {
             healthStore.requestAuthorization(toShare: Set<HKSampleType>(), read: typesToProcess) {
                 (success: Bool, error: Error?) in
@@ -64,30 +192,13 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
                 }
             }
         }
-
     }
 
-    private func checkHasPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let typesToProcess = extractHKDataTypesFromCall(call: call)
-
-        if typesToProcess == nil {
-            result(
-                FlutterError(
-                    code: "INVALID_ARGUMENT_TYPE",
-                    message: "Invalid argument type. Must be List of String", details: nil))
-            return
-        }
-
-        if typesToProcess!.isEmpty {
-            result(
-                FlutterError(
-                    code: "NO_TYPES_TO_CHECK", message: "No valid types were provided to check",
-                    details: nil))
-            return
-        }
+    private func checkHasPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
+        assignHKDataTypes(call: call)
 
         var allIsPermitted = true
-        typesToProcess!.forEach { type in
+        dataTypes.forEach { type in
             if allIsPermitted {
                 let authStatus = healthStore.authorizationStatus(for: type)
                 if authStatus != .sharingAuthorized {
@@ -99,82 +210,56 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         result(allIsPermitted)
     }
 
-    private func extractHKDataTypesFromCall(call: FlutterMethodCall) -> Set<HKObjectType>? {
-        print("Trying to extract data types from: \(call.arguments)")
+    private func assignHKDataTypes(call: FlutterMethodCall) throws {
+        if (dataTypes.count != 0) {
+            print("[assignHKDataTypes] dataTypes is allready assigned")
+            return
+        }
+
+        
+        print("[assignHKDataTypes] Trying to extract data types from: \(call.arguments)")
 
         guard let argumentsDict = call.arguments as? [String: Any],
-            let permissionsValue = argumentsDict["permissions"],
+            let permissionsValue = argumentsDict["dataTypes"],
             let healthValueStrings = permissionsValue as? [String]
         else {
             if !(call.arguments is [String: Any]) {
-                print(
-                    "Error: call.arguments was not a dictionary [String: Any]. Actual type: \(type(of: call.arguments))"
-                )
-            } else if (call.arguments as! [String: Any])["permissions"] == nil {
-                print("Error: Dictionary did not contain the key 'permissions'.")
-            } else if !((call.arguments as! [String: Any])["permissions"] is [String]) {
-                print(
-                    "Error: Value for key 'permissions' was not an array of Strings [String]. Actual type: \(type(of: (call.arguments as! [String: Any])["permissions"]))"
-                )
+                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: call.arguments was not a dictionary [String: Any]. Actual type: \(type(of: call.arguments))")
+            } else if (call.arguments as! [String: Any])["dataTypes"] == nil {
+                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Dictionary did not contain the key 'dataTypes'.")
+            } else if !((call.arguments as! [String: Any])["dataTypes"] is [String]) {
+                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Value for key 'permissions' was not an array of Strings [String]. Actual type: \(type(of: (call.arguments as! [String: Any])["permissions"]))")
             } else {
-                print(
-                    "Error: Failed to extract 'permissions' array of strings for an unknown reason."
-                )
+                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Failed to extract 'permissions' array of strings for an unknown reason.")
             }
-            return nil
         }
 
-        print("Recieved health values: \(healthValueStrings)")
-        var typesToProcess = Set<HKObjectType>()
+        if healthValueStrings.count == 0 {
+            throw ArgumentError.invalidType(message: "[assignHKDataTypes] No dataType strings provided")
+        }
+
+        print("[assignHKDataTypes] Recieved health values: \(healthValueStrings)")
 
         for valueString in healthValueStrings {
-            print("Handling: \(valueString)")
-            let type = hkObjectConverter(rawValue: valueString)
-            if type != nil {
-                print("Type found: \(type!)")
-                typesToProcess.insert(type!)
-            } else {
-                print("Unknown type: \(valueString)")
-            }
+            switch valueString {
+                case "heartRate": 
+                    if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate) {
+                        dataTypes.insert(heartRateType)
+                        print("[assignHKDataTypes] Added heartRate type")
+                    } else {
+                        print("[assignHKDataTypes] Error: Could not get HKQuantityType for heartRate")
+                    }
+                case "bodyTemperature":
+                    if let bodyTempType = HKQuantityType.quantityType(forIdentifier: .bodyTemperature) {
+                        dataTypes.insert(bodyTempType)
+                        print("[assignHKDataTypes] Added bodyTempType")
+                    } else {
+                        print("[assignHKDataTypes] Error: Could not get HKQuantityType for bodyTemperature")
+                    }
+                default:
+                    throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Undefined data type \(valueString)")
+            }   
         }
-
-        return typesToProcess
-    }
-
-    private func hkObjectConverter(rawValue: String) -> HKObjectType? {
-        print("Processing raw value: \(rawValue)")
-
-        let quantityType = hkQuantityTypeConverter(rawValue: rawValue)
-        if quantityType != nil {
-            return quantityType
-        }
-
-        let categoryType = hkCategoryTypeConverter(rawValue: rawValue)
-        if categoryType != nil {
-            return categoryType
-        }
-
-        print("Unknown type: \(rawValue)")
-        return nil
-    }
-
-    private func hkQuantityTypeConverter(rawValue: String) -> HKQuantityType? {
-        let quantityIdentifier = HKQuantityTypeIdentifier(rawValue: rawValue)
-        if let quantityType = HKQuantityType.quantityType(forIdentifier: quantityIdentifier) {
-            print("Quantity type identified: \(rawValue)")
-            return quantityType
-        }
-        return nil
-    }
-
-    private func hkCategoryTypeConverter(rawValue: String) -> HKCategoryType? {
-        let categoryIdentifier = HKCategoryTypeIdentifier(rawValue: rawValue)
-        if let categoryType = HKCategoryType.categoryType(forIdentifier: categoryIdentifier) {
-            print("CategoryType identified: \(rawValue)")
-            return categoryType
-        }
-
-        return nil
     }
 
     private func checkDataStoreAvailability(result: @escaping FlutterResult) {
