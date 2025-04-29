@@ -15,5 +15,4 @@ String? mapMetricToPermission(HealthMetric metric) {
         return 'HKQuantityTypeIdentifierHeartRate';
     }
   }
-  return null;
 }

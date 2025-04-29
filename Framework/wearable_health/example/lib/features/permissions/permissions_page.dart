@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
-import '../../../constants/metrics.dart'; // <-- Important to import this!
 
 class PermissionsPage extends StatefulWidget {
   const PermissionsPage({super.key});
@@ -23,30 +22,28 @@ class _PermissionsPageState extends State<PermissionsPage> {
   }
 
   Future<void> _checkAndRequestPermissions() async {
-    final hasPermission = await _wearableHealthService.hasPermission(HealthMetric.heartRate);
+    final hasPermission = await _wearableHealthService.hasPermissions();
     if (!mounted) return;
 
     if (hasPermission) {
-      setState(() {
-        _statusLabel = "Permission already granted!";
-        _loading = false;
-      });
+      _updateStatus("Permission already granted!");
     } else {
-      final granted = await _wearableHealthService.requestPermission(HealthMetric.heartRate);
+      final granted = await _wearableHealthService.requestPermissions();
       if (!mounted) return;
 
       if (granted) {
-        setState(() {
-          _statusLabel = "Permission granted!";
-          _loading = false;
-        });
+        _updateStatus("Permission granted!");
       } else {
-        setState(() {
-          _statusLabel = "Permission denied. Please allow access.";
-          _loading = false;
-        });
+        _updateStatus("Permission denied. Please allow access.");
       }
     }
+  }
+
+  void _updateStatus(String message) {
+    setState(() {
+      _statusLabel = message;
+      _loading = false;
+    });
   }
 
   @override
