@@ -3,6 +3,7 @@ enum CallType: String {
     case hasPermissions = "hasPermissions"
     case requestPermissions = "requestPermissions"
     case dataStoreAvailability = "dataStoreAvailability"
+    case getData = "getData"
     case unkown = "unkown"
 
     static func fromString(val: String) -> CallType {
@@ -15,6 +16,8 @@ enum CallType: String {
             return .requestPermissions
         case "dataStoreAvailability":
             return .dataStoreAvailability
+        case "getData":
+            return .getData
         default:
             return .unkown
         }

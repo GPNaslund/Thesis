@@ -2,7 +2,8 @@ enum MethodType {
   getPlatformVersion(value: "getPlatformVersion"),
   hasPermissions(value: "hasPermissions"),
   requestPermissions(value: "requestPermissions"),
-  dataStoreAvailability(value: "dataStoreAvailability");
+  dataStoreAvailability(value: "dataStoreAvailability"),
+  getData(value: "getData");
 
   const MethodType({required this.value});
 
