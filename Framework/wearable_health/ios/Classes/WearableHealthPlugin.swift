@@ -4,7 +4,7 @@ import UIKit
 
 public class WearableHealthPlugin: NSObject, FlutterPlugin {
     let healthStore = HKHealthStore()
-    let dataTypes = Set<HKObjectType>()
+    var dataTypes = Set<HKObjectType>()
 
     let dateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -33,6 +33,8 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
                 try requestPermissions(call: call, result: result)
             case .dataStoreAvailability:
                 checkDataStoreAvailability(result: result)
+            case .getData:
+                try getData(call: call, result: result)
             case .unkown:
                 fatalError("Not implemented")
             }
@@ -56,7 +58,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
                 )
             )
             return
-        } catch error {
+        } catch {
             print("An unexpected error occured: \(error.localizedDescription)")
             result(
                 FlutterError(
@@ -101,7 +103,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
 
             let query = HKSampleQuery(
                 sampleType: sampleType,
-                pedicate: predicate,
+                predicate: predicate,
                 limit: HKObjectQueryNoLimit,
                 sortDescriptors: [sortDescriptor]
             ) { _, samples, error in 
@@ -158,7 +160,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
                         }
 
                         if dataPoint["value"] != nil && dataPoint["dataType"] != nil {
-                            allCollectedData.append(dataPoint)
+                            collectedData.append(dataPoint)
                         } else {
                             print("[getData] Error: Failed to extract value/dataType for sample: \(sample.uuid)")
                         }
@@ -170,16 +172,16 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         }
 
         group.notify(queue: .main) {
-            print("[getData] All queries finished. Returning \(allCollectedData.count) data points")
-            result(allCollectedData)
+            print("[getData] All queries finished. Returning \(collectedData.count) data points")
+            result(collectedData)
         }
     }
 
     private func requestPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
-        assignHKDataTypes(call: call)
+        try assignHKDataTypes(call: call)
         
         if HKHealthStore.isHealthDataAvailable() {
-            healthStore.requestAuthorization(toShare: Set<HKSampleType>(), read: typesToProcess) {
+            healthStore.requestAuthorization(toShare: Set<HKSampleType>(), read: dataTypes) {
                 (success: Bool, error: Error?) in
                 if success {
                     print("HealthKit authorization request succeeded")
@@ -195,7 +197,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
     }
 
     private func checkHasPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
-        assignHKDataTypes(call: call)
+        try assignHKDataTypes(call: call)
 
         var allIsPermitted = true
         dataTypes.forEach { type in
@@ -217,25 +219,27 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         }
 
         
-        print("[assignHKDataTypes] Trying to extract data types from: \(call.arguments)")
+        print(
+            "[assignHKDataTypes] Trying to extract data types from: \(call.arguments ?? "Call argument null")"
+        )
 
         guard let argumentsDict = call.arguments as? [String: Any],
             let permissionsValue = argumentsDict["dataTypes"],
             let healthValueStrings = permissionsValue as? [String]
         else {
             if !(call.arguments is [String: Any]) {
-                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: call.arguments was not a dictionary [String: Any]. Actual type: \(type(of: call.arguments))")
+                throw InvalidArgument.wrongType(message: "[assignHKDataTypes] Error: call.arguments was not a dictionary [String: Any]. Actual type: \(type(of: call.arguments))")
             } else if (call.arguments as! [String: Any])["dataTypes"] == nil {
-                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Dictionary did not contain the key 'dataTypes'.")
+                throw InvalidArgument.wrongType(message: "[assignHKDataTypes] Error: Dictionary did not contain the key 'dataTypes'.")
             } else if !((call.arguments as! [String: Any])["dataTypes"] is [String]) {
-                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Value for key 'permissions' was not an array of Strings [String]. Actual type: \(type(of: (call.arguments as! [String: Any])["permissions"]))")
+                throw InvalidArgument.wrongType(message: "[assignHKDataTypes] Error: Value for key 'permissions' was not an array of Strings [String]. Actual type: \(type(of: (call.arguments as! [String: Any])["permissions"]))")
             } else {
-                throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Failed to extract 'permissions' array of strings for an unknown reason.")
+                throw InvalidArgument.wrongType(message: "[assignHKDataTypes] Error: Failed to extract 'permissions' array of strings for an unknown reason.")
             }
         }
 
         if healthValueStrings.count == 0 {
-            throw ArgumentError.invalidType(message: "[assignHKDataTypes] No dataType strings provided")
+            throw InvalidArgument.wrongType(message: "[assignHKDataTypes] No dataType strings provided")
         }
 
         print("[assignHKDataTypes] Recieved health values: \(healthValueStrings)")
@@ -257,8 +261,8 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
                         print("[assignHKDataTypes] Error: Could not get HKQuantityType for bodyTemperature")
                     }
                 default:
-                    throw ArgumentError.invalidType(message: "[assignHKDataTypes] Error: Undefined data type \(valueString)")
-            }   
+                    throw InvalidArgument.wrongType(message: "[assignHKDataTypes] Error: Undefined data type \(valueString)")
+            }
         }
     }
 
