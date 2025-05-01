@@ -1,123 +1,48 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wearable_health/provider/data_converter.dart';
-import 'package:wearable_health/provider/enums/datastore_availability.dart';
-import 'package:wearable_health/provider/health_data.dart';
-import 'package:wearable_health/provider/native/health_data_type.dart';
+import 'package:wearable_health/provider/dto/check_permissions_request.dart';
+import 'package:wearable_health/provider/dto/check_permissions_response.dart';
+import 'package:wearable_health/provider/dto/datastore_availability_response.dart';
+import 'package:wearable_health/provider/dto/get_data_response.dart';
+import 'package:wearable_health/provider/dto/get_data_request.dart';
+import 'package:wearable_health/provider/dto/request_permissions_request.dart';
+import 'package:wearable_health/provider/dto/request_permissions_response.dart';
+import 'package:wearable_health/provider/enums/health_data_type.dart';
 import 'package:wearable_health/provider/provider.dart';
 
-import 'method_type.dart';
+import '../method_type.dart';
 
-abstract class NativeProvider<T extends HealthDataType> implements Provider {
+abstract class NativeProvider implements Provider {
   final methodChannel = MethodChannel("wearable_health");
-  late List<T> dataTypes;
+
 
   @override
-  Future<DataStoreAvailability> checkDataStoreAvailability() async {
+  Future<DataStoreAvailabilityResponse> checkDataStoreAvailability() async {
     final result = await methodChannel.invokeMethod<String>(
       MethodType.dataStoreAvailability.value,
     );
-    return DataStoreAvailability.fromString(result ?? "unknown");
+
+    if (result == null) {
+      throw Exception("[checkDataStoreAvailability] received null result");
+    }
+
+    return DataStoreAvailabilityResponse.fromString(result);
   }
 
   @override
-  Future<List<HealthData>> getData(
-    DateTimeRange timeRange,
-    DataConverter? converter,
-  ) async {
-    List<HealthData> healthDataList = [];
-    debugPrint("[getData] Method started.");
-    debugPrint(
-      "[getData] Calling invokeMethod for interval: ${timeRange.start.toUtc().toIso8601String()} - ${timeRange.end.toUtc().toIso8601String()}",
+  Future<GetDataResponse> getData(GetDataRequest req) async {
+    _validateDataTypes(req.dataTypes);
+
+    Map<String, dynamic> serializedRequest = req.toMap();
+    final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
+      MethodType.getData.value,
+      serializedRequest,
     );
 
-    try {
-      final dynamic rawData = await methodChannel
-          .invokeMethod<dynamic>(MethodType.getData.value, {
-            'start': timeRange.start.toUtc().toIso8601String(),
-            'end': timeRange.end.toUtc().toIso8601String(),
-          });
-
-      debugPrint(
-        "[getData] Received rawData: Type=${rawData?.runtimeType}, Value=$rawData",
-      );
-
-      if (rawData == null) {
-        debugPrint("[getData] MethodChannel returned null.");
-        return healthDataList;
-      }
-
-      debugPrint("[getData] Checking if rawData is a List ('is List')...");
-      bool isListCheckResult = rawData is List;
-      debugPrint(
-        "[GoogleHealthConnect.getData] Result of 'rawData is List': $isListCheckResult",
-      );
-
-      if (isListCheckResult) {
-        debugPrint("[getData] OK: rawData is a List. Attempting to iterate...");
-        List<dynamic> tempList = rawData;
-        debugPrint("[getData] Number of elements in list: ${tempList.length}");
-
-        for (final item in tempList) {
-          if (item is Map) {
-            try {
-              final Map<String, String> dataPoint = item.map(
-                (key, value) => MapEntry(key.toString(), value.toString()),
-              );
-              healthDataList.add(dataPoint);
-            } catch (e, stackTrace) {
-              debugPrint(
-                "[getData] ERROR: Could not convert Map element: $item. Error: $e\n$stackTrace",
-              );
-              continue;
-            }
-          } else {
-            debugPrint(
-              "[getData] WARNING: Element in list is not a Map: $item (${item.runtimeType})",
-            );
-          }
-        }
-
-        if (converter != null) {
-          debugPrint(
-            "[getData] Applying converter to ${healthDataList.length} valid data points.",
-          );
-          try {
-            List<HealthData> converted = [];
-            for (final dataPoint in healthDataList) {
-              converted.add(converter.convertData(dataPoint));
-            }
-            debugPrint("[getData] Conversion complete.");
-            return converted;
-          } catch (e, stackTrace) {
-            debugPrint(
-              "[getData] ERROR: Error during data conversion: $e\n$stackTrace",
-            );
-            throw Exception("Error applying data converter: $e");
-          }
-        } else {
-          debugPrint(
-            "[getData] Returning ${healthDataList.length} processed data points (no converter).",
-          );
-          return healthDataList;
-        }
-      } else {
-        debugPrint("[getData] ERROR: 'rawData is List' returned false.");
-        debugPrint("[getData] rawData.runtimeType is: ${rawData.runtimeType}");
-        debugPrint("[getData] rawData.toString() is: ${rawData.toString()}");
-        throw Exception(
-          "[getData] Unexpected data type received (is List == false): ${rawData.runtimeType}",
-        );
-      }
-    } on PlatformException catch (e, stackTrace) {
-      debugPrint(
-        "[getData] ERROR: PlatformException: ${e.message}\n${e.details}\n$stackTrace",
-      );
-      rethrow;
-    } catch (e, stackTrace) {
-      debugPrint("[getData] ERROR: Unexpected error: $e\n$stackTrace");
-      rethrow;
+    if (result == null) {
+      throw Exception("[getData] received null result");
     }
+
+    return GetDataResponse.fromMap(result);
   }
 
   @override
@@ -129,33 +54,46 @@ abstract class NativeProvider<T extends HealthDataType> implements Provider {
   }
 
   @override
-  Future<bool> hasPermissions() async {
-    List<String> dataTypeStrings = _dataTypesToStrings(dataTypes);
+  Future<CheckPermissionsResponse> checkPermissions(CheckPermissionsRequest req) async {
+    _validateDataTypes(req.dataTypes);
 
-    final result = await methodChannel.invokeMethod<bool>("hasPermissions", {
-      'dataTypes': dataTypeStrings,
-    });
-    return result ?? false;
+    Map<String, dynamic> serializedRequest = req.toMap();
+    final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
+      MethodType.checkPermissions.value,
+      serializedRequest
+    );
+    
+    if (result == null) {
+      throw Exception("[checkPermissions] received null response");
+    }
+    
+    return CheckPermissionsResponse.fromMap(result);
   }
 
   @override
-  Future<bool> requestPermissions() async {
-    List<String> dataTypeStrings = _dataTypesToStrings(dataTypes);
+  Future<RequestPermissionsResponse> requestPermissions(RequestPermissionsRequest req) async {
+    _validateDataTypes(req.dataTypes);
 
-    final result = await methodChannel.invokeMethod<bool>(
+    Map<String, dynamic> serializedRequest = req.toMap();
+    final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
       MethodType.requestPermissions.value,
-      {'dataTypes': dataTypeStrings},
+      serializedRequest
     );
-    return result ?? false;
-  }
 
-  List<String> _dataTypesToStrings(List<T> dataTypes) {
-    List<String> result = [];
-
-    for (final dataType in dataTypes) {
-      result.add(dataType.getDefinition());
+    if (result == null) {
+      throw Exception("[requestPermissions] received null response");
     }
 
-    return result;
+    return RequestPermissionsResponse.fromMap(result);
+  }
+
+  bool isDataTypeSupported(HealthDataType type);
+
+  void _validateDataTypes(List<HealthDataType> dataTypes) {
+    for (final dataType in dataTypes) {
+      if (!isDataTypeSupported(dataType)) {
+        throw ArgumentError("HealthDataType $dataType is not supported by this provider.");
+      }
+    }
   }
 }
