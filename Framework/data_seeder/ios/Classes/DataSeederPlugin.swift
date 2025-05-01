@@ -1,129 +1,156 @@
 import Flutter
 import UIKit
+import HealthKit
 
 public class DataSeederPlugin: NSObject, FlutterPlugin {
-  let dataTypes: Set = [HKQuantityType.quantityType(forIdentifier: .heartRate), HKQuantityType.quantityType(forIdentifier: .bodyTemperature)]
-  private static let generationPeriodDays: TimeInterval = 7 * 24 * 60 * 60
-	private static let recordIntervalAndDuration: TimeInterval = 15 * 60
-	private static let sampleInterval: TimeInterval = 1 * 60
 
-	private static let clientIdPrefixHr = "SEEDER_HR_"
-	private static let clientIdPrefixBodyTemp = "SEEDER_BODY_TEMP_"
+    private let dataTypes: [HKQuantityType]
+    private let typesToShare: Set<HKSampleType>
+    private let typesToRead: Set<HKObjectType>
 
-	private static let baseBpm: Double = 70.0
-	private static let baseBodyTempCelsius: Double = 34.0
-	private static let baseDeltaTempCelcius: Double = 0.3
+    private static let generationPeriodDays: TimeInterval = 7 * 24 * 60 * 60
+    private static let recordIntervalAndDuration: TimeInterval = 15 * 60
+    private static let sampleInterval: TimeInterval = 1 * 60
 
-	private let healthStore = HKHealthStore()
+    private static let clientIdPrefixHr = "SEEDER_HR_"
+    private static let clientIdPrefixBodyTemp = "SEEDER_BODY_TEMP_"
 
-  
-  
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "data_seeder", binaryMessenger: registrar.messenger())
-    let instance = DataSeederPlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
-  }
+    private static let baseBpm: Double = 70.0
+    private static let baseBodyTempCelsius: Double = 34.0
+    private static let baseDeltaTempCelcius: Double = 0.3
 
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    switch call.method {
-    case "getPlatformVersion":
-      result("iOS " + UIDevice.current.systemVersion)
-    case "hasPermisssions":
-      checkHasPermissions(call, result)
-    case "requestPermissions":
-      requestPermissions(call, result)
-    case "seedData":
-      result.notImplemented()
-    default:
-      result(FlutterMethodNotImplemented)
+    private let healthStore = HKHealthStore()
+
+    override init() {
+        let optionalTypesToInit: [HKQuantityType?] = [
+             HKQuantityType.quantityType(forIdentifier: .heartRate),
+             HKQuantityType.quantityType(forIdentifier: .bodyTemperature)
+        ]
+        dataTypes = optionalTypesToInit.compactMap { $0 }
+        typesToShare = Set<HKSampleType>(dataTypes)
+        typesToRead = Set<HKObjectType>(dataTypes)
+
+        super.init()
     }
-  }
-
-	private func seedData(result: @escaping FlutterResult) {
-		let heartRateSamples = generateHistoricalHeartRateData()
-		let bodyTemperatureSamples = generateHistoricalBodyTemperatureData()
-
-		let allSamples = heartRateSamples + bodyTempSamples
-
-		guard !allSamples.isEmpty else {
-			print("No data generated to save")
-			result(false)
-		}
-
-		do {
-			try await healthStore.save()
-			print("Successfully saved \(allSamples.count) samples to HealthKit")
-			result(true)
-		} catch {
-			print("Error saving generated data to HealthKit: \(error.localizedDescription)")
-		}
-	}
 
 
-  private func requestPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {      
-      if HKHealthStore.isHealthDataAvailable() {
-          healthStore.requestAuthorization(toShare: Set<HKSampleType>(), read: dataTypes) {
-              (success: Bool, error: Error?) in
-              if success {
-                  print("HealthKit authorization request succeeded")
-                  result(true)
-              } else {
-                  print(
-                      "HealthKit authorization failed: \(error?.localizedDescription ?? "by User action")"
-                  )
-                  result(false)
-              }
-          }
-      }
-  }
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let channel = FlutterMethodChannel(name: "data_seeder", binaryMessenger: registrar.messenger())
+        let instance = DataSeederPlugin()
+        registrar.addMethodCallDelegate(instance, channel: channel)
+    }
+
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch call.method {
+        case "getPlatformVersion":
+            result("iOS " + UIDevice.current.systemVersion)
+        case "hasPermissions":
+            checkHasPermissions(result: result)
+        case "requestPermissions":
+            requestPermissions(result: result)
+        case "seedData":
+            seedData(result: result)
+        default:
+            result(FlutterMethodNotImplemented)
+        }
+    }
+
+    private func seedData(result: @escaping FlutterResult) {
+        let heartRateSamples = generateHistoricalHeartRateData()
+        let bodyTemperatureSamples = generateHistoricalBodyTemperatureData()
+
+        let allSamples = heartRateSamples + bodyTemperatureSamples
+
+        guard !allSamples.isEmpty else {
+            print("No data generated to save")
+            result(false)
+            return
+        }
+
+        healthStore.save(allSamples) { (success, error) in
+            if success {
+                print("Successfully saved \(allSamples.count) samples to HealthKit")
+                result(true)
+            } else {
+                print("Error saving generated data to HealthKit: \(error?.localizedDescription ?? "Unknown error")")
+                result(false)
+            }
+        }
+    }
 
 
-  private func checkHasPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
-      var allIsPermitted = true
-      dataTypes.forEach { type in
-          if allIsPermitted {
-              let authStatus = healthStore.authorizationStatus(for: type)
-              if authStatus != .sharingAuthorized {
-                  allIsPermitted = false
-              }
-          }
-      }
-      result(allIsPermitted)
-  }
+    private func requestPermissions(result: @escaping FlutterResult) {
+        if HKHealthStore.isHealthDataAvailable() {
+            healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) {
+                (success: Bool, error: Error?) in
+                DispatchQueue.main.async {
+                    if success {
+                        print("HealthKit authorization request finished (Success=\(success))")
+                        result(true)
+                    } else {
+                        print(
+                            "HealthKit authorization request failed: \(error?.localizedDescription ?? "Possibly denied by User")"
+                        )
+                        result(false)
+                    }
+                }
+            }
+        } else {
+            print("Health data is not available on this device.")
+            DispatchQueue.main.async {
+                result(false)
+            }
+        }
+    }
 
-	private func generateHistoricalHeartRateData() -> [HKQuantitySample] {
-		print("Generating historical heart rate data..")
-		var samples = [HKQuantitySample]()
 
-		guard let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate) else {
-			print("Heart rate type is unavailable")
-			return []
-		}
+    private func checkHasPermissions(result: @escaping FlutterResult) {
+        var hasAllReadPermissions = true
+        for type in dataTypes {
+            let authStatus = healthStore.authorizationStatus(for: type)
+            if authStatus != .sharingAuthorized {
+                hasAllReadPermissions = false
+                break
+            }
+        }
+        print("Checked read permissions: \(hasAllReadPermissions)")
+        result(hasAllReadPermissions)
+    }
 
-		let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
-		let overallEndTime = Date()
-		let overallStartTime = overallEndTime.addingTimeInterval(-generationPeriodDays)
-		let recordStartTime = overallStartTime
+    private func generateHistoricalHeartRateData() -> [HKQuantitySample] {
+        print("Generating historical heart rate data..")
+        var samples = [HKQuantitySample]()
 
-		while recordStartTime < overallEndTime {
-            let recordEndTime = min(recordStartTime.addingTimeInterval(recordIntervalAndDuration), overallEndTime)
+        guard let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate) else {
+            print("Heart rate type is unavailable")
+            return []
+        }
 
-            if recordStartTime == recordEndTime || recordEndTime.timeIntervalSince(recordStartTime) <= sampleInterval {
-                if recordStartTime >= overallEndTime { break }
+        let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
+        let overallEndTime = Date()
+        let overallStartTime = overallEndTime.addingTimeInterval(-DataSeederPlugin.generationPeriodDays)
+
+        var recordStartTime = overallStartTime
+
+        while recordStartTime < overallEndTime {
+            let recordEndTime = min(recordStartTime.addingTimeInterval(DataSeederPlugin.recordIntervalAndDuration), overallEndTime)
+
+            if recordStartTime >= recordEndTime || recordEndTime.timeIntervalSince(recordStartTime) < DataSeederPlugin.sampleInterval {
                 recordStartTime = recordEndTime
+                if recordStartTime >= overallEndTime { break }
                 continue
             }
 
-            var sampleTime = recordStartTime.addingTimeInterval(sampleInterval)
+            var sampleTime = recordStartTime.addingTimeInterval(DataSeederPlugin.sampleInterval)
 
             while sampleTime < recordEndTime {
                 let epochSeconds = Int(sampleTime.timeIntervalSince1970)
-                let variation = abs(epochSeconds % 10 - 5)
-                let bpmValue = baseBpm + Double(variation)
+                let variation = Double(abs(epochSeconds % 10 - 5))
+                let bpmValue = DataSeederPlugin.baseBpm + variation
                 let quantity = HKQuantity(unit: heartRateUnit, doubleValue: bpmValue)
 
                 let metadata: [String: Any] = [
-                    HKMetadataKeyExternalUUID: "\(clientIdPrefixHr)\(Int(recordStartTime.timeIntervalSince1970))"
+                    HKMetadataKeyExternalUUID: "\(DataSeederPlugin.clientIdPrefixHr)\(Int(recordStartTime.timeIntervalSince1970))_\(epochSeconds)"
                 ]
 
                 let sample = HKQuantitySample(
@@ -134,15 +161,15 @@ public class DataSeederPlugin: NSObject, FlutterPlugin {
                     metadata: metadata
                 )
                 samples.append(sample)
-                sampleTime = sampleTime.addingTimeInterval(sampleInterval)
+                sampleTime = sampleTime.addingTimeInterval(DataSeederPlugin.sampleInterval)
             }
             recordStartTime = recordEndTime
         }
         print("Generated \(samples.count) heart rate samples.")
         return samples
-	}
+    }
 
-	static func generateHistoricalBodyTemperatureData() -> [HKQuantitySample] {
+    private func generateHistoricalBodyTemperatureData() -> [HKQuantitySample] {
         print("Generating historical body temperature data...")
         var samples = [HKQuantitySample]()
 
@@ -153,45 +180,45 @@ public class DataSeederPlugin: NSObject, FlutterPlugin {
         let bodyTemperatureUnit = HKUnit.degreeCelsius()
 
         let overallEndTime = Date()
-        let overallStartTime = overallEndTime.addingTimeInterval(-generationPeriodDays)
+        let overallStartTime = overallEndTime.addingTimeInterval(-DataSeederPlugin.generationPeriodDays)
         var recordStartTime = overallStartTime
         let calendar = Calendar.current
 
         while recordStartTime < overallEndTime {
-            let recordEndTime = min(recordStartTime.addingTimeInterval(recordIntervalAndDuration), overallEndTime)
+            let recordEndTime = min(recordStartTime.addingTimeInterval(DataSeederPlugin.recordIntervalAndDuration), overallEndTime)
 
-            if recordStartTime == recordEndTime || recordEndTime.timeIntervalSince(recordStartTime) <= sampleInterval {
-                if recordStartTime >= overallEndTime { break }
-                recordStartTime = recordEndTime
-                continue
+            if recordStartTime >= recordEndTime || recordEndTime.timeIntervalSince(recordStartTime) < DataSeederPlugin.sampleInterval {
+                 recordStartTime = recordEndTime
+                 if recordStartTime >= overallEndTime { break }
+                 continue
             }
 
-            var sampleTime = recordStartTime.addingTimeInterval(sampleInterval)
+            var sampleTime = recordStartTime.addingTimeInterval(DataSeederPlugin.sampleInterval)
 
             while sampleTime < recordEndTime {
                 let minuteOfHour = calendar.component(.minute, from: sampleTime)
                 let variation = Double(minuteOfHour) * 0.005
-                let tempValue = baseBodyTempCelsius + baseDeltaTempCelsius + variation
+                let tempValue = DataSeederPlugin.baseBodyTempCelsius + DataSeederPlugin.baseDeltaTempCelcius + variation
                 let quantity = HKQuantity(unit: bodyTemperatureUnit, doubleValue: tempValue)
 
-                let metadata: [String: Any] = [
-                    HKMetadataKeyExternalUUID: "\(clientIdPrefixBodyTemp)\(Int(recordStartTime.timeIntervalSince1970))"
+                 let epochSeconds = Int(sampleTime.timeIntervalSince1970)
+                 let metadata: [String: Any] = [
+                    HKMetadataKeyExternalUUID: "\(DataSeederPlugin.clientIdPrefixBodyTemp)\(Int(recordStartTime.timeIntervalSince1970))_\(epochSeconds)"
                 ]
 
                 let sample = HKQuantitySample(
                     type: bodyTemperatureType,
                     quantity: quantity,
                     start: sampleTime,
-                    end: sampleTime,  
+                    end: sampleTime,
                     metadata: metadata
                 )
                 samples.append(sample)
-                sampleTime = sampleTime.addingTimeInterval(sampleInterval)
+                sampleTime = sampleTime.addingTimeInterval(DataSeederPlugin.sampleInterval)
             }
             recordStartTime = recordEndTime
         }
         print("Generated \(samples.count) body temperature samples.")
         return samples
     }
-
 }
