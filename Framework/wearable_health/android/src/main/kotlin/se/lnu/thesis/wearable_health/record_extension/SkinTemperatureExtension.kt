@@ -2,25 +2,27 @@ package se.lnu.thesis.wearable_health.record_extension
 
 import androidx.health.connect.client.records.SkinTemperatureRecord
 
-fun SkinTemperatureRecord.serialize(): Map<String, String> {
+fun SkinTemperatureRecord.serialize(): Map<String, Any?> {
     return mapOf(
-        "startTimeEpochMs" to this.startTime.toEpochMilli().toString(),
-        "endTimeEpochMs" to this.endTime.toEpochMilli().toString(),
-        "startZoneOffsetSeconds" to this.startZoneOffset?.totalSeconds.toString(),
-        "endZoneOffsetSeconds" to this.endZoneOffset?.totalSeconds.toString(),
-        "baselineCelsius" to this.baseline?.inCelsius.toString(),
+        "startTimeEpochMs" to this.startTime.toEpochMilli(),
+        "endTimeEpochMs" to this.endTime.toEpochMilli(),
+        "startZoneOffsetSeconds" to this.startZoneOffset,
+        "endZoneOffsetSeconds" to this.endZoneOffset?.totalSeconds,
+        "baselineCelsius" to this.baseline?.inCelsius,
         "measurementLocation" to mapMeasurementLocationToString(this.measurementLocation),
-        "deltas" to this.serializeDeltas()
+        "deltas" to this.extractDeltas(),
     )
 }
 
-fun SkinTemperatureRecord.serializeDeltas(): String {
-    val resultList: MutableList<String> = mutableListOf()
+fun SkinTemperatureRecord.extractDeltas(): List<Map<String, Any?>> {
+    val resultList: MutableList<Map<String, Any?>> = mutableListOf()
     for (delta in this.deltas) {
-        val deltaString = "[timeMs:${delta.time.toEpochMilli()}, deltaCelsius:${delta.delta.inCelsius}]"
-        resultList.add(deltaString)
+        resultList.add(mapOf(
+            "timeMs" to delta.time.toEpochMilli(),
+            "deltaCelsius" to delta.delta.inCelsius
+        ))
     }
-    return resultList.toString()
+    return resultList
 }
 
 fun mapMeasurementLocationToString(location: Int): String {
