@@ -33,18 +33,22 @@ abstract class NativeProvider implements Provider {
     _validateDataTypes(req.dataTypes);
 
     Map<String, dynamic> serializedRequest = req.toMap();
-    final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
+    final result = await methodChannel.invokeMethod<Map<Object?, Object?>>(
       MethodType.getData.value,
       serializedRequest,
     );
+
 
     if (result == null) {
       throw Exception("[getData] received null result");
     }
 
+
+    GetDataResponse response = GetDataResponse.fromMap(result);
+
     if (req.converter != null) {
-      Map<String, dynamic> convertedResult = req.converter!.convertData(result);
-      return GetDataResponse.fromMap(convertedResult);
+      List<Map<String, dynamic>> convertedResult = req.converter!.convertData(response.result);
+      return GetDataResponse(convertedResult);
     } else {
       return GetDataResponse.fromMap(result);
     }
@@ -63,7 +67,7 @@ abstract class NativeProvider implements Provider {
     _validateDataTypes(req.dataTypes);
 
     Map<String, dynamic> serializedRequest = req.toMap();
-    final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
+    final result = await methodChannel.invokeMethod<Map<Object?, Object?>>(
       MethodType.checkPermissions.value,
       serializedRequest
     );
@@ -80,7 +84,7 @@ abstract class NativeProvider implements Provider {
     _validateDataTypes(req.dataTypes);
 
     Map<String, dynamic> serializedRequest = req.toMap();
-    final result = await methodChannel.invokeMethod<Map<String, dynamic>>(
+    final result = await methodChannel.invokeMethod<Map<Object?, Object?>>(
       MethodType.requestPermissions.value,
       serializedRequest
     );

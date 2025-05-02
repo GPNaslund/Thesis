@@ -5,9 +5,11 @@ class CheckPermissionsResponse {
 
   CheckPermissionsResponse(this.permissions);
 
-  factory CheckPermissionsResponse.fromMap(Map<String, dynamic> serialized) {
+  factory CheckPermissionsResponse.fromMap(Map<Object?, Object?> rawResponse) {
+    Map<String, dynamic> serialized = Map.from(rawResponse);
+
     _validateMapContent(serialized);
-    List<String> providedPermissions = serialized["permissions"];
+    List<String> providedPermissions = List.from(serialized["permissions"]);
     List<HealthDataType> result = [];
     for (final dataType in providedPermissions) {
       result.add(HealthDataType.fromString(dataType));
@@ -20,8 +22,14 @@ class CheckPermissionsResponse {
       throw Exception("[CheckPermissionsResponse] serialized map lacks 'permissions' key");
     }
 
-    if (content["permissions"] is! List<String>) {
-      throw Exception("[CheckPermissionsResponse] 'permissions' must be List<String>");
+    if (content["permissions"] is! List<Object?>) {
+      throw Exception("[CheckPermissionsResponse] 'permissions' must be List<String>. Received: ${content["permissions"].runtimeType}");
+    }
+
+    for (final element in content["permissions"]) {
+      if (element is! String) {
+        throw Exception("[CheckPermissionsResponse] found non string in 'permissions' List");
+      }
     }
   }
 
