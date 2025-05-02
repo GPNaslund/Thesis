@@ -20,7 +20,7 @@ class _PermissionsPageState extends State<PermissionsPage> {
     super.initState();
     _checkAndRequestPermissions();
   }
-
+  
   Future<void> _checkAndRequestPermissions() async {
     final hasPermission = await _wearableHealthService.hasPermissions();
     if (!mounted) return;
@@ -33,8 +33,10 @@ class _PermissionsPageState extends State<PermissionsPage> {
 
       if (granted) {
         _updateStatus("Permission granted!");
+        Navigator.pop(context, true);
       } else {
         _updateStatus("Permission denied. Please allow access.");
+        Navigator.pop(context, false);
       }
     }
   }
