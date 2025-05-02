@@ -3,12 +3,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wearable_health/provider/native/health_connect/data/health_connect_data_type.dart';
-import 'package:wearable_health/provider/native/health_connect/data/heart_rate.dart';
-import 'package:wearable_health/provider/native/health_connect/data/skin_temperature.dart';
-import 'package:wearable_health/provider/native/health_kit/data/body_temperature.dart';
-import 'package:wearable_health/provider/native/health_kit/data/health_kit_data_type.dart';
-import 'package:wearable_health/provider/native/health_kit/data/heart_rate.dart';
+import 'package:wearable_health/provider/dto/check_permissions_request.dart';
+import 'package:wearable_health/provider/dto/get_data_request.dart';
+import 'package:wearable_health/provider/dto/get_data_response.dart';
+import 'package:wearable_health/provider/dto/request_permissions_request.dart';
+import 'package:wearable_health/provider/enums/health_data_type.dart';
 import 'package:wearable_health/provider/provider.dart';
 import 'package:wearable_health/wearable_health.dart';
 
@@ -30,6 +29,7 @@ class _MyAppState extends State<MyApp> {
   Provider? _wearableHealthPlugin;
   String _consoleOutput = '';
   bool _isLoadingData = false;
+  List<HealthDataType> dataTypes = [];
 
   @override
   void initState() {
@@ -41,17 +41,17 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initializePlugin() async {
     if (Platform.isAndroid) {
-      List<HealthConnectDataType> dataTypes = [
-        HealthConnectHeartRate(),
-        HealthConnectSkinTemperature(),
+      dataTypes = [
+        HealthDataType.heartRate,
+        HealthDataType.skinTemperature,
       ];
-      _wearableHealthPlugin = WearableHealth.getGoogleHealthConnect(dataTypes);
+      _wearableHealthPlugin = WearableHealth.getGoogleHealthConnect();
     } else if (Platform.isIOS) {
-      List<HealthKitDataType> dataTypes = [
-        HealthKitHeartRate(),
-        HealthKitBodyTemperature(),
+      dataTypes = [
+        HealthDataType.heartRate,
+        HealthDataType.bodyTemperature,
       ];
-      _wearableHealthPlugin = WearableHealth.getAppleHealthKit(dataTypes);
+      _wearableHealthPlugin = WearableHealth.getAppleHealthKit();
     } else {
       setState(() {
         _platformVersion = 'Unsupported Platform';
@@ -86,12 +86,13 @@ class _MyAppState extends State<MyApp> {
     if (_wearableHealthPlugin == null) return;
     _appendToConsole('Checking permissions...');
     try {
-      final hasPermissions = await _wearableHealthPlugin!.hasPermissions();
+      CheckPermissionsRequest request = CheckPermissionsRequest(dataTypes);
+      final result = await _wearableHealthPlugin!.checkPermissions(request);
       if (mounted) {
         setState(() {
-          _hasPermissions = hasPermissions;
+          _hasPermissions = result.permissions.length == dataTypes.length;
         });
-        _appendToConsole('Got permissions: $hasPermissions');
+        _appendToConsole('Got permissions: ${result.permissions.toString()}');
       }
     } on PlatformException catch (e) {
       debugPrint('PlatformException at permission check: ${e.message}');
@@ -116,12 +117,13 @@ class _MyAppState extends State<MyApp> {
     if (_wearableHealthPlugin == null) return;
     _appendToConsole('Requesting permissions...');
     try {
-      final granted = await _wearableHealthPlugin!.requestPermissions();
+      RequestPermissionsRequest request = RequestPermissionsRequest(dataTypes);
+      final result = await _wearableHealthPlugin!.requestPermissions(request);
       if (mounted) {
         setState(() {
-          _hasPermissions = granted;
+          _hasPermissions = result.permissions.length == dataTypes.length;
         });
-        _appendToConsole('Permissions granted: $granted');
+        _appendToConsole('Permissions granted: ${result.permissions.toString()}');
       }
     } on PlatformException catch (e) {
       debugPrint('PlatformException when requesting permissions: ${e.message}');
@@ -171,18 +173,16 @@ class _MyAppState extends State<MyApp> {
       _appendToConsole('Start: ${range.start.toIso8601String()}');
       _appendToConsole('End:  ${range.end.toIso8601String()}');
 
-      final List<HealthData> data = await _wearableHealthPlugin!.getData(
-        range,
-        null,
-      );
+      GetDataRequest request = GetDataRequest(range, dataTypes);
+      final GetDataResponse result = await _wearableHealthPlugin!.getData(request);
 
       if (mounted) {
-        if (data == null || data.isEmpty) {
+        if (result.result.isEmpty) {
           _appendToConsole('No data was found for the period.');
         } else {
-          _appendToConsole('Data amount received (${data.length}):');
-          for (int i = 0; i < data.length; i++) {
-            final dataPoint = data[i];
+          _appendToConsole('Data amount received (${result.result.length}):');
+          for (int i = 0; i < result.result.length; i++) {
+            final dataPoint = result.result[i];
             _appendToConsole('${i + 1}. ${dataPoint.toString()}');
             if (i % 50 == 0) await Future.delayed(Duration.zero);
           }
