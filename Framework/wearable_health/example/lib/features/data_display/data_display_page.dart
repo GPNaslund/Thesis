@@ -2,9 +2,12 @@
 
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
+import '../../../constants/metrics.dart';
 
 class DataDisplayPage extends StatefulWidget {
-  const DataDisplayPage({super.key});
+  final HealthMetric metric;
+
+  const DataDisplayPage({super.key, required this.metric});
 
   @override
   State<DataDisplayPage> createState() => _DataDisplayPageState();
@@ -16,6 +19,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   String _consoleOutput = '';
   bool _isLoading = false;
+  bool _useConverter = false;
 
   @override
   void dispose() {
@@ -41,7 +45,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     setState(() {
       _isLoading = true;
     });
-    _appendToConsole('Fetching health data...');
+    _appendToConsole('Fetching ${_useConverter ? 'OpenMHealth' : 'raw'} data for ${widget.metric.name}...');
 
     try {
       final now = DateTime.now();
@@ -49,7 +53,11 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       final startOfWeek = endOfDay.subtract(const Duration(days: 6));
       final range = DateTimeRange(start: startOfWeek, end: endOfDay);
 
-      final healthData = await _wearableHealthService.getHealthData(range);
+      final healthData = await _wearableHealthService.getHealthData(
+        widget.metric,
+        range,
+        convert: _useConverter,
+      );
 
       if (healthData.isEmpty) {
         _appendToConsole('No data found for the selected time range.');
@@ -59,7 +67,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           final dataPoint = healthData[i];
           _appendToConsole('${i + 1}. ${dataPoint.toString()}');
           if (i % 50 == 0) {
-            await Future.delayed(Duration.zero); // To keep UI responsive
+            await Future.delayed(Duration.zero);
           }
         }
       }
@@ -81,7 +89,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Health Data Display')),
+      appBar: AppBar(title: Text('Data for ${widget.metric.name}')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -105,6 +113,21 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ElevatedButton(
                   onPressed: _clearConsole,
                   child: const Text('Clear Console'),
+                ),
+                Flexible( // 👈 Wrap your dropdown
+                  child: DropdownButton<bool>(
+                    isExpanded: true,
+                    value: _useConverter,
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() => _useConverter = val);
+                      }
+                    },
+                    items: const [
+                      DropdownMenuItem(value: false, child: Text('Raw Format')),
+                      DropdownMenuItem(value: true, child: Text('OpenMHealth Format')),
+                    ],
+                  ),
                 ),
               ],
             ),

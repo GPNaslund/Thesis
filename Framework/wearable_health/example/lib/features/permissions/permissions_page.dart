@@ -1,7 +1,9 @@
 // lib/features/permissions/permissions_page.dart
 
 import 'package:flutter/material.dart';
+import '../../../constants/metrics.dart';
 import '../../../services/wearable_health_service.dart';
+import '../data_display/metric_selection_page.dart';
 
 class PermissionsPage extends StatefulWidget {
   const PermissionsPage({super.key});
@@ -14,38 +16,39 @@ class _PermissionsPageState extends State<PermissionsPage> {
   final WearableHealthService _wearableHealthService = WearableHealthService();
   String _statusLabel = "Checking permissions...";
   bool _loading = true;
+  bool _hasRetried = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAndRequestPermissions();
+    _requestAllPermissions();
   }
-  
-  Future<void> _checkAndRequestPermissions() async {
-    final hasPermission = await _wearableHealthService.hasPermissions();
+
+  Future<void> _requestAllPermissions() async {
+    setState(() => _loading = true);
+
+    final result = await _wearableHealthService.requestPermissions(HealthMetric.values);
     if (!mounted) return;
 
-    if (hasPermission) {
-      _updateStatus("Permission already granted!");
+    if (result.grantedMetrics.isNotEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MetricSelectionPage(grantedMetrics: result.grantedMetrics),
+        ),
+      );
     } else {
-      final granted = await _wearableHealthService.requestPermissions();
-      if (!mounted) return;
-
-      if (granted) {
-        _updateStatus("Permission granted!");
-        Navigator.pop(context, true);
-      } else {
-        _updateStatus("Permission denied. Please allow access.");
-        Navigator.pop(context, false);
+      if (!_hasRetried) {
+        _hasRetried = true;
+        await Future.delayed(const Duration(milliseconds: 500));
+        _requestAllPermissions();
+        return;
       }
+      setState(() {
+        _statusLabel = "Permissions denied. Please allow access to continue.";
+        _loading = false;
+      });
     }
-  }
-
-  void _updateStatus(String message) {
-    setState(() {
-      _statusLabel = message;
-      _loading = false;
-    });
   }
 
   @override
@@ -59,14 +62,9 @@ class _PermissionsPageState extends State<PermissionsPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _statusLabel,
+              'Please adjust permissions in Settings',
               style: const TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _checkAndRequestPermissions,
-              child: const Text("Try Again"),
             ),
           ],
         ),

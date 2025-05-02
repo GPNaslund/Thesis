@@ -1,7 +1,7 @@
-// lib/constants/metric_mapper.dart
+// lib/constants/metrics_mapper.dart
 
-import 'dart:io';
 import 'metrics.dart';
+import 'package:wearable_health/provider/enums/health_data_type.dart';
 
 String getMetricLabel(HealthMetric metric) {
   switch (metric) {
@@ -12,21 +12,11 @@ String getMetricLabel(HealthMetric metric) {
   }
 }
 
-String? mapMetricToPermission(HealthMetric metric) {
-  if (Platform.isAndroid) {
-    switch (metric) {
-      case HealthMetric.heartRate:
-        return 'android.permission.health.READ_HEART_RATE';
-      case HealthMetric.skinTemperature:
-        return 'android.permission.health.READ_SKIN_TEMPERATURE';
-    }
-  } else {
-    switch (metric) {
-      case HealthMetric.heartRate:
-        return 'HKQuantityTypeIdentifierHeartRate';
-      case HealthMetric.skinTemperature:
-        return 'HKQuantityTypeIdentifierBodyTemperature';
-    }
+HealthDataType? mapMetricToHealthDataType(HealthMetric metric) {
+  switch (metric) {
+    case HealthMetric.heartRate:
+      return HealthDataType.heartRate;
+    case HealthMetric.skinTemperature:
+      return HealthDataType.skinTemperature;
   }
-  return null;
 }
