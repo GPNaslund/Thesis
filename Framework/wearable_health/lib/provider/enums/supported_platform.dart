@@ -1,0 +1,4 @@
+enum SupportedPlatform {
+  ios,
+  android,
+}

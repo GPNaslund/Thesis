@@ -1,1 +1,1 @@
-typedef HealthData = Map<String, String>;
+typedef HealthData = Map<String, dynamic>;
