@@ -42,7 +42,12 @@ abstract class NativeProvider implements Provider {
       throw Exception("[getData] received null result");
     }
 
-    return GetDataResponse.fromMap(result);
+    if (req.converter != null) {
+      Map<String, dynamic> convertedResult = req.converter!.convertData(result);
+      return GetDataResponse.fromMap(convertedResult);
+    } else {
+      return GetDataResponse.fromMap(result);
+    }
   }
 
   @override

@@ -1,3 +1,3 @@
 abstract class DataConverter {
-  Map<String, String> convertData(Map<String, String> rawData);
+  Map<String, dynamic> convertData(Map<String, dynamic> rawData);
 }
