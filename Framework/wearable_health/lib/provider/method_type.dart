@@ -1,6 +1,6 @@
 enum MethodType {
   getPlatformVersion(value: "getPlatformVersion"),
-  hasPermissions(value: "hasPermissions"),
+  checkPermissions(value: "checkPermissions"),
   requestPermissions(value: "requestPermissions"),
   dataStoreAvailability(value: "dataStoreAvailability"),
   getData(value: "getData");
