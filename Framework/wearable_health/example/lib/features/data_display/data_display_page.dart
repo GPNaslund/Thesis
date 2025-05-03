@@ -1,5 +1,3 @@
-// lib/features/data_display/data_display_page.dart
-
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
 import '../../../constants/metrics.dart';
@@ -15,40 +13,20 @@ class DataDisplayPage extends StatefulWidget {
 
 class _DataDisplayPageState extends State<DataDisplayPage> {
   final WearableHealthService _wearableHealthService = WearableHealthService();
-  final ScrollController _scrollController = ScrollController();
-
-  String _consoleOutput = '';
   bool _isLoading = false;
-  bool _useConverter = false;
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _appendToConsole(String text) {
-    setState(() {
-      _consoleOutput = '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
-  }
+  bool _useConverter = false; // not used yet
+  List<String> _fetchedResults = [];
 
   Future<void> _fetchData() async {
-    setState(() => _isLoading = true);
-    _appendToConsole('Fetching ${_useConverter ? 'OpenMHealth' : 'raw'} data for ${widget.metric.name}...');
+    setState(() {
+      _isLoading = true;
+      _fetchedResults = ['Fetching data...'];
+    });
 
     try {
       final now = DateTime.now();
-      final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
-      final startOfWeek = endOfDay.subtract(const Duration(days: 6));
-      final range = DateTimeRange(start: startOfWeek, end: endOfDay);
+      final start = now.subtract(const Duration(days: 1));
+      final range = DateTimeRange(start: start, end: now);
 
       final healthData = await _wearableHealthService.getHealthData(
         widget.metric,
@@ -57,25 +35,28 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       );
 
       if (healthData.isEmpty) {
-        _appendToConsole(
-          'No data fetched.\nMake sure ${widget.metric.name} is allowed in Settings.',
-        );
+        setState(() {
+          _fetchedResults = [
+            'No data fetched.',
+            'Make sure ${widget.metric.name} is allowed in settings.'
+          ];
+        });
       } else {
-        _appendToConsole('Data points received (${healthData.length}):');
-        for (int i = 0; i < healthData.length; i++) {
-          _appendToConsole('${i + 1}. ${healthData[i]}');
-          if (i % 50 == 0) await Future.delayed(Duration.zero); // keep UI responsive
-        }
+        setState(() {
+          _fetchedResults = healthData.map((e) => e.toString()).toList();
+        });
       }
     } catch (e) {
-      _appendToConsole('Error while fetching data: $e');
+      setState(() {
+        _fetchedResults = ['Error while fetching data: $e'];
+      });
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
   void _clearConsole() {
-    setState(() => _consoleOutput = '');
+    setState(() => _fetchedResults = []);
   }
 
   @override
@@ -87,7 +68,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: _isLoading ? null : _fetchData,
@@ -102,42 +82,43 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   )
                       : const Text('Fetch Data'),
                 ),
+                const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _clearConsole,
                   child: const Text('Clear Console'),
                 ),
-                Flexible(
-                  child: DropdownButton<bool>(
-                    isExpanded: true,
-                    value: _useConverter,
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() => _useConverter = val);
-                      }
-                    },
-                    items: const [
-                      DropdownMenuItem(value: false, child: Text('Raw Format')),
-                      DropdownMenuItem(value: true, child: Text('OpenMHealth Format')),
-                    ],
-                  ),
+                const SizedBox(width: 12),
+                DropdownButton<bool>(
+                  value: _useConverter,
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _useConverter = val);
+                    }
+                  },
+                  items: const [
+                    DropdownMenuItem(value: false, child: Text('Raw Format')),
+                    DropdownMenuItem(value: true, child: Text('OpenMHealth Format')),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            const Text('Console:', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Output:', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 8),
             Expanded(
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
-                  borderRadius: BorderRadius.circular(4.0),
+                  borderRadius: BorderRadius.circular(4),
                   color: Colors.grey.shade100,
                 ),
                 child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Text(_consoleOutput),
+                  child: SelectableText(_fetchedResults.join('\n')),
                 ),
               ),
             ),

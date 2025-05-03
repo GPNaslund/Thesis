@@ -1,5 +1,3 @@
-// lib/services/wearable_health_service.dart
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:wearable_health/provider/health_data.dart';
@@ -49,7 +47,7 @@ class WearableHealthService {
     final request = GetDataRequest(
       range,
       [type],
-      converter: null,
+      converter: null // null for now cause have no open mhealth converter
     );
 
     try {
