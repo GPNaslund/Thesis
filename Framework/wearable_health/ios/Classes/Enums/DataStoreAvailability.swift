@@ -1,4 +1,4 @@
 enum DataStoreAvailability: String {
-    case available = "available"
-    case unavailable = "unavailable"
+    case available
+    case unavailable
 }
