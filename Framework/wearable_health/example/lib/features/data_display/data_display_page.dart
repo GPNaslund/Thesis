@@ -29,8 +29,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   void _appendToConsole(String text) {
     setState(() {
-      _consoleOutput =
-      '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
+      _consoleOutput = '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.animateTo(
@@ -42,9 +41,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   }
 
   Future<void> _fetchData() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
     _appendToConsole('Fetching ${_useConverter ? 'OpenMHealth' : 'raw'} data for ${widget.metric.name}...');
 
     try {
@@ -60,30 +57,25 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       );
 
       if (healthData.isEmpty) {
-        _appendToConsole('No data found for the selected time range.');
+        _appendToConsole(
+          'No data fetched.\nMake sure ${widget.metric.name} is allowed in Settings.',
+        );
       } else {
         _appendToConsole('Data points received (${healthData.length}):');
         for (int i = 0; i < healthData.length; i++) {
-          final dataPoint = healthData[i];
-          _appendToConsole('${i + 1}. ${dataPoint.toString()}');
-          if (i % 50 == 0) {
-            await Future.delayed(Duration.zero);
-          }
+          _appendToConsole('${i + 1}. ${healthData[i]}');
+          if (i % 50 == 0) await Future.delayed(Duration.zero); // keep UI responsive
         }
       }
     } catch (e) {
       _appendToConsole('Error while fetching data: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
   void _clearConsole() {
-    setState(() {
-      _consoleOutput = '';
-    });
+    setState(() => _consoleOutput = '');
   }
 
   @override
@@ -114,7 +106,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   onPressed: _clearConsole,
                   child: const Text('Clear Console'),
                 ),
-                Flexible( // 👈 Wrap your dropdown
+                Flexible(
                   child: DropdownButton<bool>(
                     isExpanded: true,
                     value: _useConverter,
@@ -132,10 +124,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               ],
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Console:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            const Text('Console:', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Expanded(
               child: Container(

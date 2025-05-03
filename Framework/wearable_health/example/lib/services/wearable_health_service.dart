@@ -11,10 +11,6 @@ import 'package:wearable_health/provider/enums/health_data_type.dart';
 import '../constants/metrics.dart';
 import '../constants/metric_mapper.dart';
 
-typedef PermissionResult = ({bool allGranted, List<HealthMetric> grantedMetrics});
-
-typedef HealthDataMap = Map<String, String>;
-
 class WearableHealthService {
   late final Provider _provider;
 
@@ -32,28 +28,21 @@ class WearableHealthService {
     }
   }
 
-  Future<PermissionResult> requestPermissions(List<HealthMetric> metrics) async {
+  Future<void> requestPermissions(List<HealthMetric> metrics) async {
     final types = metrics
         .map(mapMetricToHealthDataType)
         .whereType<HealthDataType>()
         .toList();
 
     final request = RequestPermissionsRequest(types);
-    final result = await _provider.requestPermissions(request);
-
-    final grantedMetrics = metrics.where((m) =>
-        result.permissions.contains(mapMetricToHealthDataType(m))
-    ).toList();
-
-    final allGranted = grantedMetrics.length == metrics.length;
-    return (allGranted: allGranted, grantedMetrics: grantedMetrics);
+    await _provider.requestPermissions(request);
   }
 
   Future<List<HealthData>> getHealthData(
       HealthMetric metric,
-      DateTimeRange range,
-      {bool convert = false}
-      ) async {
+      DateTimeRange range, {
+        bool convert = false,
+      }) async {
     final type = mapMetricToHealthDataType(metric);
     if (type == null) return [];
 

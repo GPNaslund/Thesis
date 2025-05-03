@@ -14,60 +14,34 @@ class PermissionsPage extends StatefulWidget {
 
 class _PermissionsPageState extends State<PermissionsPage> {
   final WearableHealthService _wearableHealthService = WearableHealthService();
-  String _statusLabel = "Checking permissions...";
-  bool _loading = true;
-  bool _hasRetried = false;
 
   @override
   void initState() {
     super.initState();
-    _requestAllPermissions();
+    _initNativePermissionsFlow();
   }
 
-  Future<void> _requestAllPermissions() async {
-    setState(() => _loading = true);
+  Future<void> _initNativePermissionsFlow() async {
+    try {
+      await _wearableHealthService.requestPermissions(HealthMetric.values);
+    } catch (_) {
+    }
 
-    final result = await _wearableHealthService.requestPermissions(HealthMetric.values);
     if (!mounted) return;
 
-    if (result.grantedMetrics.isNotEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => MetricSelectionPage(grantedMetrics: result.grantedMetrics),
-        ),
-      );
-    } else {
-      if (!_hasRetried) {
-        _hasRetried = true;
-        await Future.delayed(const Duration(milliseconds: 500));
-        _requestAllPermissions();
-        return;
-      }
-      setState(() {
-        _statusLabel = "Permissions denied. Please allow access to continue.";
-        _loading = false;
-      });
-    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const MetricSelectionPage(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Health Permissions")),
+    return const Scaffold(
       body: Center(
-        child: _loading
-            ? const CircularProgressIndicator()
-            : Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Please adjust permissions in Settings',
-              style: const TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+        child: CircularProgressIndicator(),
       ),
     );
   }
