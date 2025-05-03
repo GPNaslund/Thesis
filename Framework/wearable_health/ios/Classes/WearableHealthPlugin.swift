@@ -4,7 +4,7 @@ import UIKit
 
 public class WearableHealthPlugin: NSObject, FlutterPlugin {
     let healthStore = HKHealthStore()
-
+    
     private enum CallType: String {
         case getPlatformVersion
         case checkPermissions
@@ -12,23 +12,23 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
         case checkDataStoreAvailability
         case getData
         case unknown
-
+        
         static func fromString(val: String) -> CallType {
             return CallType(rawValue: val) ?? .unknown
         }
     }
-
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
             name: "wearable_health", binaryMessenger: registrar.messenger())
         let instance = WearableHealthPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
-
+    
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         print("WearableHealthPlugin: Received call: \(call.method)")
         let callType: CallType = CallType.fromString(val: call.method)
-
+        
         switch callType {
         case .getPlatformVersion:
             handleGetPlatformVersion(result: result)
@@ -45,58 +45,59 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
             result(FlutterMethodNotImplemented)
         }
     }
-
+    
     private func handleGetPlatformVersion(result: @escaping FlutterResult) {
         result("iOS " + UIDevice.current.systemVersion)
     }
-
+    
     private func handleCheckPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
-         do {
-             let request = try CheckPermissionsRequest(arguments: call.arguments)
-
-             var grantedTypes: Set<HKObjectType> = []
-             for objectType in request.objectTypesToRequest {
-                 if healthStore.authorizationStatus(for: objectType) == .sharingAuthorized {
-                     grantedTypes.insert(objectType)
-                 }
-             }
-             print("WearableHealthPlugin [CheckPermissions]: Granted types: \(grantedTypes.map { $0.identifier })")
-
-             let response = CheckPermissionsResponse(granted: grantedTypes)
-             result(response.toMap())
-
-         } catch let error as PermissionsRequestError {
-             print("WearableHealthPlugin [CheckPermissions]: Invalid Argument Error - \(error.localizedDescription)")
-             result(FlutterError(code: "INVALID_ARGUMENT",
-                                 message: error.localizedDescription,
-                                 details: nil))
-         } catch {
-             print("WearableHealthPlugin [CheckPermissions]: Unexpected Error - \(error.localizedDescription)")
-             result(FlutterError(code: "UNEXPECTED_ERROR",
-                                 message: "An unexpected error occurred while checking permissions: \(error.localizedDescription)",
-                                 details: nil))
-         }
-     }
-
+        do {
+            let request = try CheckPermissionsRequest(arguments: call.arguments)
+            
+            var grantedTypes: Set<HKObjectType> = []
+            for objectType in request.objectTypesToRequest {
+                if healthStore.authorizationStatus(for: objectType) == .sharingAuthorized {
+                    grantedTypes.insert(objectType)
+                }
+            }
+            print("WearableHealthPlugin [CheckPermissions]: Granted types: \(grantedTypes.map { $0.identifier })")
+            
+            let response = CheckPermissionsResponse(granted: grantedTypes)
+            result(response.toMap())
+            
+        } catch let error as PermissionsRequestError {
+            print("WearableHealthPlugin [CheckPermissions]: Invalid Argument Error - \(error.localizedDescription)")
+            result(FlutterError(code: "INVALID_ARGUMENT",
+                                message: error.localizedDescription,
+                                details: nil))
+        } catch {
+            print("WearableHealthPlugin [CheckPermissions]: Unexpected Error - \(error.localizedDescription)")
+            result(FlutterError(code: "UNEXPECTED_ERROR",
+                                message: "An unexpected error occurred while checking permissions: \(error.localizedDescription)",
+                                details: nil))
+        }
+    }
+    
     private func handleRequestPermissions(call: FlutterMethodCall, result: @escaping FlutterResult) {
         do {
             let request = try CheckPermissionsRequest(arguments: call.arguments)
-
+            
             let typesToRead: Set<HKObjectType> = request.objectTypesToRequest
             let typesToWrite: Set<HKSampleType>? = nil
-
+            
             guard !typesToRead.isEmpty || (typesToWrite != nil && !typesToWrite!.isEmpty) else {
                 print("WearableHealthPlugin [RequestPermissions]: No valid types to request permissions for.")
-                let emptyResponse = CheckPermissionsResponse(granted: [])
+                let emptyResponse = RequestPermissionsResponse(granted: [])
                 result(emptyResponse.toMap())
                 return
             }
-
-             print("WearableHealthPlugin [RequestPermissions]: Requesting auth for read types: \(typesToRead.map { $0.identifier })")
+            
+            print("WearableHealthPlugin [RequestPermissions]: Requesting auth for read types: \(typesToRead.map { $0.identifier })")
+            
             healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { [weak self] (success, error) in
                 guard let self = self else { return }
-
-                 DispatchQueue.main.async {
+                
+                DispatchQueue.main.async {
                     if let error = error {
                         print("WearableHealthPlugin [RequestPermissions]: HealthKit authorization request failed - \(error.localizedDescription)")
                         result(FlutterError(code: "AUTH_REQUEST_ERROR",
@@ -104,35 +105,36 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
                                             details: nil))
                         return
                     }
-
+                    
                     print("WearableHealthPlugin [RequestPermissions]: Auth request process completed. Success flag: \(success). Checking actual status...")
-
+                    
                     var actuallyGrantedTypes: Set<HKObjectType> = []
                     for objectType in typesToRead {
                         if self.healthStore.authorizationStatus(for: objectType) == .sharingAuthorized {
                             actuallyGrantedTypes.insert(objectType)
                         }
                     }
-                     print("WearableHealthPlugin [RequestPermissions]: Actually granted read permissions: \(actuallyGrantedTypes.map { $0.identifier })")
-
-                    let response = CheckPermissionsResponse(granted: actuallyGrantedTypes)
+                    print("WearableHealthPlugin [RequestPermissions]: Actually granted read permissions: \(actuallyGrantedTypes.map { $0.identifier })")
+                    
+                    let response = RequestPermissionsResponse(granted: actuallyGrantedTypes)
+                    
                     result(response.toMap())
                 }
             }
-
+            
         } catch let error as PermissionsRequestError {
-             print("WearableHealthPlugin [RequestPermissions]: Invalid Argument Error - \(error.localizedDescription)")
+            print("WearableHealthPlugin [RequestPermissions]: Invalid Argument Error - \(error.localizedDescription)")
             result(FlutterError(code: "INVALID_ARGUMENT",
                                 message: error.localizedDescription,
                                 details: nil))
         } catch {
-             print("WearableHealthPlugin [RequestPermissions]: Unexpected Error - \(error.localizedDescription)")
+            print("WearableHealthPlugin [RequestPermissions]: Unexpected Error - \(error.localizedDescription)")
             result(FlutterError(code: "UNEXPECTED_ERROR",
                                 message: "An unexpected error occurred while requesting permissions: \(error.localizedDescription)",
                                 details: nil))
         }
     }
-
+    
     private func handleCheckAvailability(result: @escaping FlutterResult) {
         if HKHealthStore.isHealthDataAvailable() {
             print("WearableHealthPlugin [CheckAvailability]: HealthKit is available.")
@@ -142,7 +144,7 @@ public class WearableHealthPlugin: NSObject, FlutterPlugin {
             result("unavailable")
         }
     }
-
+    
     private func handleGetData(call: FlutterMethodCall, result: @escaping FlutterResult) {
          let dataCollectionQueue = DispatchQueue(label: "com.wearablehealth.datacollection.serial")
          var collectedData: [[String: Any?]] = []

@@ -145,10 +145,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _fetchData() async {
+    /*
     if (_wearableHealthPlugin == null || _hasPermissions != true) {
       _appendToConsole('Plugin not initialized or permissions missing.');
       return;
     }
+    */
 
     if (mounted) {
       setState(() {
@@ -258,11 +260,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   ElevatedButton(
                     onPressed:
-                        (_hasPermissions == true &&
-                                !_isLoadingData &&
-                                _wearableHealthPlugin != null)
-                            ? _fetchData
-                            : null,
+                        _fetchData,
                     child:
                         _isLoadingData
                             ? const SizedBox(
