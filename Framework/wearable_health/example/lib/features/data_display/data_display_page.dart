@@ -14,7 +14,7 @@ class DataDisplayPage extends StatefulWidget {
 class _DataDisplayPageState extends State<DataDisplayPage> {
   final WearableHealthService _wearableHealthService = WearableHealthService();
   bool _isLoading = false;
-  bool _useConverter = false; // not used yet
+  bool _useConverter = false;
   List<String> _fetchedResults = [];
 
   Future<void> _fetchData() async {
@@ -66,46 +66,14 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _fetchData,
-                  child: _isLoading
-                      ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Text('Fetch Data'),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: _clearConsole,
-                  child: const Text('Clear Console'),
-                ),
-                const SizedBox(width: 12),
-                DropdownButton<bool>(
-                  value: _useConverter,
-                  onChanged: (val) {
-                    if (val != null) {
-                      setState(() => _useConverter = val);
-                    }
-                  },
-                  items: const [
-                    DropdownMenuItem(value: false, child: Text('Raw Format')),
-                    DropdownMenuItem(value: true, child: Text('OpenMHealth Format')),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text('Output:', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(
+                'Output:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: 8),
             Expanded(
@@ -121,6 +89,39 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   child: SelectableText(_fetchedResults.join('\n')),
                 ),
               ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _fetchData,
+              child: _isLoading
+                  ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+                  : const Text('Fetch Data'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _clearConsole,
+              child: const Text('Clear Console'),
+            ),
+            const SizedBox(height: 12),
+            DropdownButton<bool>(
+              isExpanded: true,
+              value: _useConverter,
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _useConverter = val);
+                }
+              },
+              items: const [
+                DropdownMenuItem(value: false, child: Text('Raw Format')),
+                DropdownMenuItem(value: true, child: Text('OpenMHealth Format')),
+              ],
             ),
           ],
         ),
