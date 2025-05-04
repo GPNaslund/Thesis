@@ -15,6 +15,12 @@
       <excludeFolder url="file://$MODULE_DIR$/wearable_health/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/wearable_health/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/wearable_health/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/data_seeder/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/data_seeder/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/data_seeder/build" />
+      <excludeFolder url="file://$MODULE_DIR$/data_seeder/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/data_seeder/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/data_seeder/example/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
