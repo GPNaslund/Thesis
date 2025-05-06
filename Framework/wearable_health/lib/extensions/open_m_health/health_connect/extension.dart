@@ -1,5 +1,4 @@
 import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate.dart';
-import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/duration_unit_value.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/time_frame.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/time_interval.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/unit_value.dart';
@@ -12,6 +11,8 @@ extension OpenMHealthConverter on HealthConnectData {
     if (this is HealthConnectHeartRate) {
       return (this as HealthConnectHeartRate).toOpenMHealthHeartRate();
     }
+
+    throw UnimplementedError("Unimplemented HealthDataType");
   }
 }
 

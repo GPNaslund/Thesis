@@ -6,8 +6,6 @@ class TimeInterval extends Ieee1752Schema {
   final DateTime? endDateTime;
   final DurationUnitValue? duration;
 
-  TimeInterval._({this.startDateTime, this.endDateTime, this.duration});
-
   TimeInterval.startAndDuration(DateTime start, DurationUnitValue dur)
     : startDateTime = start,
       endDateTime = null,

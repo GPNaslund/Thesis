@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="android/app/src/main/java"/>
+	<classpathentry kind="lib" path="android/gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/processDebugResources/R.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/AssetManifest.bin.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/AssetManifest.json.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/FontManifest.json.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/fonts/MaterialIcons-Regular.otf.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/isolate_snapshot_data.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/kernel_blob.bin.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/NativeAssetsManifest.json.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/NOTICES.Z.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/shaders/ink_sparkle.frag.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/flutter_assets/vm_snapshot_data.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/flutter/debug/libs.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/merged_java_res/debug/mergeDebugJavaResource/base.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7a4cc2bc16915d29c8f6121775ac35665b5a1fcf40e5791e17ec2678fe4a04ec_0.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7a4cc2bc16915d29c8f6121775ac35665b5a1fcf40e5791e17ec2678fe4a04ec_1.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7a4cc2bc16915d29c8f6121775ac35665b5a1fcf40e5791e17ec2678fe4a04ec_2.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7a4cc2bc16915d29c8f6121775ac35665b5a1fcf40e5791e17ec2678fe4a04ec_3.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7a4cc2bc16915d29c8f6121775ac35665b5a1fcf40e5791e17ec2678fe4a04ec_4.jar"/>
+	<classpathentry kind="lib" path="build/app/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7a4cc2bc16915d29c8f6121775ac35665b5a1fcf40e5791e17ec2678fe4a04ec_5.jar"/>
+	<classpathentry kind="lib" path="build/integration_test/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar"/>
+	<classpathentry kind="lib" path="build/integration_test/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar"/>
+	<classpathentry kind="lib" path="build/wearable_health/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar"/>
+	<classpathentry kind="lib" path="build/wearable_health/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar"/>
+	<classpathentry kind="output" path="build/app/intermediates/javac/debug/compileDebugJavaWithJavac/classes"/>
+</classpath>

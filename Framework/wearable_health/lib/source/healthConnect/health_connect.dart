@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/constants.dart';
+import 'package:wearable_health/dto/health_data_response.dart';
+import 'package:wearable_health/source/healthConnect/data/dto/heart_rate.dart';
+import 'package:wearable_health/source/healthConnect/data/dto/skin_temperature.dart';
 import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
 import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
 import 'package:wearable_health/source/health_data_source.dart';
@@ -8,21 +11,17 @@ import 'package:wearable_health/source/health_source_availability.dart';
 
 class HealthConnect
     extends HealthDataSource<HealthConnectHealthMetric, HealthConnectData> {
-  final methodChannel = MethodChannel(methodChannelName);
+  final methodChannel = MethodChannel("wearable_health");
 
   @override
-  Future<List<HealthConnectHealthMetric>> checkPermissions(
-    List<HealthConnectHealthMetric> metrics,
-  ) async {
-    List<String> types = [];
-    for (final element in metrics) {
-      types.add(element.definition);
-    }
-
-    List<String> response = await methodChannel.invokeMethod(
+  Future<List<HealthConnectHealthMetric>> checkPermissions() async {
+    List<String>? response = await methodChannel.invokeListMethod(
       "$healthConnectPrefix/$checkPermissionsSuffix",
-      {"types": types},
     );
+
+    if (response == null) {
+      throw Exception("[HealthConnect] checkPermissions returned null");
+    }
 
     List<HealthConnectHealthMetric> result = [];
     for (final element in response) {
@@ -44,7 +43,7 @@ class HealthConnect
       types.add(metric.definition);
     }
 
-    Map<String, dynamic>? response = await methodChannel.invokeMapMethod(
+    Map<String, List<dynamic>>? response = await methodChannel.invokeMapMethod(
       "$healthConnectPrefix/$getDataSuffix",
       {"start": start, "end": end, "types": types},
     );
@@ -58,9 +57,29 @@ class HealthConnect
   }
 
   List<HealthConnectData> _convertToHealthConnectData(
-    Map<String, dynamic> response,
+    Map<String, List<dynamic>> response,
   ) {
     List<HealthConnectData> result = [];
+    var healthDataResponse = HealthDataResponse.fromMap(response);
+    healthDataResponse.data.forEach((key, value) {
+      var healthMetric = HealthConnectHealthMetric.fromString(key);
+      if (healthMetric == HealthConnectHealthMetric.heartRate) {
+        for (final element in value) {
+          var heartRate = HealthConnectHeartRate.fromMap(element);
+          result.add(heartRate);
+        }
+      } else if (healthMetric == HealthConnectHealthMetric.skinTemperature) {
+        for (final element in value) {
+          var skinTemp = HealthConnectSkinTemperature.fromMap(element);
+          result.add(skinTemp);
+        }
+      } else {
+        throw UnimplementedError(
+          "Failed to convert: $key into a HealthConnect data type",
+        );
+      }
+    });
+
     return result;
   }
 
@@ -78,7 +97,7 @@ class HealthConnect
   ) async {
     List<String> definitions = [];
     for (final metric in metrics) {
-      definitions.add(metric.value);
+      definitions.add(metric.definition);
     }
 
     final List<String>? response = await methodChannel.invokeListMethod(

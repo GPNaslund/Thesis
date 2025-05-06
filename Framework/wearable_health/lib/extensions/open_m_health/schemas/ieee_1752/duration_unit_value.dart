@@ -15,6 +15,7 @@ class DurationUnitValue extends Ieee1752Schema {
   factory DurationUnitValue.days(num days) =>
       DurationUnitValue(value: days, unit: "d");
 
+  @override
   Map<String, dynamic> toJson() {
     return {"value": value, "unit": unit};
   }

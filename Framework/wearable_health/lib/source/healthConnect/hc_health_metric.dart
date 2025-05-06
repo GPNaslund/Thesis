@@ -9,11 +9,11 @@ enum HealthConnectHealthMetric implements HealthMetric {
   final String value;
 
   @override
-  String get definition => name;
+  String get definition => value;
 
   factory HealthConnectHealthMetric.fromString(String input) {
     for (final metric in HealthConnectHealthMetric.values) {
-      if (metric.definition == input) {
+      if (metric.value == input) {
         return metric;
       }
     }

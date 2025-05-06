@@ -5,7 +5,7 @@ import 'package:wearable_health/source/health_source_availability.dart';
 
 abstract class HealthDataSource<T extends HealthMetric, S extends HealthData> {
   Future<String> getPlatformVersion();
-  Future<List<T>> checkPermissions(List<T> metrics);
+  Future<List<T>> checkPermissions();
   Future<List<T>> requestPermissions(List<T> metrics);
   Future<List<S>> getData(List<T> metrics, DateTimeRange timeRange);
   Future<HealthSourceAvailability> checkHealthStoreAvailability();

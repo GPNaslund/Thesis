@@ -1,14 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wearable_health/provider/dto/check_permissions_request.dart';
-import 'package:wearable_health/provider/dto/get_data_request.dart';
-import 'package:wearable_health/provider/dto/get_data_response.dart';
-import 'package:wearable_health/provider/dto/request_permissions_request.dart';
-import 'package:wearable_health/provider/enums/health_data_type.dart';
-import 'package:wearable_health/provider/provider.dart';
+import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
+import 'package:wearable_health/source/health_data_source.dart';
 import 'package:wearable_health/wearable_health.dart';
 
 typedef HealthData = Map<String, String>;
@@ -25,11 +20,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  bool? _hasPermissions;
-  Provider? _wearableHealthPlugin;
   String _consoleOutput = '';
-  bool _isLoadingData = false;
-  List<HealthDataType> dataTypes = [];
+  List<HealthConnectHealthMetric> dataTypes = [
+    HealthConnectHealthMetric.heartRate,
+  ];
+  HealthDataSource hc = WearableHealth.getGoogleHealthConnect();
 
   @override
   void initState() {
@@ -40,34 +35,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initializePlugin() async {
-    if (Platform.isAndroid) {
-      dataTypes = [
-        HealthDataType.heartRate,
-        HealthDataType.skinTemperature,
-      ];
-      _wearableHealthPlugin = WearableHealth.getGoogleHealthConnect();
-    } else if (Platform.isIOS) {
-      dataTypes = [
-        HealthDataType.heartRate,
-        HealthDataType.bodyTemperature,
-      ];
-      _wearableHealthPlugin = WearableHealth.getAppleHealthKit();
-    } else {
-      setState(() {
-        _platformVersion = 'Unsupported Platform';
-        _consoleOutput = 'Plugin only supports Android and iOS';
-      });
-      return;
-    }
-
     await initPlatformState();
     await _checkPermissions();
   }
 
   Future<void> initPlatformState() async {
-    if (_wearableHealthPlugin == null) return;
     try {
-      final platformVersion = await _wearableHealthPlugin!.getPlatformVersion();
+      final platformVersion = await hc.getPlatformVersion();
       if (mounted) {
         setState(() {
           _platformVersion = platformVersion ?? 'Unknown';
@@ -83,80 +57,46 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkPermissions() async {
-    if (_wearableHealthPlugin == null) return;
     _appendToConsole('Checking permissions...');
     try {
-      CheckPermissionsRequest request = CheckPermissionsRequest(dataTypes);
-      final result = await _wearableHealthPlugin!.checkPermissions(request);
+      final result = await hc.checkPermissions();
       if (mounted) {
-        setState(() {
-          _hasPermissions = result.permissions.length == dataTypes.length;
-        });
-        _appendToConsole('Got permissions: ${result.permissions.toString()}');
+        _appendToConsole('Got permissions: ${result.toString()}');
       }
     } on PlatformException catch (e) {
       debugPrint('PlatformException at permission check: ${e.message}');
       if (mounted) {
         _appendToConsole('Error when checking permissions: ${e.message}');
-        setState(() {
-          _hasPermissions = false;
-        });
       }
     } catch (e) {
       debugPrint('Error when checking permissions: $e');
       if (mounted) {
         _appendToConsole('Error when checking permissions: $e');
-        setState(() {
-          _hasPermissions = false;
-        });
       }
     }
   }
 
   Future<void> _requestPermissions() async {
-    if (_wearableHealthPlugin == null) return;
     _appendToConsole('Requesting permissions...');
     try {
-      RequestPermissionsRequest request = RequestPermissionsRequest(dataTypes);
-      final result = await _wearableHealthPlugin!.requestPermissions(request);
+      final result = await hc.requestPermissions(dataTypes);
       if (mounted) {
-        setState(() {
-          _hasPermissions = result.permissions.length == dataTypes.length;
-        });
-        _appendToConsole('Permissions granted: ${result.permissions.toString()}');
+        _appendToConsole('Permissions granted: $result');
       }
     } on PlatformException catch (e) {
       debugPrint('PlatformException when requesting permissions: ${e.message}');
       if (mounted) {
         _appendToConsole('Error when requesting permissions: ${e.message}');
-        setState(() {
-          _hasPermissions = false;
-        });
       }
     } catch (e) {
       debugPrint('Error when requesting permissions: $e');
       if (mounted) {
         _appendToConsole('Error when requesting permissions: $e');
-        setState(() {
-          _hasPermissions = false;
-        });
       }
     }
   }
 
   Future<void> _fetchData() async {
-    /*
-    if (_wearableHealthPlugin == null || _hasPermissions != true) {
-      _appendToConsole('Plugin not initialized or permissions missing.');
-      return;
-    }
-    */
-
-    if (mounted) {
-      setState(() {
-        _isLoadingData = true;
-      });
-    }
     _appendToConsole('Getting data...');
 
     try {
@@ -175,16 +115,15 @@ class _MyAppState extends State<MyApp> {
       _appendToConsole('Start: ${range.start.toIso8601String()}');
       _appendToConsole('End:  ${range.end.toIso8601String()}');
 
-      GetDataRequest request = GetDataRequest(range, dataTypes);
-      final GetDataResponse result = await _wearableHealthPlugin!.getData(request);
+      final result = await hc.getData(dataTypes, range);
 
       if (mounted) {
-        if (result.result.isEmpty) {
+        if (result.isEmpty) {
           _appendToConsole('No data was found for the period.');
         } else {
-          _appendToConsole('Data amount received (${result.result.length}):');
-          for (int i = 0; i < result.result.length; i++) {
-            final dataPoint = result.result[i];
+          _appendToConsole('Data amount received (${result.length}):');
+          for (int i = 0; i < result.length; i++) {
+            final dataPoint = result[i];
             _appendToConsole('${i + 1}. ${dataPoint.toString()}');
             if (i % 50 == 0) await Future.delayed(Duration.zero);
           }
@@ -199,12 +138,6 @@ class _MyAppState extends State<MyApp> {
     } catch (e, stacktrace) {
       if (mounted) {
         _appendToConsole('Error when getting data: $e\n$stacktrace');
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingData = false;
-        });
       }
     }
   }
@@ -245,33 +178,17 @@ class _MyAppState extends State<MyApp> {
             children: [
               Text('Running on: $_platformVersion'),
               const SizedBox(height: 8),
-              Text('Permissions granted: ${_hasPermissions ?? 'Checking...'}'),
-              const SizedBox(height: 20),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed:
-                        _wearableHealthPlugin == null
-                            ? null
-                            : _requestPermissions,
+                    onPressed: _requestPermissions,
                     child: const Text('Request permissions'),
                   ),
                   ElevatedButton(
-                    onPressed:
-                        _fetchData,
-                    child:
-                        _isLoadingData
-                            ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                            : const Text('Get data (1 week)'),
+                    onPressed: _fetchData,
+                    child: const Text('Get data (1 week)'),
                   ),
                 ],
               ),
