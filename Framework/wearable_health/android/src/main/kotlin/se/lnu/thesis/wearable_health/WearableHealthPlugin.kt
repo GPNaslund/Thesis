@@ -2,7 +2,6 @@ package se.lnu.thesis.wearable_health
 
 import android.content.Context
 import android.util.Log
-import android.health.connect.HealthConnectException
 import androidx.health.connect.client.HealthConnectClient
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware

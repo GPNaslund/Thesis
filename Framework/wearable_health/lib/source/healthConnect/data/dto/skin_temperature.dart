@@ -1,4 +1,6 @@
 import 'package:wearable_health/source/healthConnect/data/dto/metadata.dart';
+import 'package:wearable_health/source/healthConnect/data/dto/skin_temperature_delta.dart';
+import 'package:wearable_health/source/healthConnect/data/dto/temperature.dart';
 import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
 import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
 import 'package:wearable_health/source/health_metric.dart';
@@ -28,16 +30,19 @@ class HealthConnectSkinTemperature extends HealthConnectData {
     Map<String, dynamic> serialized,
   ) {
     String startTime = serialized["startTime"];
-    int? startZoneOffset = serialized["startZoneOffset"];
+    int? startZoneOffset = serialized["startZoneOffsetSeconds"];
     String endTime = serialized["endTime"];
-    int? endZoneOffset = serialized["endZoneOffset"];
-    Map<String, dynamic> metadata = serialized["metadata"];
-    List<Map<String, dynamic>> deltas = serialized["deltas"];
-    Map<String, double> baseline = serialized["baseline"];
-    Temperature baselineObj = Temperature(
-      baseline["inCelcius"]!,
-      baseline["inFahrenheit"]!,
-    );
+    int? endZoneOffset = serialized["endZoneOffsetSeconds"];
+    Map<dynamic, dynamic> metadata = serialized["metadata"];
+    List<dynamic> deltas = serialized["deltas"];
+    Map<dynamic, dynamic>? baseline = serialized["baseline"];
+    Temperature? baselineObj;
+    if (baseline != null) {
+      baselineObj = Temperature(
+        baseline["inCelsius"]!,
+        baseline["inFahrenheit"]!,
+      );
+    }
     int measurementLocation = serialized["measurementLocation"];
 
     HealthConnectMetadata metadataObj = HealthConnectMetadata.fromMap(metadata);
@@ -63,34 +68,31 @@ class HealthConnectSkinTemperature extends HealthConnectData {
   @override
   HealthMetric get healthMetric =>
       throw HealthConnectHealthMetric.skinTemperature;
-}
 
-class Temperature {
-  double inCelcius;
-  double inFahrenheit;
+  @override
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> result = {
+      "startTime": startTime.toUtc().toIso8601String(),
+      "endTime": endTime.toUtc().toIso8601String(),
+      "measurementLocation": measurementLocation,
+      "metadata": metadata.toJson(),
+    };
 
-  Temperature(this.inCelcius, this.inFahrenheit);
-}
-
-class SkinTemperatureDelta {
-  DateTime time;
-  TemperatureDelta delta;
-
-  SkinTemperatureDelta(this.time, this.delta);
-
-  factory SkinTemperatureDelta.fromMap(Map<String, dynamic> serialized) {
-    DateTime time = DateTime.parse(serialized["time"]);
-    TemperatureDelta delta = TemperatureDelta(
-      serialized["delta"]["inCelcius"],
-      serialized["delta"]["inFahrenheit"],
-    );
-    return SkinTemperatureDelta(time, delta);
+    if (baseline != null) {
+      result["baseline"] = baseline!.toJson();
+    }
+    List<Map<String, dynamic>> deltaMaps = [];
+    for (final element in deltas) {
+      deltaMaps.add(element.toJson());
+    }
+    result["deltas"] = deltaMaps;
+    if (startZoneOffset != null) {
+      result["startZoneOffset"] = startZoneOffset;
+    }
+    if (endZoneOffset != null) {
+      result["endZoneOffset"] = endZoneOffset;
+    }
+    return result;
   }
 }
 
-class TemperatureDelta {
-  double inCelcius;
-  double inFahrenheit;
-
-  TemperatureDelta(this.inCelcius, this.inFahrenheit);
-}

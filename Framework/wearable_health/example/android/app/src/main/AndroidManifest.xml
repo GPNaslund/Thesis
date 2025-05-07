@@ -1,8 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
-    <uses-permission android:name="android.permission.health.READ_SKIN_TEMPERATURE" />
-    <uses-permission android:name="android.permission.START_VIEW_PERMISSION_USAGE" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE"/>
+    <uses-permission android:name="android.permission.health.READ_SKIN_TEMPERATURE"/>
 
     <application
         android:label="wearable_health_example"
@@ -20,7 +19,7 @@
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme"
-                />
+            />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -30,9 +29,10 @@
         <activity
             android:name=".PermissionRationaleActivity"
             android:exported="true"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"> <intent-filter>
-            <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
-        </intent-filter>
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW_PERMISSION_USAGE"/>
                 <category android:name="android.intent.category.HEALTH_PERMISSIONS"/>
@@ -45,18 +45,18 @@
             android:targetActivity=".PermissionRationaleActivity"
             android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
-                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE"/>
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS"/>
             </intent-filter>
         </activity-alias>
 
         <meta-data
             android:name="flutterEmbedding"
-            android:value="2" />
+            android:value="2"/>
     </application>
 
     <queries>
-        <package android:name="com.google.android.apps.healthdata" />
+        <package android:name="com.google.android.apps.healthdata"/>
 
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>

@@ -5,6 +5,8 @@ import 'package:wearable_health/source/healthConnect/data/health_connect_data.da
 import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
 import 'package:wearable_health/source/health_metric.dart';
 
+import 'heart_rate_record_sample.dart';
+
 class HealthConnectHeartRate extends HealthConnectData {
   DateTime startTime;
   int? startZoneOffset;
@@ -83,7 +85,7 @@ class HealthConnectHeartRate extends HealthConnectData {
 
     HealthConnectMetadata metadata;
     final dynamic metadataMapData = serialized["metadata"];
-    if (metadataMapData is Map<String, dynamic>) {
+    if (metadataMapData is Map<dynamic, dynamic>) {
       metadata = HealthConnectMetadata.fromMap(metadataMapData);
     } else if (metadataMapData == null) {
       throw FormatException(
@@ -107,18 +109,29 @@ class HealthConnectHeartRate extends HealthConnectData {
 
   @override
   HealthMetric get healthMetric => throw HealthConnectHealthMetric.heartRate;
-}
 
-class HeartRateRecordSample {
-  DateTime time;
-  int beatsPerMinute;
+  @override
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> result = {
+      "startTime": startTime.toUtc().toIso8601String(),
+      "endTime": endTime.toUtc().toIso8601String(),
+    };
 
-  HeartRateRecordSample(this.time, this.beatsPerMinute);
+    if (startZoneOffset != null) {
+      result["startZoneOffset"] = startZoneOffset;
+    }
+    if (endZoneOffset != null) {
+      result["endZoneOffset"] = endZoneOffset;
+    }
 
-  factory HeartRateRecordSample.fromMap(Map<String, dynamic> serialized) {
-    return HeartRateRecordSample(
-      DateTime.parse(serialized["time"]),
-      serialized["beatsPerMinute"],
-    );
+    List<Map<String, dynamic>> samplesJson = [];
+    for (final element in samples) {
+      samplesJson.add(element.toJson());
+    }
+    result["samples"] = samplesJson;
+
+    result["metadata"] = metadata.toJson();
+
+    return result;
   }
 }
