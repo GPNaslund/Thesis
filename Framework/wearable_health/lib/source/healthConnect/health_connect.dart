@@ -75,7 +75,7 @@ class HealthConnect
         }
       } else {
         throw UnimplementedError(
-          "Failed to convert: $key into a HealthConnect data type",
+          "[HealthConnect] Failed to convert: $key into a HealthConnect data type",
         );
       }
     });
@@ -125,7 +125,7 @@ class HealthConnect
     );
 
     if (result == null) {
-      throw Exception("[checkDataStoreAvailability] received null result");
+      throw Exception("[HealthConnect] checkHealthStoreAvailability received null result");
     }
 
     return HealthSourceAvailability.fromString(result);
