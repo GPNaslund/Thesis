@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
+import 'package:wearable_health/source/healthKit/data/health_kit_data.dart';
 import 'package:wearable_health/source/healthKit/health_kit.dart';
 import 'package:wearable_health/source/healthKit/hk_health_metric.dart';
 import 'package:wearable_health/wearable_health.dart';
@@ -105,13 +106,11 @@ class _MyAppState extends State<HealthKitApp> {
           _appendToConsole('No data was found for the period.');
         } else {
           _appendToConsole('Data amount received (${result.length}):');
-          final healthConnectData = result as List<HealthConnectData>;
+          final healthConnectData = result as List<HealthKitData>;
           for (int i = 0; i < result.length; i++) {
             final dataPoint = healthConnectData[i];
-            final openMHealthData = dataPoint.toOpenMHealth();
-            for (int y = 0; y < openMHealthData.length; y++) {
-              _appendToConsole('${i + 1}:${y + 1}. ${openMHealthData[y].toJson()}');
-            }
+            final openMHealthData = dataPoint.toJson();
+              _appendToConsole('$openMHealthData');
             if (i % 50 == 0) await Future.delayed(Duration.zero);
           }
         }
