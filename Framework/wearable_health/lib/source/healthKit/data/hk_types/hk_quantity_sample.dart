@@ -81,7 +81,7 @@ class HKQuantitySample extends HKSample {
 
     for (final entry in value.entries) {
       if (entry is! String) {
-        throw FormatException("Found non String key in map");
+        throw FormatException("Found non String key in map. Found: $entry that is ${entry.runtimeType}");
       }
     }
 
