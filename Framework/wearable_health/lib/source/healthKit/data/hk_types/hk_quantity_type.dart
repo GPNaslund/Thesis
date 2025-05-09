@@ -8,20 +8,18 @@ enum HKQuantityAggregationStyle {
 class HKQuantityType extends HKSampleType {
   final HKQuantityAggregationStyle aggregationStyle;
 
-  const HKQuantityType({
+  HKQuantityType({
     required super.identifier,
     required this.aggregationStyle,
   });
 
-  static const HKQuantityType heartRate = HKQuantityType(
-    identifier: 'HKQuantityTypeIdentifierHeartRate',
-    aggregationStyle: HKQuantityAggregationStyle.discrete,
-  );
+  HKQuantityType.heartRate()
+      : aggregationStyle = HKQuantityAggregationStyle.discrete,
+        super(identifier: 'HKQuantityTypeIdentifierHeartRate');
 
-  static const HKQuantityType bodyTemperature = HKQuantityType(
-    identifier: 'HKQuantityTypeIdentifierBodyTemperature',
-    aggregationStyle: HKQuantityAggregationStyle.discrete,
-  );
+  HKQuantityType.bodyTemperature()
+      : aggregationStyle = HKQuantityAggregationStyle.discrete,
+        super(identifier: 'HKQuantityTypeIdentifierBodyTemperature');
 
   @override
   bool operator ==(Object other) =>

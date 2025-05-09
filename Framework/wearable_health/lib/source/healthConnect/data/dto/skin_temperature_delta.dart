@@ -1,60 +1,33 @@
 import 'package:wearable_health/source/healthConnect/data/dto/temperature_delta.dart';
 
 class SkinTemperatureDelta {
-  DateTime time;
-  TemperatureDelta delta;
+  late DateTime time;
+  late TemperatureDelta delta;
 
   SkinTemperatureDelta(this.time, this.delta);
 
-  factory SkinTemperatureDelta.fromMap(Map<dynamic, dynamic> serialized) {
-    T getField<T>(Map<dynamic, dynamic> map, String key, {bool isNullable = false}) {
-      final value = map[key];
+  SkinTemperatureDelta.fromJson(Map<String, dynamic> jsonData) {
+    var time = _extractDateTime(jsonData, "time");
+    this.time = time;
 
-      if (value == null) {
-        if (isNullable) {
-          return null as T;
-        } else {
-          throw FormatException(
-              "SkinTemperatureDelta.fromMap: Missing required field '$key'. Got map: $map");
-        }
-      }
-
-      if (value is T) {
-        return value;
-      }
-
-      if (T == int && value is num) {
-        return value.toInt() as T;
-      }
-      if (T == double && value is num) {
-        return value.toDouble() as T;
-      }
-
-      throw FormatException(
-          "SkinTemperatureDelta.fromMap: Invalid type for field '$key'. Expected $T, got ${value.runtimeType}. Value: '$value'");
-    }
-
-    final String timeString = getField<String>(serialized, 'time');
-    DateTime parsedTime;
-    try {
-      parsedTime = DateTime.parse(timeString);
-    } catch (e) {
-      throw FormatException(
-          "SkinTemperatureDelta.fromMap: Invalid DateTime-format for 'time': '$timeString'. Error: $e");
-    }
-
-    final Map<dynamic, dynamic> deltaMap = getField<Map<dynamic, dynamic>>(serialized, 'delta');
-
-    TemperatureDelta parsedDelta;
-    try {
-      parsedDelta = TemperatureDelta.fromMap(deltaMap);
-    } catch (e) {
-      throw FormatException(
-          "SkinTemperatureDelta.fromMap: Could not create TemperatureDelta from deltaMap. Internal error: $e");
-    }
-
-    return SkinTemperatureDelta(parsedTime, parsedDelta);
+    var delta = _extractTempDelta(jsonData, "delta");
+    this.delta = delta;
   }
+
+  DateTime _extractDateTime(Map<String, dynamic> jsonData, String keyName) {
+    var dateTime = jsonData[keyName] is String
+        ? DateTime.parse(jsonData[keyName])
+        : throw FormatException("Expected string for date time");
+    return dateTime;
+  }
+
+  TemperatureDelta _extractTempDelta(Map<String, dynamic> jsonData, String keyName) {
+    var tempDelta = jsonData[keyName] is Map<dynamic, dynamic>
+        ? TemperatureDelta.fromJson(jsonData[keyName])
+        : throw FormatException("Expected map for temperature delta");
+    return tempDelta;
+  }
+
 
   Map<String, dynamic> toJson() {
     return {

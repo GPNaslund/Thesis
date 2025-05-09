@@ -1,41 +1,22 @@
 class TemperatureDelta {
-  double inCelsius;
-  double inFahrenheit;
+  late double inCelsius;
+  late double inFahrenheit;
 
   TemperatureDelta(this.inCelsius, this.inFahrenheit);
 
-  factory TemperatureDelta.fromMap(Map<dynamic, dynamic> serialized) {
-    T getField<T>(Map<dynamic, dynamic> map, String key, {bool isNullable = false}) {
-      final value = map[key];
+  TemperatureDelta.fromJson(Map<String, dynamic> jsonData) {
+    var inCelsius = _extractDouble(jsonData, "inCelsius");
+    this.inCelsius = inCelsius;
 
-      if (value == null) {
-        if (isNullable) {
-          return null as T;
-        } else {
-          throw FormatException(
-              "TemperatureDelta.fromMap: Missing required field '$key'. Received map: $map");
-        }
-      }
+    var inFahrenheit = _extractDouble(jsonData, "inFahrenheit");
+    this.inFahrenheit = inFahrenheit;
+  }
 
-      if (value is T) {
-        return value;
-      }
-
-      if (T == double && value is num) {
-        return value.toDouble() as T;
-      }
-      if (T == int && value is num) {
-        return value.toInt() as T;
-      }
-
-      throw FormatException(
-          "TemperatureDelta.fromMap: Invalid type for field '$key'. Expected $T, got ${value.runtimeType}. Value: '$value'");
-    }
-
-    final double celsius = getField<double>(serialized, 'inCelsius');
-    final double fahrenheit = getField<double>(serialized, 'inFahrenheit');
-
-    return TemperatureDelta(celsius, fahrenheit);
+  double _extractDouble(Map<String, dynamic> jsonData, String keyName) {
+    var value = jsonData[keyName] is double
+        ? jsonData[keyName]
+        : throw FormatException("Expected value to be of type double");
+    return value;
   }
 
   Map<String, dynamic> toJson() {
@@ -44,4 +25,5 @@ class TemperatureDelta {
       "inFahrenheit": inFahrenheit,
     };
   }
+
 }

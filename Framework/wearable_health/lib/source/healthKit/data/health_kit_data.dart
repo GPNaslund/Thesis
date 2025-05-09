@@ -1,7 +1,6 @@
 import 'package:wearable_health/source/healthKit/hk_health_metric.dart';
+import 'package:wearable_health/source/json/json_converter.dart';
 
-import '../../../dto/health_data.dart';
-
-abstract class HealthKitData implements HealthData<HealthKitHealthMetric> {
-
+abstract class HealthKitData with JsonConverter {
+  HealthKitHealthMetric get healthMetric;
 }

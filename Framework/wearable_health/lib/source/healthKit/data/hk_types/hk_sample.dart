@@ -3,14 +3,14 @@ import 'hk_sample_type.dart';
 import 'hk_source_revision.dart';
 
 class HKSample {
-  final String uuid;
-  final DateTime startDate;
-  final DateTime endDate;
-  final bool hasUndeterminedDuration;
-  final HKSampleType sampleType;
-  final Map<String, dynamic>? metadata;
-  final HKDevice? device;
-  final HKSourceRevision? sourceRevision;
+  late String uuid;
+  late DateTime startDate;
+  late DateTime endDate;
+  late bool hasUndeterminedDuration;
+  late HKSampleType sampleType;
+  late Map<String, dynamic>? metadata;
+  late HKDevice? device;
+  late HKSourceRevision? sourceRevision;
 
   HKSample({
     required this.uuid,

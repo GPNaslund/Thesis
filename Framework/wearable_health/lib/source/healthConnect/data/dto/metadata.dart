@@ -1,11 +1,11 @@
 class HealthConnectMetadata {
-  String? clientRecordId;
-  int clientRecordVersion;
-  String dataOrigin;
-  String? device;
-  String id;
-  DateTime lastModifiedTime;
-  int recordingMethod;
+  late String? clientRecordId;
+  late int clientRecordVersion;
+  late String dataOrigin;
+  late String? device;
+  late String id;
+  late DateTime lastModifiedTime;
+  late int recordingMethod;
 
   HealthConnectMetadata({
     this.clientRecordId,
@@ -17,51 +17,55 @@ class HealthConnectMetadata {
     required this.recordingMethod,
   });
 
-  factory HealthConnectMetadata.fromMap(Map<dynamic, dynamic> serialized) {
-    T getField<T>(Map<dynamic, dynamic> map, String key, {bool isNullable = false}) {
-      final value = map[key];
-      if (value == null) {
-        if (isNullable) {
-          return null as T;
-        } else {
-          throw FormatException("Missing required field '$key' in HealthConnectMetadata map.");
-        }
-      }
-      if (value is T) {
-        return value;
-      }
-      if (T == int && value is num) {
-        return value.toInt() as T;
-      }
-      throw FormatException(
-          "Invalid type for field '$key' in HealthConnectMetadata map. Expected $T, got ${value.runtimeType}. Value: $value");
-    }
+  HealthConnectMetadata.fromJson(Map<dynamic, dynamic> jsonData) {
+    final String? clientRecordId = _getField<String?>(jsonData, "clientRecordId", isNullable: true);
+    this.clientRecordId = clientRecordId;
 
-    final String? clientRecordId = getField<String?>(serialized, "clientRecordId", isNullable: true);
-    final int clientRecordVersion = getField<int>(serialized, "clientRecordVersion");
-    final String dataOrigin = getField<String>(serialized, "dataOrigin");
-    final String? device = getField<String?>(serialized, "device", isNullable: true);
-    final String id = getField<String>(serialized, "id");
-    final String lastModifiedTimeString = getField<String>(serialized, "lastModifiedTime");
-    final int recordingMethod = getField<int>(serialized, "recordingMethod");
+    final int clientRecordVersion = _getField<int>(jsonData, "clientRecordVersion");
+    this.clientRecordVersion = clientRecordVersion;
 
-    DateTime lastModifiedTimeDateTime;
+    final String dataOrigin = _getField<String>(jsonData, "dataOrigin");
+    this.dataOrigin = dataOrigin;
+
+    final String? device = _getField<String?>(jsonData, "device", isNullable: true);
+    this.device = device;
+
+    final String id = _getField<String>(jsonData, "id");
+    this.id = id;
+
+    final String lastModifiedTimeString = _getField<String>(jsonData, "lastModifiedTime");
+
+    final int recordingMethod = _getField<int>(jsonData, "recordingMethod");
+    this.recordingMethod = recordingMethod;
+
+
+    DateTime lastModifiedTime;
     try {
-      lastModifiedTimeDateTime = DateTime.parse(lastModifiedTimeString);
+      lastModifiedTime = DateTime.parse(lastModifiedTimeString);
+      this.lastModifiedTime = lastModifiedTime;
     } catch (e) {
       throw FormatException(
           "Invalid DateTime format for 'lastModifiedTime': '$lastModifiedTimeString'. Error: $e");
     }
+  }
 
-    return HealthConnectMetadata(
-      clientRecordId: clientRecordId,
-      clientRecordVersion: clientRecordVersion,
-      dataOrigin: dataOrigin,
-      device: device,
-      id: id,
-      lastModifiedTime: lastModifiedTimeDateTime,
-      recordingMethod: recordingMethod,
-    );
+  T _getField<T>(Map<dynamic, dynamic> map, String key, {bool isNullable = false}) {
+    final value = map[key];
+    if (value == null) {
+      if (isNullable) {
+        return null as T;
+      } else {
+        throw FormatException("Missing required field '$key' in HealthConnectMetadata map.");
+      }
+    }
+    if (value is T) {
+      return value;
+    }
+    if (T == int && value is num) {
+      return value.toInt() as T;
+    }
+    throw FormatException(
+        "Invalid type for field '$key' in HealthConnectMetadata map. Expected $T, got ${value.runtimeType}. Value: $value");
   }
 
   Map<String, dynamic> toJson() {

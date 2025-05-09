@@ -33,6 +33,6 @@ class HKUnit {
 
   @override
   String toString() {
-    return 'HKUnit($unitString)';
+    return unitString;
   }
 }

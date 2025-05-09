@@ -1,14 +1,21 @@
 class HeartRateRecordSample {
-  DateTime time;
-  int beatsPerMinute;
+  late DateTime time;
+  late int beatsPerMinute;
 
   HeartRateRecordSample(this.time, this.beatsPerMinute);
 
-  factory HeartRateRecordSample.fromMap(Map<String, dynamic> serialized) {
-    return HeartRateRecordSample(
-      DateTime.parse(serialized["time"]),
-      serialized["beatsPerMinute"],
-    );
+  HeartRateRecordSample.fromJson(Map<String, dynamic> jsonData) {
+    var time = jsonData["time"] is String
+      ? DateTime.parse(jsonData["time"])
+      : throw FormatException("Expected String type");
+
+    this.time = time;
+
+    var beatsPerMinute = jsonData["beatsPerMinute"] is int
+      ? jsonData["beatsPerMinute"]
+      : throw FormatException("Expected integer");
+
+    this.beatsPerMinute = beatsPerMinute;
   }
 
   Map<String, dynamic> toJson() {

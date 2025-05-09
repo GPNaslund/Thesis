@@ -1,7 +1,7 @@
 class HKObjectType {
-  final String identifier;
+  late String identifier;
 
-  const HKObjectType(this.identifier);
+  HKObjectType(this.identifier);
 
   @override
   bool operator ==(Object other) =>

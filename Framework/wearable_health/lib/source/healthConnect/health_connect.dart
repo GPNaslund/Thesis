@@ -61,7 +61,7 @@ class HealthConnect {
       var healthMetric = HealthConnectHealthMetric.fromString(key);
       if (healthMetric == HealthConnectHealthMetric.heartRate) {
         for (final element in value) {
-          var heartRate = HealthConnectHeartRate.fromMap(element);
+          var heartRate = HealthConnectHeartRate.fromJson(element);
           result.add(heartRate);
         }
       } else if (healthMetric == HealthConnectHealthMetric.skinTemperature) {

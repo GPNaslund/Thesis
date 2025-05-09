@@ -13,7 +13,7 @@ class HKSourceRevision {
     this.operatingSystemVersion,
   });
 
-  factory HKSourceRevision.fromJson(Map<String, dynamic> json) {
+  factory HKSourceRevision.fromMap(Map<String, dynamic> json) {
     return HKSourceRevision(
       source: HKSource.fromJson(json['source'] as Map<String, dynamic>),
       version: json['version'] as String?,

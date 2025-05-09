@@ -16,6 +16,13 @@ class HKQuantity {
     throw ArgumentError('Unit mismatch: Cannot directly convert ${unit.unitString} to ${targetUnit.unitString} without conversion logic.');
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      "doubleValue": doubleValue,
+      "unit": unit.toString(),
+    };
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

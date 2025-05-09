@@ -1,0 +1,95 @@
+import 'package:wearable_health/source/healthKit/data/hk_types/hk_sample_type.dart';
+import 'package:wearable_health/source/healthKit/data/hk_types/hk_source_revision.dart';
+import 'package:wearable_health/source/healthKit/data/hk_types/hk_unit.dart';
+
+import 'hk_device.dart';
+import 'hk_quantity.dart';
+import 'hk_sample.dart';
+
+class HKQuantitySample extends HKSample {
+  late HKQuantity quantity;
+  late int count;
+
+
+  HKQuantitySample({
+    required super.uuid,
+    required super.startDate,
+    required super.endDate,
+    required super.hasUndeterminedDuration,
+    super.metadata,
+    HKDevice? super.device,
+    super.sourceRevision,
+
+    required this.quantity,
+    required this.count,
+    required super.sampleType,
+  });
+
+  @override
+  String toString() {
+    return 'HKQuantitySample(uuid: $uuid, quantity: $quantity, count: $count, startDate: $startDate)';
+  }
+
+  Map<String, dynamic> toJson() {
+    var result = {
+      "uuid": uuid,
+      "startDate": startDate.toUtc().toIso8601String(),
+      "endDate": endDate.toUtc().toIso8601String(),
+      "hasUndeterminedDuration": hasUndeterminedDuration,
+      "quantity": quantity.toJson(),
+      "count": count,
+      "sampleType": sampleType.identifier,
+    };
+
+    if (metadata != null) {
+      result["metadata"] = metadata!;
+    }
+    if (device != null) {
+      result["device"] = device!.toJson();
+    }
+    if (sourceRevision != null) {
+      result["sourceRevision"] = sourceRevision!.toJson();
+    }
+
+    return result;
+  }
+
+  HKQuantitySample.fromJson(Map<String, dynamic> jsonData)
+      : quantity = HKQuantity(
+    doubleValue: _getDataTypeFromMap<double>(jsonData["count"]),
+    unit: HKUnit.count.divided(HKUnit.minute),
+  ),
+        count = _getDataTypeFromMap<int>(jsonData["countForQuantitySample"] ?? 1),
+        super(
+        uuid: _getDataTypeFromMap<String>(jsonData["uuid"]),
+        startDate: _getDataTypeFromMap<DateTime>(jsonData["startDate"]),
+        endDate: _getDataTypeFromMap<DateTime>(jsonData["endDate"]),
+        hasUndeterminedDuration: _getDataTypeFromMap<bool>(jsonData["hasUndeterminedDuration"]),
+        sampleType: HKSampleType(identifier: _getDataTypeFromMap<String>(jsonData["sampleType"])),
+        metadata: jsonData["metadata"] != null
+            ? _getDataTypeFromMap<Map<String, dynamic>>(jsonData["metadata"])
+            : null,
+        device: jsonData["device"] != null
+            ? HKDevice.fromMap(jsonData["device"])
+            : null,
+        sourceRevision: jsonData["sourceRevision"] != null
+            ? HKSourceRevision.fromMap(jsonData["sourceRevision"])
+            : null,
+      );
+
+  static T _getDataTypeFromMap<T>(dynamic value) {
+    final formatException = FormatException("$value is not of type $T");
+
+    if (T is DateTime) {
+      if (value != String) {
+        throw formatException;
+      }
+      var parsedDateTime = DateTime.parse(value);
+      return parsedDateTime as T;
+    } else if (value is T) {
+      return value;
+    }
+
+    throw formatException;
+  }
+}
