@@ -60,23 +60,19 @@ class HKQuantitySample extends HKSample {
         endDate: _getDataTypeFromMap<DateTime>(jsonData["endDate"], false)!,
         sampleType: HKSampleType(identifier: _getDataTypeFromMap<String>(jsonData["sampleType"], false)!),
         metadata: jsonData["metadata"] != null
-            ? _extractMap(jsonData["metadata"], true)
+            ? _extractMap(jsonData["metadata"])
             : null,
         device: jsonData["device"] != null
-            ? HKDevice.fromMap(jsonData["device"])
+            ? HKDevice.fromMap(_extractMap(jsonData["device"]))
             : null,
         sourceRevision: jsonData["sourceRevision"] != null
-            ? HKSourceRevision.fromMap(jsonData["sourceRevision"])
+            ? HKSourceRevision.fromMap(_extractMap(jsonData["sourceRevision"]))
             : null,
       );
 
-  static Map<String, dynamic>? _extractMap(dynamic value, bool nullable) {
+  static Map<String, dynamic> _extractMap(dynamic value) {
     if (value == null) {
-      if (nullable) {
-        return null;
-      } else {
         throw FormatException("Value is null, but a Map was expected and nullable was false.");
-      }
     }
 
     if (value is Map<String, dynamic>) {
