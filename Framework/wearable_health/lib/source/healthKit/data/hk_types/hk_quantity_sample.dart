@@ -77,7 +77,7 @@ class HKQuantitySample extends HKSample {
     final formatException = FormatException("$value is not of type $T");
 
     if (T is DateTime) {
-      if (value != String) {
+      if (value is! String) {
         throw formatException;
       }
       var parsedDateTime = DateTime.parse(value);
