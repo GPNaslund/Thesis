@@ -1,7 +1,7 @@
 
 enum HealthKitHealthMetric {
   heartRate(value: "HKQuantityTypeIdentifierHeartRate"),
-  bodyTemperature(value: "HKQuantityTypeIdentifierHeartRate");
+  bodyTemperature(value: "HKQuantityTypeIdentifierBodyTemperature");
 
   const HealthKitHealthMetric({ required this.value });
 
