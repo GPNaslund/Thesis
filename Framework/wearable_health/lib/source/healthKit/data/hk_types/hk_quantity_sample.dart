@@ -53,7 +53,7 @@ class HKQuantitySample extends HKSample {
 
   HKQuantitySample.fromJson(Map<String, dynamic> jsonData)
       : quantity = HKQuantity(
-    doubleValue: _getDataTypeFromMap<double>(jsonData["count"]),
+    doubleValue: _getDataTypeFromMap<double>(jsonData["value"]),
     unit: HKUnit.count.divided(HKUnit.minute),
   ),
         super(
