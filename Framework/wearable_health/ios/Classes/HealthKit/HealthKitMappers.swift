@@ -24,7 +24,7 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
     map["uuid"] = sample.uuid.uuidString
     map["startTime"] = sample.startDate.toISO8601String()
     map["endTime"] = sample.endDate.toISO8601String()
-    map["dataType"] = sample.sampleType.identifier
+    map["sampleType"] = sample.sampleType.identifier
     
     // Source information
     let sourceRevision = sample.sourceRevision

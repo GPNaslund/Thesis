@@ -191,7 +191,7 @@ public class HealthKitDataHandler {
             dataCollectionQueue.sync {
                 var groupedResult: [String: [[String: Any?]]] = [:]
                 for sampleMap in allMappedSamplesFromQueries {
-                    if let typeIdentifier = sampleMap["dataType"] as? String {
+                    if let typeIdentifier = sampleMap["sampleType"] as? String {
                         if groupedResult[typeIdentifier] == nil {
                             groupedResult[typeIdentifier] = []
                         }
