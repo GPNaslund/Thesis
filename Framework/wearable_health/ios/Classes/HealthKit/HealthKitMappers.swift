@@ -22,8 +22,8 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
     
     // HKSample properties
     map["uuid"] = sample.uuid.uuidString
-    map["startTime"] = sample.startDate.toISO8601String()
-    map["endTime"] = sample.endDate.toISO8601String()
+    map["startDate"] = sample.startDate.toISO8601String()
+    map["endDate"] = sample.endDate.toISO8601String()
     map["sampleType"] = sample.sampleType.identifier
     
     // Source information
