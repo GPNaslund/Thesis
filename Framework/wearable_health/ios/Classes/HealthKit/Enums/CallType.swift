@@ -2,7 +2,7 @@ enum CallType: String {
     case getPlatformVersion
     case checkPermissions
     case requestPermissions
-    case checkDataStoreAvailability 
+    case checkDataStoreAvailability
     case getData
     case unknown
 
