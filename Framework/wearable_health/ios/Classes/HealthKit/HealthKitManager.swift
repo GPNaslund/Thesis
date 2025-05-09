@@ -24,8 +24,6 @@ public class HealthKitManager {
         switch callType {
         case .platformVersion:
             getPlatformVersion(result: result)
-        case .checkPermissions:
-            permissionsHandler.checkPermissions(call: call, result: result)
         case .requestPermissions:
             permissionsHandler.requestPermissions(call: call, result: result)
         case .checkDataStoreAvailability:

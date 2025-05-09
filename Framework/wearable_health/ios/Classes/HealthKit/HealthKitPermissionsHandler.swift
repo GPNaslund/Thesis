@@ -8,12 +8,6 @@ public class HealthKitPermissionsHandler {
         healthStore = store
     }
     
-    public func checkPermissions(
-        call: FlutterMethodCall,
-        result: @escaping FlutterResult
-    ) {
-        result("Privacy policy restrics the extraction of read rights")
-    }
     
     public func requestPermissions(
         call: FlutterMethodCall,
@@ -74,7 +68,7 @@ public class HealthKitPermissionsHandler {
                             "[HealthKitPermissionsHandler]: Auth request process completed. Success flag: \(success). Checking actual status..."
                         )
                         
-                        result("Success")
+                        result(true)
                     }
                 }
                 
