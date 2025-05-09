@@ -93,22 +93,24 @@ class HKQuantitySample extends HKSample {
       }
     }
 
-    if (T is Map<String, dynamic> && value is Map<dynamic, dynamic>) {
+    if (T is Map<String, dynamic> && value is Map) {
       try {
         final newMap = <String, dynamic>{};
+        bool allKeysAreStrings = true;
         for (final entry in value.entries) {
           if (entry.key is String) {
             newMap[entry.key as String] = entry.value;
           } else {
+            allKeysAreStrings = false;
             throw FormatException(
-                "Cannot convert Map<dynamic, dynamic> to Map<String, dynamic>: Key '${entry.key}' (type: ${entry.key.runtimeType}) is not a String.");
+                "Cannot convert Map to Map<String, dynamic>: Key '${entry.key}' (type: ${entry.key.runtimeType}) is not a String.");
           }
         }
         return newMap as T?;
       } catch (e) {
         if (e is FormatException) rethrow;
         throw FormatException(
-            "Error converting Map<dynamic, dynamic> to Map<String, dynamic>. Original error: $e. Value: '$value'");
+            "Error converting Map (value type: ${value.runtimeType}) to Map<String, dynamic>. Original error: $e. Value: '$value'");
       }
     }
 
