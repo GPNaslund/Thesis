@@ -14,7 +14,6 @@ class HKQuantitySample extends HKSample {
     required super.uuid,
     required super.startDate,
     required super.endDate,
-    required super.hasUndeterminedDuration,
     super.metadata,
     HKDevice? super.device,
     super.sourceRevision,
@@ -33,7 +32,6 @@ class HKQuantitySample extends HKSample {
       "uuid": uuid,
       "startDate": startDate.toUtc().toIso8601String(),
       "endDate": endDate.toUtc().toIso8601String(),
-      "hasUndeterminedDuration": hasUndeterminedDuration,
       "quantity": quantity.toJson(),
       "sampleType": sampleType.identifier,
     };
@@ -53,17 +51,16 @@ class HKQuantitySample extends HKSample {
 
   HKQuantitySample.fromJson(Map<String, dynamic> jsonData)
       : quantity = HKQuantity(
-    doubleValue: _getDataTypeFromMap<double>(jsonData["value"]),
+    doubleValue: _getDataTypeFromMap<double>(jsonData["value"], false),
     unit: HKUnit.count.divided(HKUnit.minute),
   ),
         super(
-        uuid: _getDataTypeFromMap<String>(jsonData["uuid"]),
-        startDate: _getDataTypeFromMap<DateTime>(jsonData["startDate"]),
-        endDate: _getDataTypeFromMap<DateTime>(jsonData["endDate"]),
-        hasUndeterminedDuration: _getDataTypeFromMap<bool>(jsonData["hasUndeterminedDuration"]),
-        sampleType: HKSampleType(identifier: _getDataTypeFromMap<String>(jsonData["sampleType"])),
+        uuid: _getDataTypeFromMap<String>(jsonData["uuid"], false),
+        startDate: _getDataTypeFromMap<DateTime>(jsonData["startDate"], false),
+        endDate: _getDataTypeFromMap<DateTime>(jsonData["endDate"], false),
+        sampleType: HKSampleType(identifier: _getDataTypeFromMap<String>(jsonData["sampleType"], false)),
         metadata: jsonData["metadata"] != null
-            ? _getDataTypeFromMap<Map<String, dynamic>>(jsonData["metadata"])
+            ? _getDataTypeFromMap<Map<String, dynamic>>(jsonData["metadata"], true)
             : null,
         device: jsonData["device"] != null
             ? HKDevice.fromMap(jsonData["device"])
@@ -73,7 +70,7 @@ class HKQuantitySample extends HKSample {
             : null,
       );
 
-  static T _getDataTypeFromMap<T>(dynamic value) {
+  static T _getDataTypeFromMap<T>(dynamic value, bool nullable) {
     if (T == DateTime) {
       if (value is String) {
         try {

@@ -6,7 +6,6 @@ class HKSample {
   late String uuid;
   late DateTime startDate;
   late DateTime endDate;
-  late bool hasUndeterminedDuration;
   late HKSampleType sampleType;
   late Map<String, dynamic>? metadata;
   late HKDevice? device;
@@ -16,7 +15,6 @@ class HKSample {
     required this.uuid,
     required this.startDate,
     required this.endDate,
-    required this.hasUndeterminedDuration,
     required this.sampleType,
     this.metadata,
     this.device,
