@@ -65,7 +65,6 @@ class HealthKit  {
           var hkBodyTemperature = HKBodyTemperature.fromJson(element);
           result.add(hkBodyTemperature);
         }
-        throw UnimplementedError("BodyTemperature not implemented");
       } else {
         throw UnimplementedError("[HealthKit] Failed to convert: $key into HealthKitData type");
       }
