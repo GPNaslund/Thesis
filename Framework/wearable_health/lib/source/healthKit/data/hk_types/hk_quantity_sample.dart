@@ -66,7 +66,7 @@ class HKQuantitySample extends HKSample {
             ? HKDevice.fromMap(_extractMap(jsonData["device"]))
             : null,
         sourceRevision: jsonData["sourceRevision"] != null
-            ? HKSourceRevision.fromMap(_extractMap(jsonData["sourceRevision"]))
+            ? _extractMap(jsonData["sourceRevision"])
             : null,
       );
 

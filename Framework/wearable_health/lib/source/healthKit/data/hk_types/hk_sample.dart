@@ -9,7 +9,7 @@ class HKSample {
   late HKSampleType sampleType;
   late Map<String, dynamic>? metadata;
   late HKDevice? device;
-  late HKSourceRevision? sourceRevision;
+  late Map<String, dynamic>? sourceRevision;
 
   HKSample({
     required this.uuid,
