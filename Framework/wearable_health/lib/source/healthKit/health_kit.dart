@@ -54,7 +54,7 @@ class HealthKit  {
       var healthMetric = HealthKitHealthMetric.fromString(key);
       if (healthMetric == HealthKitHealthMetric.heartRate) {
         for (final element in value) {
-          log(element.toString());
+          print(element.toString());
         }
         throw UnimplementedError("HeartRate unimplemented");
       } else if (healthMetric == HealthKitHealthMetric.bodyTemperature) {
