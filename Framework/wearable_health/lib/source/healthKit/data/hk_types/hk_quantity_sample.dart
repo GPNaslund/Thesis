@@ -74,18 +74,34 @@ class HKQuantitySample extends HKSample {
       );
 
   static T _getDataTypeFromMap<T>(dynamic value) {
-    final formatException = FormatException("$value is not of type $T");
-
-    if (T is DateTime) {
-      if (value is! String) {
-        throw formatException;
+    if (T == DateTime) {
+      if (value is String) {
+        try {
+          return DateTime.parse(value) as T;
+        } catch (e) {
+          throw FormatException(
+              "Could not parse String '$value' as DateTime. Original error: $e");
+        }
+      } else if (value is DateTime) {
+        return value as T;
+      } else {
+        throw FormatException(
+            "Expected a String or DateTime for DateTime conversion, but got ${value?.runtimeType} ('$value')");
       }
-      var parsedDateTime = DateTime.parse(value);
-      return parsedDateTime as T;
     } else if (value is T) {
       return value;
+    } else {
+      if (value is num) {
+        if (T == double) {
+          return value.toDouble() as T;
+        }
+        if (T == int) {
+          return value.toInt() as T;
+        }
+      }
+      final String valueTypeString = value?.runtimeType.toString() ?? 'null';
+      throw FormatException(
+          "Cannot convert $valueTypeString ('$value') to type $T.");
     }
-
-    throw formatException;
   }
 }
