@@ -1,5 +1,4 @@
 import 'package:wearable_health/source/healthKit/data/hk_types/hk_sample_type.dart';
-import 'package:wearable_health/source/healthKit/data/hk_types/hk_source_revision.dart';
 import 'package:wearable_health/source/healthKit/data/hk_types/hk_unit.dart';
 
 import 'hk_device.dart';
@@ -43,7 +42,7 @@ class HKQuantitySample extends HKSample {
       result["device"] = device!.toJson();
     }
     if (sourceRevision != null) {
-      result["sourceRevision"] = sourceRevision!.toJson();
+      result["sourceRevision"] = sourceRevision!;
     }
 
     return result;

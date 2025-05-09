@@ -1,6 +1,5 @@
 import 'hk_device.dart';
 import 'hk_sample_type.dart';
-import 'hk_source_revision.dart';
 
 class HKSample {
   late String uuid;
