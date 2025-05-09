@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
-import 'package:wearable_health/source/healthKit/data/health_kit_data.dart';
 import 'package:wearable_health/source/healthKit/health_kit.dart';
 import 'package:wearable_health/source/healthKit/hk_health_metric.dart';
 import 'package:wearable_health/wearable_health.dart';
-import 'package:wearable_health/extensions/open_m_health/health_connect/health_connect_data.dart';
 
 typedef HealthData = Map<String, String>;
 
@@ -25,7 +22,7 @@ class _MyAppState extends State<HealthKitApp> {
   String _platformVersion = 'Unknown';
   String _consoleOutput = '';
   List<HealthKitHealthMetric> dataTypes = [
-    HealthKitHealthMetric.heartRate
+    HealthKitHealthMetric.bodyTemperature
   ];
 
   HealthKit hk = WearableHealth.getAppleHealthKit();
@@ -106,9 +103,8 @@ class _MyAppState extends State<HealthKitApp> {
           _appendToConsole('No data was found for the period.');
         } else {
           _appendToConsole('Data amount received (${result.length}):');
-          final healthConnectData = result as List<HealthKitData>;
           for (int i = 0; i < result.length; i++) {
-            final dataPoint = healthConnectData[i];
+            final dataPoint = result[i];
             final openMHealthData = dataPoint.toJson();
               _appendToConsole('$openMHealthData');
             if (i % 50 == 0) await Future.delayed(Duration.zero);

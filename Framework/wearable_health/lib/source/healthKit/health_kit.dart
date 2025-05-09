@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/constants.dart';
 import 'package:wearable_health/dto/health_data_response.dart';
+import 'package:wearable_health/source/healthKit/data/dto/hk_body_temperature.dart';
 import 'package:wearable_health/source/healthKit/data/dto/hk_heart_rate.dart';
 import 'package:wearable_health/source/healthKit/data/health_kit_data.dart';
 import 'package:wearable_health/source/healthKit/hk_health_metric.dart';
@@ -55,14 +56,14 @@ class HealthKit  {
       var healthMetric = HealthKitHealthMetric.fromString(key);
       if (healthMetric == HealthKitHealthMetric.heartRate) {
         for (final element in value) {
-          print(element);
           var hkHeartRate = HKHeartRate.fromJson(element);
           result.add(hkHeartRate);
         }
       } else if (healthMetric == HealthKitHealthMetric.bodyTemperature) {
-        // Convert to DTO
         for (final element in value) {
           log(element.toString());
+          var hkBodyTemperature = HKBodyTemperature.fromJson(element);
+          result.add(hkBodyTemperature);
         }
         throw UnimplementedError("BodyTemperature not implemented");
       } else {
