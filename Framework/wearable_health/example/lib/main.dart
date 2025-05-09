@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
 import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
+import 'package:wearable_health/source/healthKit/hk_health_metric.dart';
 import 'package:wearable_health/source/health_data_source.dart';
 import 'package:wearable_health/wearable_health.dart';
 import 'package:wearable_health/extensions/open_m_health/health_connect/health_connect_data.dart';
@@ -23,10 +24,16 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   String _consoleOutput = '';
+  /*
   List<HealthConnectHealthMetric> dataTypes = [
     HealthConnectHealthMetric.skinTemperature,
   ];
-  HealthDataSource hc = WearableHealth.getGoogleHealthConnect();
+   */
+
+  List<HealthKitHealthMetric> dataTypes = [
+    HealthKitHealthMetric.heartRate,
+  ];
+  HealthDataSource hc = WearableHealth.getAppleHealthKit();
 
   @override
   void initState() {

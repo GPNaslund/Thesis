@@ -10,7 +10,7 @@ import 'package:wearable_health/source/health_source_availability.dart';
 
 import '../health_data_source.dart';
 
-class HealthConnect extends HealthDataSource<HealthKitHealthMetric, HealthKitData> {
+class HealthKit extends HealthDataSource<HealthKitHealthMetric, HealthKitData> {
   final methodChannel = MethodChannel("wearable_health");
 
   @override
