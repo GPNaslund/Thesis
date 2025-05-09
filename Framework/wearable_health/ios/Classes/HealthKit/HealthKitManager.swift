@@ -22,7 +22,7 @@ public class HealthKitManager {
             .fromString(val: call.method.components(separatedBy: "/")[1])
         
         switch callType {
-        case .getPlatformVersion:
+        case .platformVersion:
             getPlatformVersion(result: result)
         case .checkPermissions:
             permissionsHandler.checkPermissions(call: call, result: result)
