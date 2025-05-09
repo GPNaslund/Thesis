@@ -55,6 +55,7 @@ class HealthKit  {
       var healthMetric = HealthKitHealthMetric.fromString(key);
       if (healthMetric == HealthKitHealthMetric.heartRate) {
         for (final element in value) {
+          print(element);
           var hkHeartRate = HKHeartRate.fromJson(element);
           result.add(hkHeartRate);
         }
