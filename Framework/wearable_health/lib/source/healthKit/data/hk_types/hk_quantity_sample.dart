@@ -60,7 +60,7 @@ class HKQuantitySample extends HKSample {
         endDate: _getDataTypeFromMap<DateTime>(jsonData["endDate"], false)!,
         sampleType: HKSampleType(identifier: _getDataTypeFromMap<String>(jsonData["sampleType"], false)!),
         metadata: jsonData["metadata"] != null
-            ? _getDataTypeFromMap<Map<String, dynamic>>(jsonData["metadata"], true)
+            ? _extractMap(jsonData["metadata"], true)
             : null,
         device: jsonData["device"] != null
             ? HKDevice.fromMap(jsonData["device"])
@@ -69,6 +69,24 @@ class HKQuantitySample extends HKSample {
             ? HKSourceRevision.fromMap(jsonData["sourceRevision"])
             : null,
       );
+
+  static Map<String, dynamic>? _extractMap(dynamic value, bool nullable) {
+    if (nullable && value == null) {
+      return null;
+    }
+
+    if (value is! Map) {
+      throw FormatException("Value is not a map");
+    }
+
+    for (final entry in value.entries) {
+      if (entry is! String) {
+        throw FormatException("Found non String key in map");
+      }
+    }
+
+    return value as Map<String, dynamic>;
+  }
 
   static T? _getDataTypeFromMap<T>(dynamic value, bool nullable) {
     if (value == null) {
@@ -90,27 +108,6 @@ class HKQuantitySample extends HKSample {
       } catch (e) {
         throw FormatException(
             "Could not parse String '$value' as DateTime. Original error: $e");
-      }
-    }
-
-    if (T is Map<String, dynamic> && value is Map) {
-      try {
-        final newMap = <String, dynamic>{};
-        bool allKeysAreStrings = true;
-        for (final entry in value.entries) {
-          if (entry.key is String) {
-            newMap[entry.key as String] = entry.value;
-          } else {
-            allKeysAreStrings = false;
-            throw FormatException(
-                "Cannot convert Map to Map<String, dynamic>: Key '${entry.key}' (type: ${entry.key.runtimeType}) is not a String.");
-          }
-        }
-        return newMap as T?;
-      } catch (e) {
-        if (e is FormatException) rethrow;
-        throw FormatException(
-            "Error converting Map (value type: ${value.runtimeType}) to Map<String, dynamic>. Original error: $e. Value: '$value'");
       }
     }
 
