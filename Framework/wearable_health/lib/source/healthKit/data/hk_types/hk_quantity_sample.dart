@@ -71,21 +71,32 @@ class HKQuantitySample extends HKSample {
       );
 
   static Map<String, dynamic>? _extractMap(dynamic value, bool nullable) {
-    if (nullable && value == null) {
-      return null;
-    }
-
-    if (value is! Map) {
-      throw FormatException("Value is not a map");
-    }
-
-    for (final entry in value.entries) {
-      if (entry is! String) {
-        throw FormatException("Found non String key in map. Found: $entry that is ${entry.runtimeType}");
+    if (value == null) {
+      if (nullable) {
+        return null;
+      } else {
+        throw FormatException("Value is null, but a Map was expected and nullable was false.");
       }
     }
 
-    return value as Map<String, dynamic>;
+    if (value is Map<String, dynamic>) {
+      return value;
+    }
+
+    if (value is Map) {
+      final newMap = <String, dynamic>{};
+      for (final entry in value.entries) {
+        if (entry.key is String) {
+          newMap[entry.key as String] = entry.value;
+        } else {
+          throw FormatException(
+              "Map key is not a String. Key: '${entry.key}', Type: ${entry.key.runtimeType}");
+        }
+      }
+      return newMap;
+    }
+
+    throw FormatException("Value is not a map. Type was: ${value.runtimeType}");
   }
 
   static T? _getDataTypeFromMap<T>(dynamic value, bool nullable) {
