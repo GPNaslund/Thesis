@@ -51,14 +51,14 @@ class HKQuantitySample extends HKSample {
 
   HKQuantitySample.fromJson(Map<String, dynamic> jsonData)
       : quantity = HKQuantity(
-    doubleValue: _getDataTypeFromMap<double>(jsonData["value"], false)!,
+    doubleValue: _getDataTypeFromMap<double>(jsonData["value"]),
     unit: HKUnit.count.divided(HKUnit.minute),
   ),
         super(
-        uuid: _getDataTypeFromMap<String>(jsonData["uuid"], false)!,
-        startDate: _getDataTypeFromMap<DateTime>(jsonData["startDate"], false)!,
-        endDate: _getDataTypeFromMap<DateTime>(jsonData["endDate"], false)!,
-        sampleType: HKSampleType(identifier: _getDataTypeFromMap<String>(jsonData["sampleType"], false)!),
+        uuid: _getDataTypeFromMap<String>(jsonData["uuid"]),
+        startDate: _getDataTypeFromMap<DateTime>(jsonData["startDate"]),
+        endDate: _getDataTypeFromMap<DateTime>(jsonData["endDate"]),
+        sampleType: HKSampleType(identifier: _getDataTypeFromMap<String>(jsonData["sampleType"])),
         metadata: jsonData["metadata"] != null
             ? _extractMap(jsonData["metadata"])
             : null,
@@ -95,14 +95,10 @@ class HKQuantitySample extends HKSample {
     throw FormatException("Value is not a map. Type was: ${value.runtimeType}");
   }
 
-  static T? _getDataTypeFromMap<T>(dynamic value, bool nullable) {
+  static T _getDataTypeFromMap<T>(dynamic value) {
     if (value == null) {
-      if (nullable) {
-        return null;
-      } else {
         throw FormatException(
             "Value is null, but type $T is not permitted to be null in this context (nullable was false).");
-      }
     }
 
     if (value is T) {
@@ -111,7 +107,7 @@ class HKQuantitySample extends HKSample {
 
     if (T == DateTime && value is String) {
       try {
-        return DateTime.parse(value) as T?;
+        return DateTime.parse(value) as T;
       } catch (e) {
         throw FormatException(
             "Could not parse String '$value' as DateTime. Original error: $e");
@@ -120,15 +116,15 @@ class HKQuantitySample extends HKSample {
 
     if (value is num) {
       if (T == double && value is int) {
-        return value.toDouble() as T?;
+        return value.toDouble() as T;
       }
       if (T == int && value is double) {
-        return value.round() as T?;
+        return value.round() as T;
       }
     }
 
     if (T == String) {
-      return value.toString() as T?;
+      return value.toString() as T;
     }
 
     final String valueTypeString = value.runtimeType.toString();
