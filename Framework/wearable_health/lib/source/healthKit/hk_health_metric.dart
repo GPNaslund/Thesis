@@ -1,6 +1,5 @@
-import 'package:wearable_health/source/health_metric.dart';
 
-enum HealthKitHealthMetric implements HealthMetric {
+enum HealthKitHealthMetric {
   heartRate(value: "HKQuantityTypeIdentifierHeartRate"),
   bodyTemperature(value: "HKQuantityTypeIdentifierHeartRate");
 
@@ -8,7 +7,6 @@ enum HealthKitHealthMetric implements HealthMetric {
 
   final String value;
 
-  @override
   String get definition => value;
 
   factory HealthKitHealthMetric.fromString(String input) {

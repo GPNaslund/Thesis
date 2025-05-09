@@ -6,14 +6,11 @@ import 'package:wearable_health/source/healthConnect/data/dto/heart_rate.dart';
 import 'package:wearable_health/source/healthConnect/data/dto/skin_temperature.dart';
 import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
 import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
-import 'package:wearable_health/source/health_data_source.dart';
 import 'package:wearable_health/source/health_source_availability.dart';
 
-class HealthConnect
-    extends HealthDataSource<HealthConnectHealthMetric, HealthConnectData> {
+class HealthConnect {
   final methodChannel = MethodChannel("wearable_health");
 
-  @override
   Future<List<HealthConnectHealthMetric>> checkPermissions() async {
     List<String>? response = await methodChannel.invokeListMethod(
       "$healthConnectPrefix/$checkPermissionsSuffix",
@@ -31,7 +28,6 @@ class HealthConnect
     return result;
   }
 
-  @override
   Future<List<HealthConnectData>> getData(
     List<HealthConnectHealthMetric> metrics,
     DateTimeRange timeRange,
@@ -83,7 +79,6 @@ class HealthConnect
     return result;
   }
 
-  @override
   Future<String> getPlatformVersion() async {
     String version = await methodChannel.invokeMethod(
       "$healthConnectPrefix/$platformVersionSuffix",
@@ -91,7 +86,6 @@ class HealthConnect
     return version;
   }
 
-  @override
   Future<List<HealthConnectHealthMetric>> requestPermissions(
     List<HealthConnectHealthMetric> metrics,
   ) async {
@@ -118,7 +112,6 @@ class HealthConnect
     return result;
   }
 
-  @override
   Future<HealthSourceAvailability> checkHealthStoreAvailability() async {
     final result = await methodChannel.invokeMethod(
       "$healthConnectPrefix/$checkDataStoreAvailabilitySuffix",

@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:wearable_health/source/healthConnect/data/dto/metadata.dart';
 import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
 import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
-import 'package:wearable_health/source/health_metric.dart';
 
 import 'heart_rate_record_sample.dart';
 
@@ -108,7 +107,7 @@ class HealthConnectHeartRate extends HealthConnectData {
   }
 
   @override
-  HealthMetric get healthMetric => throw HealthConnectHealthMetric.heartRate;
+  HealthConnectHealthMetric get healthMetric => HealthConnectHealthMetric.heartRate;
 
   @override
   Map<String, dynamic> toJson() {

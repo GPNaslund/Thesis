@@ -3,7 +3,6 @@ import 'package:wearable_health/source/healthConnect/data/dto/skin_temperature_d
 import 'package:wearable_health/source/healthConnect/data/dto/temperature.dart';
 import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
 import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
-import 'package:wearable_health/source/health_metric.dart';
 
 class HealthConnectSkinTemperature extends HealthConnectData {
   Temperature? baseline;
@@ -66,8 +65,7 @@ class HealthConnectSkinTemperature extends HealthConnectData {
   }
 
   @override
-  HealthMetric get healthMetric =>
-      throw HealthConnectHealthMetric.skinTemperature;
+  HealthConnectHealthMetric get healthMetric => HealthConnectHealthMetric.skinTemperature;
 
   @override
   Map<String, dynamic> toJson() {

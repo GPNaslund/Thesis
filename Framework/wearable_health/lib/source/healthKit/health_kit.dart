@@ -8,12 +8,10 @@ import 'package:wearable_health/source/healthKit/data/health_kit_data.dart';
 import 'package:wearable_health/source/healthKit/hk_health_metric.dart';
 import 'package:wearable_health/source/health_source_availability.dart';
 
-import '../health_data_source.dart';
 
-class HealthKit extends HealthDataSource<HealthKitHealthMetric, HealthKitData> {
+class HealthKit  {
   final methodChannel = MethodChannel("wearable_health");
 
-  @override
   Future<HealthSourceAvailability> checkHealthStoreAvailability() async {
     final result = await methodChannel.invokeMethod(
       "$healthKitPrefix/$checkDataStoreAvailabilitySuffix",
@@ -26,13 +24,6 @@ class HealthKit extends HealthDataSource<HealthKitHealthMetric, HealthKitData> {
     return HealthSourceAvailability.fromString(result);
   }
 
-  @override
-  Future<List<HealthKitHealthMetric>> checkPermissions() async {
-    List<HealthKitHealthMetric> result = [];
-    return result;
-  }
-
-  @override
   Future<List<HealthKitData>> getData(List<HealthKitHealthMetric> metrics, DateTimeRange timeRange) async {
     final start = timeRange.start.toUtc().toIso8601String();
     final end = timeRange.end.toUtc().toIso8601String();
@@ -80,7 +71,6 @@ class HealthKit extends HealthDataSource<HealthKitHealthMetric, HealthKitData> {
     return result;
   }
 
-  @override
   Future<String> getPlatformVersion() async {
     String version = await methodChannel.invokeMethod(
       "$healthKitPrefix/$platformVersionSuffix",
@@ -88,14 +78,13 @@ class HealthKit extends HealthDataSource<HealthKitHealthMetric, HealthKitData> {
     return version;
   }
 
-  @override
-  Future<List<HealthKitHealthMetric>> requestPermissions(List<HealthKitHealthMetric> metrics) async {
+  Future<bool> requestPermissions(List<HealthKitHealthMetric> metrics) async {
     List<String> definitions = [];
     for (final metric in metrics) {
       definitions.add(metric.definition);
     }
 
-    final List<String>? response = await methodChannel.invokeListMethod(
+    final bool? response = await methodChannel.invokeMethod(
       "$healthKitPrefix/$requestPermissionsSuffix",
       {"types": definitions},
     );
@@ -104,12 +93,6 @@ class HealthKit extends HealthDataSource<HealthKitHealthMetric, HealthKitData> {
       throw Exception("[HealthKit] requestPermissions returned null");
     }
 
-    List<HealthKitHealthMetric> result = [];
-    for (final element in response) {
-      final permitted = HealthKitHealthMetric.fromString(element);
-      result.add(permitted);
-    }
-
-    return result;
+    return response;
   }
 }

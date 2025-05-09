@@ -1,6 +1,4 @@
-import 'package:wearable_health/source/health_metric.dart';
-
-enum HealthConnectHealthMetric implements HealthMetric {
+enum HealthConnectHealthMetric  {
   heartRate(value: "android.permission.health.READ_HEART_RATE"),
   skinTemperature(value: "android.permission.health.READ_SKIN_TEMPERATURE");
 
@@ -8,7 +6,6 @@ enum HealthConnectHealthMetric implements HealthMetric {
 
   final String value;
 
-  @override
   String get definition => value;
 
   factory HealthConnectHealthMetric.fromString(String input) {
