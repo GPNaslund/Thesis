@@ -3,12 +3,16 @@ package se.lnu.thesis.wearable_health.record_extension
 import androidx.health.connect.client.records.HeartRateRecord
 
 fun HeartRateRecord.serialize(): Map<String, Any?> {
+    val samples = this.extractSamples()
+    val metaData = this.extractMetadata()
+
     return mapOf(
-        "startTimeEpochMs" to this.startTime.toEpochMilli().toString(),
-        "endTimeEpochMs" to this.endTime.toEpochMilli().toString(),
+        "startTimeEpochMs" to this.startTime.toEpochMilli(),
+        "endTimeEpochMs" to this.endTime.toEpochMilli(),
         "startZoneOffsetSeconds" to this.startZoneOffset?.totalSeconds,
         "endZoneOffsetSeconds" to this.endZoneOffset?.totalSeconds,
-        "samples" to this.extractSamples()
+        "samples" to samples,
+        "metadata" to metaData,
     )
 }
 
@@ -20,5 +24,18 @@ fun HeartRateRecord.extractSamples(): List<Map<String, Any?>> {
             "beatsPerMinute" to sample.beatsPerMinute,
         ))
     }
+    return result
+}
+
+fun HeartRateRecord.extractMetadata(): Map<String, Any?> {
+    val result: Map<String, Any?> = mapOf(
+        "clientRecordId" to this.metadata.clientRecordId,
+        "clientRecordVersion" to this.metadata.clientRecordVersion,
+        "dataOrigin" to this.metadata.dataOrigin.toString(),
+        "device" to this.metadata.device,
+        "id" to this.metadata.id,
+        "lastModifiedTime" to this.metadata.lastModifiedTime.toString(),
+        "recordingMethod" to this.metadata.recordingMethod,
+    )
     return result
 }

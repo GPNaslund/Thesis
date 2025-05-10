@@ -1,7 +1,6 @@
-import 'package:wearable_health/provider/native/health_kit/apple_health_kit.dart';
-import 'package:wearable_health/provider/native/health_connect/google_health_connect.dart';
-import 'package:wearable_health/provider/provider.dart';
+import 'package:wearable_health/source/healthKit/health_kit.dart';
 
+import 'source/healthConnect/health_connect.dart';
 import 'wearable_health_platform_interface.dart';
 
 class WearableHealth {
@@ -9,11 +8,11 @@ class WearableHealth {
     return WearableHealthPlatform.instance.getPlatformVersion();
   }
 
-  static Provider getAppleHealthKit() {
-    return AppleHealthKit();
+  static HealthKit getAppleHealthKit() {
+    return HealthKit();
   }
 
-  static Provider getGoogleHealthConnect() {
-    return GoogleHealthConnect();
+  static HealthConnect getGoogleHealthConnect() {
+    return HealthConnect();
   }
 }

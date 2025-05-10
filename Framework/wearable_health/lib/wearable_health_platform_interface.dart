@@ -20,6 +20,7 @@ abstract class WearableHealthPlatform extends PlatformInterface {
   /// they register themselves.
   static set instance(WearableHealthPlatform instance) {
     PlatformInterface.verifyToken(instance, _token);
+
     _instance = instance;
   }
 

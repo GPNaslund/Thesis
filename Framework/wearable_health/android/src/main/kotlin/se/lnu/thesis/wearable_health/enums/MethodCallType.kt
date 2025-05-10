@@ -1,7 +1,7 @@
 package se.lnu.thesis.wearable_health.enums
 
 enum class MethodCallType(val value: String) {
-    GET_PLATFORM_VERSION("getPlatformVersion"),
+    GET_PLATFORM_VERSION("platformVersion"),
     CHECK_PERMISSIONS("checkPermissions"),
     REQUEST_PERMISSIONS("requestPermissions"),
     DATA_STORE_AVAILABILITY("dataStoreAvailability"),
@@ -11,7 +11,7 @@ enum class MethodCallType(val value: String) {
     companion object {
         fun fromString(value: String): MethodCallType {
             return when (value) {
-                "getPlatformVersion" -> GET_PLATFORM_VERSION
+                "platformVersion" -> GET_PLATFORM_VERSION
                 "checkPermissions" -> CHECK_PERMISSIONS
                 "requestPermissions" -> REQUEST_PERMISSIONS
                 "dataStoreAvailability" -> DATA_STORE_AVAILABILITY
