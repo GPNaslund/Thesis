@@ -5,7 +5,7 @@ import 'hk_sample.dart';
 
 class HKQuantitySample extends HKSample {
   late HKQuantity quantity;
-
+  late int? count;
 
   HKQuantitySample({
     required super.uuid,
@@ -17,6 +17,7 @@ class HKQuantitySample extends HKSample {
 
     required this.quantity,
     required super.sampleType,
+    required this.count
   });
 
   @override
@@ -32,6 +33,10 @@ class HKQuantitySample extends HKSample {
       "quantity": quantity.toJson(),
       "sampleType": sampleType.identifier,
     };
+
+    if (count != null) {
+      result["count"] = count!;
+    }
 
     if (metadata != null) {
       result["metadata"] = metadata!;
@@ -51,6 +56,9 @@ class HKQuantitySample extends HKSample {
     doubleValue: _getDataTypeFromMap<double>(jsonData["value"]),
     unit: _getDataTypeFromMap<String>(jsonData["unit"]),
   ),
+  count = jsonData["count"] != null
+        ? _getDataTypeFromMap<int>(jsonData["count"])
+        : null,
         super(
         uuid: _getDataTypeFromMap<String>(jsonData["uuid"]),
         startDate: _getDataTypeFromMap<DateTime>(jsonData["startDate"]),
