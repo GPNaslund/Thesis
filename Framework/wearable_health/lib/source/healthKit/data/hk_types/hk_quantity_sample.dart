@@ -1,6 +1,4 @@
 import 'package:wearable_health/source/healthKit/data/hk_types/hk_sample_type.dart';
-import 'package:wearable_health/source/healthKit/data/hk_types/hk_unit.dart';
-
 import 'hk_device.dart';
 import 'hk_quantity.dart';
 import 'hk_sample.dart';
@@ -51,7 +49,7 @@ class HKQuantitySample extends HKSample {
   HKQuantitySample.fromJson(Map<String, dynamic> jsonData)
       : quantity = HKQuantity(
     doubleValue: _getDataTypeFromMap<double>(jsonData["value"]),
-    unit: HKUnit.count.divided(HKUnit.minute),
+    unit: _getDataTypeFromMap<String>(jsonData["unit"]),
   ),
         super(
         uuid: _getDataTypeFromMap<String>(jsonData["uuid"]),
