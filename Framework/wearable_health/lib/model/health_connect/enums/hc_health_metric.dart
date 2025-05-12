@@ -1,4 +1,4 @@
-enum HealthConnectHealthMetric  {
+enum HealthConnectHealthMetric {
   heartRate(value: "android.permission.health.READ_HEART_RATE"),
   skinTemperature(value: "android.permission.health.READ_SKIN_TEMPERATURE");
 
