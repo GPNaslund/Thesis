@@ -69,11 +69,13 @@ class JsonConverterImpl implements JsonConverter {
   Map<String, List<Map<String, dynamic>>>
   extractJsonObjectWithListOfJsonObjects(dynamic value, String errMsg) {
     var outerMap = extractMap(value, errMsg);
+    Map<String, List<Map<String, dynamic>>> result = {};
     for (final entry in outerMap.entries) {
-      extractStringValue(entry.key, errMsg);
-      extractListOfJsonObjects(entry.value, errMsg);
+      var key = extractStringValue(entry.key, errMsg);
+      var typedList = extractListOfJsonObjects(entry.value, errMsg);
+      result[key] = typedList;
     }
-    return value;
+    return result;
   }
 
   @override

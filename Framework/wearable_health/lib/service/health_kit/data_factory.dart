@@ -32,7 +32,7 @@ class HKDataFactoryImpl implements HKDataFactory {
   ) {
     var quantity = _createQuantity(data, errMsg);
     var count =
-        data["count"]
+        data["count"] != null
             ? jsonConverter.extractIntValue(data["count"], errMsg)
             : null;
     var uuid = jsonConverter.extractStringValue(data["uuid"], errMsg);
@@ -44,13 +44,13 @@ class HKDataFactoryImpl implements HKDataFactory {
     );
     var sampleType = HKSampleType(identifier: sampleTypeData);
     var metadata =
-        data["metadata"]
+        data["metadata"] != null
             ? jsonConverter.extractJsonObject(data["metadata"], errMsg)
             : null;
     var device = data["device"] ? _createDevice(data, errMsg) : null;
 
     var sourceRevision =
-        data["sourceRevision"]
+        data["sourceRevision"] != null
             ? jsonConverter.extractJsonObject(data["sourceRevision"], errMsg)
             : null;
 
@@ -76,29 +76,29 @@ class HKDataFactoryImpl implements HKDataFactory {
   HKDevice _createDevice(Map<String, dynamic> data, String errMsg) {
     var deviceMap = jsonConverter.extractMap(data, errMsg);
     var name =
-        deviceMap["name"]
+        deviceMap["name"] != null
             ? jsonConverter.extractStringValue(deviceMap["name"], errMsg)
             : null;
     var manufacturer =
-        deviceMap["manufacturer"]
+        deviceMap["manufacturer"] != null
             ? jsonConverter.extractStringValue(
               deviceMap["manufacturer"],
               errMsg,
             )
             : null;
     var model =
-        deviceMap["model"]
+        deviceMap["model"] != null
             ? jsonConverter.extractStringValue(deviceMap["model"], errMsg)
             : null;
     var hardwareVersion =
-        deviceMap["hardwareVersion"]
+        deviceMap["hardwareVersion"] != null
             ? jsonConverter.extractStringValue(
               deviceMap["hardwareVersion"],
               errMsg,
             )
             : null;
     var softwareVersion =
-        deviceMap["softwareVersion"]
+        deviceMap["softwareVersion"] != null
             ? jsonConverter.extractStringValue(
               deviceMap["softwareVersion"],
               errMsg,

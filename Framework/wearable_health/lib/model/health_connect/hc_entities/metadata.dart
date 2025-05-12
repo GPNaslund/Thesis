@@ -1,6 +1,6 @@
 class HealthConnectMetadata {
   late String? clientRecordId;
-  late int clientRecordVersion;
+  late int? clientRecordVersion;
   late String dataOrigin;
   late String? device;
   late String id;
@@ -16,5 +16,4 @@ class HealthConnectMetadata {
     required this.lastModifiedTime,
     required this.recordingMethod,
   });
-  
 }

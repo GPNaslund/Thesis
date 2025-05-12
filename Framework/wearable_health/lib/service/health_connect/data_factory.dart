@@ -27,12 +27,12 @@ class HCDataFactoryImpl implements HCDataFactory {
     );
 
     var startZoneOffset =
-        data["startZoneOffset"]
+        data["startZoneOffset"] != null
             ? converter.extractIntValue(data["startZoneOffset"], errMsg)
             : null;
 
     var endZoneOffset =
-        data["endZoneOffset"]
+        data["endZoneOffset"] != null
             ? converter.extractIntValue(data["endZoneOffset"], errMsg)
             : null;
 
@@ -49,7 +49,8 @@ class HCDataFactoryImpl implements HCDataFactory {
       samples.add(heartRateRecordSample);
     }
 
-    var metadata = _extractMetaData(data, errMsg);
+    var metadataMap = converter.extractJsonObject(data["metadata"], errMsg);
+    var metadata = _extractMetaData(metadataMap, errMsg);
 
     return HealthConnectHeartRate(
       startTime: startTime,
@@ -76,15 +77,16 @@ class HCDataFactoryImpl implements HCDataFactory {
       errMsg,
     );
     var startZoneOffset =
-        data["startZoneOffsetSeconds"]
+        data["startZoneOffsetSeconds"] != null
             ? converter.extractIntValue(data["startZoneOffsetSeconds"], errMsg)
             : null;
     var endZoneOffset =
-        data["endZoneOffsetSeconds"]
+        data["endZoneOffsetSeconds"] != null
             ? converter.extractIntValue(data["endZoneOffsetSeconds"], errMsg)
             : null;
 
-    var metadata = _extractMetaData(data, errMsg);
+    var metadataMap = converter.extractJsonObject(data["metadata"], errMsg);
+    var metadata = _extractMetaData(metadataMap, errMsg);
 
     var skinTempDeltaList = converter.extractList(data["deltas"], errMsg);
     List<SkinTemperatureDelta> skinTempDeltas = [];
@@ -110,7 +112,7 @@ class HCDataFactoryImpl implements HCDataFactory {
     }
 
     var baselineData =
-        data["baseline"]
+        data["baseline"] != null
             ? converter.extractJsonObject(data["baseline"], errMsg)
             : null;
 
@@ -147,16 +149,18 @@ class HCDataFactoryImpl implements HCDataFactory {
     String errMsg,
   ) {
     var clientRecordId =
-        data["clientRecordId"]
+        data["clientRecordId"] != null
             ? converter.extractStringValue(data["clientRecordId"], errMsg)
             : null;
-    var clientRecordVersion = converter.extractIntValue(
-      data["clientRecordVersion"],
-      errMsg,
-    );
+
+    var clientRecordVersion =
+        data["clientRecordVersion"] != null
+            ? converter.extractIntValue(data["clientRecordVersion"], errMsg)
+            : null;
+
     var dataOrigin = converter.extractStringValue(data["dataOrigin"], errMsg);
     var device =
-        data["device"]
+        data["device"] != null
             ? converter.extractStringValue(data["device"], errMsg)
             : null;
     var id = converter.extractStringValue(data["id"], errMsg);
