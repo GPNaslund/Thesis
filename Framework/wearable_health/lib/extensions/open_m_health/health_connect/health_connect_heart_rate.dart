@@ -1,4 +1,4 @@
-import '../../../source/healthConnect/data/dto/heart_rate.dart';
+import '../../../model/health_connect/hc_entities/heart_rate.dart';
 import '../schemas/heart_rate.dart';
 import '../schemas/ieee_1752/time_frame.dart';
 import '../schemas/ieee_1752/time_interval.dart';

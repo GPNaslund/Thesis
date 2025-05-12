@@ -5,7 +5,7 @@ import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/descr
 import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/temperature_unit.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/temperature_unit_value.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/measurement_location.dart';
-import 'package:wearable_health/source/healthKit/data/dto/hk_body_temperature.dart';
+import 'package:wearable_health/model/health_kit/hk_body_temperature.dart';
 
 import '../schemas/ieee_1752/time_frame.dart';
 

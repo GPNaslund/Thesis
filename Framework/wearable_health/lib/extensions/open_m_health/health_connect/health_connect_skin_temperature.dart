@@ -3,7 +3,7 @@ import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/descr
 import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/temperature_unit_value.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/ieee_1752/time_frame.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/measurement_location.dart';
-import 'package:wearable_health/source/healthConnect/data/dto/skin_temperature.dart';
+import 'package:wearable_health/model/health_connect/hc_entities/skin_temperature.dart';
 
 import '../schemas/ieee_1752/temperature_unit.dart';
 
@@ -41,12 +41,14 @@ extension OpenMHealthBodyTemperatureConverter on HealthConnectSkinTemperature {
       var unitValue = TemperatureUnitValue(value: finalTemp, unit: tempUnit);
       var timeFrame = TimeFrame(dateTime: element.time);
       var descriptiveStatistic = DescriptiveStatistic.count;
-      result.add(OpenMHealthBodyTemperature(
-        bodyTemperature: unitValue,
-        effectiveTimeFrame: timeFrame,
-        descriptiveStatistic: descriptiveStatistic,
-        measurementLocation: measurementLocationValue,
-      ));
+      result.add(
+        OpenMHealthBodyTemperature(
+          bodyTemperature: unitValue,
+          effectiveTimeFrame: timeFrame,
+          descriptiveStatistic: descriptiveStatistic,
+          measurementLocation: measurementLocationValue,
+        ),
+      );
     }
     return result;
   }
