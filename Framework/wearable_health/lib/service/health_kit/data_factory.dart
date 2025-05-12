@@ -47,7 +47,7 @@ class HKDataFactoryImpl implements HKDataFactory {
         data["metadata"] != null
             ? jsonConverter.extractJsonObject(data["metadata"], errMsg)
             : null;
-    var device = data["device"] ? _createDevice(data, errMsg) : null;
+    var device = data["device"] != null ? _createDevice(data, errMsg) : null;
 
     var sourceRevision =
         data["sourceRevision"] != null
