@@ -106,7 +106,9 @@ class _MyAppState extends State<HealthKitApp> {
           for (int i = 0; i < result.length; i++) {
             final dataPoint = result[i];
             final openMHealthData = dataPoint.toOpenMHealth();
-            _appendToConsole('$openMHealthData');
+            for (final element in openMHealthData) {
+              _appendToConsole('${element.toJson()}');
+            }
             if (i % 50 == 0) await Future.delayed(Duration.zero);
           }
         }
