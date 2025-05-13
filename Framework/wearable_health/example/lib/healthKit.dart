@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wearable_health/source/healthKit/health_kit.dart';
-import 'package:wearable_health/source/healthKit/hk_health_metric.dart';
-import 'package:wearable_health/wearable_health.dart';
+import 'package:wearable_health/controller/wearable_health.dart';
+import 'package:wearable_health/extensions/open_m_health/health_kit/health_kit_data.dart';
+import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
+import 'package:wearable_health/service/health_kit/health_kit_interface.dart';
 
 typedef HealthData = Map<String, String>;
 
@@ -21,11 +22,9 @@ class HealthKitApp extends StatefulWidget {
 class _MyAppState extends State<HealthKitApp> {
   String _platformVersion = 'Unknown';
   String _consoleOutput = '';
-  List<HealthKitHealthMetric> dataTypes = [
-    HealthKitHealthMetric.bodyTemperature
-  ];
+  List<HealthKitHealthMetric> dataTypes = [HealthKitHealthMetric.heartRate];
 
-  HealthKit hk = WearableHealth.getAppleHealthKit();
+  HealthKit hk = WearableHealth().getAppleHealthKit();
 
   @override
   void initState() {
@@ -44,7 +43,7 @@ class _MyAppState extends State<HealthKitApp> {
       final platformVersion = await hk.getPlatformVersion();
       if (mounted) {
         setState(() {
-          _platformVersion = platformVersion ?? 'Unknown';
+          _platformVersion = platformVersion;
         });
       }
     } catch (e) {
@@ -56,13 +55,12 @@ class _MyAppState extends State<HealthKitApp> {
     }
   }
 
-
   Future<void> _requestPermissions() async {
     _appendToConsole('Requesting permissions...');
     try {
       final result = await hk.requestPermissions(dataTypes);
       if (mounted) {
-          _appendToConsole('Permissions granted: $result');
+        _appendToConsole('Permissions granted: $result');
       }
     } on PlatformException catch (e) {
       debugPrint('PlatformException when requesting permissions: ${e.message}');
@@ -105,8 +103,10 @@ class _MyAppState extends State<HealthKitApp> {
           _appendToConsole('Data amount received (${result.length}):');
           for (int i = 0; i < result.length; i++) {
             final dataPoint = result[i];
-            final openMHealthData = dataPoint.toJson();
-              _appendToConsole('$openMHealthData');
+            final openMHealthData = dataPoint.toOpenMHealth();
+            for (final element in openMHealthData) {
+              _appendToConsole('${element.toJson()}');
+            }
             if (i % 50 == 0) await Future.delayed(Duration.zero);
           }
         }
@@ -128,7 +128,7 @@ class _MyAppState extends State<HealthKitApp> {
     if (mounted) {
       setState(() {
         _consoleOutput =
-        '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
+            '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
       });
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wearable_health/source/healthConnect/data/health_connect_data.dart';
-import 'package:wearable_health/source/healthConnect/hc_health_metric.dart';
-import 'package:wearable_health/source/healthConnect/health_connect.dart';
-import 'package:wearable_health/wearable_health.dart';
+import 'package:wearable_health/controller/wearable_health.dart';
 import 'package:wearable_health/extensions/open_m_health/health_connect/health_connect_data.dart';
+import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart';
+import 'package:wearable_health/service/health_connect/health_connect_interface.dart';
 
 typedef HealthData = Map<String, String>;
 
@@ -24,10 +23,10 @@ class _MyAppState extends State<HealthConnectApp> {
   String _platformVersion = 'Unknown';
   String _consoleOutput = '';
   List<HealthConnectHealthMetric> dataTypes = [
-    HealthConnectHealthMetric.skinTemperature,
+    HealthConnectHealthMetric.heartRate,
   ];
 
-  HealthConnect hc = WearableHealth.getGoogleHealthConnect();
+  HealthConnect hc = WearableHealth().getGoogleHealthConnect();
 
   @override
   void initState() {
@@ -47,7 +46,7 @@ class _MyAppState extends State<HealthConnectApp> {
       final platformVersion = await hc.getPlatformVersion();
       if (mounted) {
         setState(() {
-          _platformVersion = platformVersion ?? 'Unknown';
+          _platformVersion = platformVersion;
         });
       }
     } catch (e) {
@@ -125,12 +124,14 @@ class _MyAppState extends State<HealthConnectApp> {
           _appendToConsole('No data was found for the period.');
         } else {
           _appendToConsole('Data amount received (${result.length}):');
-          final healthConnectData = result as List<HealthConnectData>;
+          final healthConnectData = result;
           for (int i = 0; i < result.length; i++) {
             final dataPoint = healthConnectData[i];
             final openMHealthData = dataPoint.toOpenMHealth();
             for (int y = 0; y < openMHealthData.length; y++) {
-              _appendToConsole('${i + 1}:${y + 1}. ${openMHealthData[y].toJson()}');
+              _appendToConsole(
+                '${i + 1}:${y + 1}. ${openMHealthData[y].toJson()}',
+              );
             }
             if (i % 50 == 0) await Future.delayed(Duration.zero);
           }
@@ -153,7 +154,7 @@ class _MyAppState extends State<HealthConnectApp> {
     if (mounted) {
       setState(() {
         _consoleOutput =
-        '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
+            '${_consoleOutput.isEmpty ? '' : '$_consoleOutput\n'}$text';
       });
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
