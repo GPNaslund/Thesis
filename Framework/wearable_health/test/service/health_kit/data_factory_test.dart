@@ -156,10 +156,8 @@ void main() {
           'sourceRevision': {'source': 'TestApp', 'version': '1.0'},
         };
 
-        // Act
         final result = dataFactory.createBodyTemperature(testData);
 
-        // Assert
         expect(result, isA<HKBodyTemperature>());
         expect(result.data.uuid, equals('test-uuid'));
         expect(result.data.quantity.doubleValue, equals(37.5));
@@ -167,7 +165,6 @@ void main() {
       });
 
       test('should create a valid HKBodyTemperature with minimal data', () {
-        // Arrange
         final testData = {
           'uuid': 'minimal-uuid',
           'startDate': '2023-01-01T12:00:00Z',
@@ -177,10 +174,8 @@ void main() {
           'sampleType': 'HKQuantityTypeIdentifierBodyTemperature',
         };
 
-        // Act
         final result = dataFactory.createBodyTemperature(testData);
 
-        // Assert
         expect(result, isA<HKBodyTemperature>());
         expect(result.data.uuid, equals('minimal-uuid'));
         expect(result.data.count, isNull);
@@ -192,7 +187,6 @@ void main() {
 
     group('createHeartRate', () {
       test('should create a valid HKHeartRate from complete data', () {
-        // Arrange
         final testData = {
           'uuid': 'heart-rate-uuid',
           'startDate': '2023-01-01T12:00:00Z',
@@ -212,10 +206,8 @@ void main() {
           'sourceRevision': {'source': 'HealthApp', 'version': '2.0'},
         };
 
-        // Act
         final result = dataFactory.createHeartRate(testData);
 
-        // Assert
         expect(result, isA<HKHeartRate>());
         expect(result.data.uuid, equals('heart-rate-uuid'));
         expect(result.data.quantity.unit, equals('count/min'));
@@ -224,9 +216,8 @@ void main() {
 
     group('error handling', () {
       test('should propagate errors from JsonConverter', () {
-        // Arrange
         final testData = {
-          'uuid': null, // This will cause an error in extractStringValue
+          'uuid': null,
           'startDate': '2023-01-01T12:00:00Z',
           'endDate': '2023-01-01T12:05:00Z',
           'value': 37.5,
@@ -234,7 +225,6 @@ void main() {
           'sampleType': 'HKQuantityTypeIdentifierBodyTemperature',
         };
 
-        // Act & Assert
         expect(
           () => dataFactory.createBodyTemperature(testData),
           throwsA(isA<FormatException>()),
@@ -242,7 +232,6 @@ void main() {
       });
 
       test('should handle null optional fields correctly', () {
-        // Arrange
         final testData = {
           'uuid': 'test-uuid',
           'startDate': '2023-01-01T12:00:00Z',
@@ -256,10 +245,8 @@ void main() {
           'sourceRevision': null,
         };
 
-        // Act
         final result = dataFactory.createBodyTemperature(testData);
 
-        // Assert
         expect(result, isA<HKBodyTemperature>());
         expect(result.data.count, isNull);
         expect(result.data.metadata, isNull);
@@ -270,7 +257,6 @@ void main() {
 
     group('_createDevice', () {
       test('should handle partial device data', () {
-        // Arrange
         final testData = {
           'uuid': 'test-uuid',
           'startDate': '2023-01-01T12:00:00Z',
@@ -281,10 +267,8 @@ void main() {
           'device': {'name': 'TestDevice'},
         };
 
-        // Act
         final result = dataFactory.createBodyTemperature(testData);
 
-        // Assert
         expect(result.data.device, isNotNull);
         expect(result.data.device!.manufacturer, isNull);
         expect(result.data.device!.model, isNull);
