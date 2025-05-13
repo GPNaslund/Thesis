@@ -5,7 +5,20 @@ import 'package:wearable_health/model/health_connect/hc_entities/heart_rate.dart
 import 'package:wearable_health/model/health_connect/hc_entities/skin_temperature.dart';
 import 'package:wearable_health/model/health_connect/health_connect_data.dart';
 
+/// Extension that converts [HealthConnectData] instances to OpenMHealth schema format.
+///
+/// Provides the [toOpenMHealth] method to transform different Health Connect data types
+/// into standardized OpenMHealth schema representations.
 extension OpenMHealthConverter on HealthConnectData {
+  /// Converts this [HealthConnectData] instance to OpenMHealth schema format.
+  ///
+  /// Supports conversion of:
+  /// - [HealthConnectHeartRate] → Heart rate schema
+  /// - [HealthConnectSkinTemperature] → Body temperature schema
+  ///
+  /// Returns a list of [OpenMHealthSchema] objects.
+  ///
+  /// Throws [UnimplementedError] for unsupported [HealthConnectData] types.
   List<OpenMHealthSchema> toOpenMHealth() {
     if (this is HealthConnectHeartRate) {
       return (this as HealthConnectHeartRate).toOpenMHealthHeartRate();

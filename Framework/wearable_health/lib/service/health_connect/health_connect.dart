@@ -10,13 +10,23 @@ import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart
 
 import '../../model/health_data.dart';
 
+/// Implementation of HealthConnect interface for accessing health data from Android devices.
+/// Handles communication with the native Health Connect API through method channels.
 class HealthConnectImpl implements HealthConnect {
+  /// Channel for communication with native Android Health Connect API.
   MethodChannel methodChannel;
+
+  /// Factory for creating Health Connect data objects from JSON responses.
   HCDataFactory dataFactory;
+
+  /// Utility for safely converting JSON data structures.
   JsonConverter jsonConverter;
 
+  /// Creates a new HealthConnect implementation with required dependencies.
   HealthConnectImpl(this.methodChannel, this.dataFactory, this.jsonConverter);
 
+  /// Queries current permission status for Health Connect metrics.
+  /// Returns a list of metrics that are currently permitted.
   @override
   Future<List<HealthConnectHealthMetric>> checkPermissions() async {
     List<String>? response = await methodChannel.invokeListMethod(
@@ -35,6 +45,8 @@ class HealthConnectImpl implements HealthConnect {
     return result;
   }
 
+  /// Retrieves health data for specified metrics within the given time range.
+  /// Returns a list of typed health data objects (heart rate, skin temperature, etc.).
   @override
   Future<List<HealthConnectData>> getData(
     List<HealthConnectHealthMetric> metrics,
@@ -60,6 +72,8 @@ class HealthConnectImpl implements HealthConnect {
     return result;
   }
 
+  /// Converts raw JSON response from the platform to typed HealthConnectData objects.
+  /// Handles different metric types and creates appropriate data objects.
   List<HealthConnectData> _convertToHealthConnectData(
     Map<String, List<dynamic>> response,
   ) {
@@ -94,6 +108,7 @@ class HealthConnectImpl implements HealthConnect {
     return result;
   }
 
+  /// Retrieves the platform version of the Android device.
   @override
   Future<String> getPlatformVersion() async {
     String version = await methodChannel.invokeMethod(
@@ -102,6 +117,8 @@ class HealthConnectImpl implements HealthConnect {
     return version;
   }
 
+  /// Requests permissions for the specified health metrics.
+  /// Returns a list of metrics that were granted permission.
   @override
   Future<List<HealthConnectHealthMetric>> requestPermissions(
     List<HealthConnectHealthMetric> metrics,
@@ -129,6 +146,8 @@ class HealthConnectImpl implements HealthConnect {
     return result;
   }
 
+  /// Checks if Health Connect is available and accessible on the device.
+  /// Returns an availability status indicating if Health Connect can be used.
   @override
   Future<HealthConnectAvailability> checkHealthStoreAvailability() async {
     final result = await methodChannel.invokeMethod(

@@ -11,13 +11,23 @@ import 'package:wearable_health/service/health_kit/health_kit_interface.dart';
 import 'package:wearable_health/model/health_kit/health_kit_data.dart';
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 
+/// Implementation of HealthKit interface for accessing health data from iOS devices.
+/// Handles communication with the native HealthKit API through method channels.
 class HealthKitImpl implements HealthKit {
+  /// Channel for communication with native iOS HealthKit API.
   MethodChannel methodChannel;
+
+  /// Factory for creating HealthKit data objects from JSON responses.
   HKDataFactory dataFactory;
+
+  /// Utility for safely converting JSON data structures.
   JsonConverter jsonConverter;
 
+  /// Creates a new HealthKit implementation with required dependencies.
   HealthKitImpl(this.methodChannel, this.dataFactory, this.jsonConverter);
 
+  /// Checks if HealthKit is available and accessible on the device.
+  /// Returns an availability status indicating if HealthKit can be used.
   @override
   Future<HealthKitAvailability> checkHealthStoreAvailability() async {
     final result = await methodChannel.invokeMethod(
@@ -33,6 +43,8 @@ class HealthKitImpl implements HealthKit {
     return HealthKitAvailability.fromString(result);
   }
 
+  /// Retrieves health data for specified metrics within the given time range.
+  /// Returns a list of typed health data objects (heart rate, body temperature, etc.).
   @override
   Future<List<HealthKitData>> getData(
     List<HealthKitHealthMetric> metrics,
@@ -58,6 +70,8 @@ class HealthKitImpl implements HealthKit {
     return result;
   }
 
+  /// Converts raw JSON response from the platform to typed HealthKitData objects.
+  /// Handles different metric types and creates appropriate data objects.
   List<HealthKitData> _convertToHealthKitData(
     Map<String, List<dynamic>> response,
   ) {
@@ -91,6 +105,7 @@ class HealthKitImpl implements HealthKit {
     return result;
   }
 
+  /// Retrieves the platform version of the iOS device.
   @override
   Future<String> getPlatformVersion() async {
     String version = await methodChannel.invokeMethod(
@@ -99,6 +114,8 @@ class HealthKitImpl implements HealthKit {
     return version;
   }
 
+  /// Requests permissions for the specified health metrics.
+  /// Returns a boolean indicating if all permissions were granted.
   @override
   Future<bool> requestPermissions(List<HealthKitHealthMetric> metrics) async {
     List<String> definitions = [];

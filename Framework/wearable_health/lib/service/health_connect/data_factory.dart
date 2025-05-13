@@ -8,11 +8,18 @@ import 'package:wearable_health/model/health_connect/hc_entities/temperature_del
 import 'package:wearable_health/service/converters/json/json_converter_interface.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 
+/// Implementation of HCDataFactory that creates Health Connect (Android)
+/// data objects from JSON map structures.
 class HCDataFactoryImpl implements HCDataFactory {
+  /// JSON converter for safe type extraction.
   JsonConverter converter;
 
+  /// Creates a new factory with the specified JSON converter.
   HCDataFactoryImpl(this.converter);
 
+  /// Creates a HealthConnectHeartRate object from JSON map data.
+  /// Extracts and validates all required fields, handling time conversions
+  /// and sample collection.
   @override
   HealthConnectHeartRate createHeartRate(Map<String, dynamic> data) {
     var errMsg =
@@ -62,6 +69,8 @@ class HCDataFactoryImpl implements HCDataFactory {
     );
   }
 
+  /// Creates a HealthConnectSkinTemperature object from JSON map data.
+  /// Extracts temperature baseline, delta measurements, and metadata.
   @override
   HealthConnectSkinTemperature createSkinTemperature(
     Map<String, dynamic> data,
@@ -144,6 +153,8 @@ class HCDataFactoryImpl implements HCDataFactory {
     );
   }
 
+  /// Helper method to extract Health Connect metadata from a map.
+  /// Creates standardized metadata objects with proper validation.
   HealthConnectMetadata _extractMetaData(
     Map<String, dynamic> data,
     String errMsg,
