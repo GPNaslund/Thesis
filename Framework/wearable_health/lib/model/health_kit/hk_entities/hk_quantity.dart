@@ -2,7 +2,11 @@ class HKQuantity {
   final double doubleValue;
   final String unit;
 
-  const HKQuantity({required this.doubleValue, required this.unit});
+  const HKQuantity(
+    double value, {
+    required this.doubleValue,
+    required this.unit,
+  });
 
   @override
   bool operator ==(Object other) =>

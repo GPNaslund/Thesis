@@ -70,7 +70,7 @@ class HKDataFactoryImpl implements HKDataFactory {
   HKQuantity _createQuantity(Map<String, dynamic> data, String errMsg) {
     var value = jsonConverter.extractDoubleValue(data["value"], errMsg);
     var unit = jsonConverter.extractStringValue(data["unit"], errMsg);
-    return HKQuantity(doubleValue: value, unit: unit);
+    return HKQuantity(value, doubleValue: value, unit: unit);
   }
 
   HKDevice _createDevice(Map<String, dynamic> data, String errMsg) {
