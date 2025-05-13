@@ -32,7 +32,6 @@ void main() {
     });
 
     test('toOpenMHealth should convert HealthConnectHeartRate correctly', () {
-      // Arrange
       final heartRateData = HealthConnectHeartRate(
         startTime: startTime,
         endTime: endTime,
@@ -47,7 +46,6 @@ void main() {
 
       final result = heartRateData.toOpenMHealth();
 
-      // Assert
       expect(result, isA<List<OpenMHealthSchema>>());
       expect(result.length, equals(2));
       expect(result[0], isA<OpenMHealthHeartRate>());
