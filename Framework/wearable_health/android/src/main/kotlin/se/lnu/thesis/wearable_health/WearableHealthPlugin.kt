@@ -52,6 +52,7 @@ class WearableHealthPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activityPluginBinding = binding // ✅ this is currently missing
         hcManager.onAttachedToActivity(binding)
     }
 

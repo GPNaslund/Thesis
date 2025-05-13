@@ -23,4 +23,9 @@ class HealthConnectHeartRate extends HealthConnectData {
 
   @override
   HealthConnectHealthMetric get metric => HealthConnectHealthMetric.heartRate;
+
+  @override
+  String toString() {
+    return 'HealthConnectHeartRate(start: ${startTime.toIso8601String()}, end: ${endTime.toIso8601String()}, samples: $samples)';
+  }
 }

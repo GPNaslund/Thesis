@@ -1,33 +1,23 @@
-import 'dart:io';
+// lib/main.dart
 
 import 'package:flutter/material.dart';
-
-import 'healthConnect.dart';
-import 'healthKit.dart';
+import 'features/home/home_page.dart';
 
 void main() {
-  Widget appToRun;
+  runApp(const MyApp());
+}
 
-  if (Platform.isAndroid) {
-    print("Running Android specific App");
-    appToRun = const HealthConnectApp();
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-
-  } else if (Platform.isIOS) {
-    print("Running iOS specific App");
-    appToRun = const HealthKitApp();
-
-  } else {
-    print("Unsupported platform: ${Platform.operatingSystem}");
-    appToRun = MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text("Unsupported Platform")),
-        body: Center(
-          child: Text("This application is designed for Android or iOS, but is running on ${Platform.operatingSystem}."),
-        ),
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Wearable Health Test App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      home: const HomePage(),
     );
   }
-
-  runApp(appToRun);
 }
