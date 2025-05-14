@@ -7,7 +7,12 @@ import 'package:wearable_health/model/health_connect/hc_entities/skin_temperatur
 
 import '../schemas/ieee_1752/temperature_unit.dart';
 
+/// Extension to convert [HealthConnectSkinTemperature] data to OpenMHealth body temperature schema format.
 extension OpenMHealthBodyTemperatureConverter on HealthConnectSkinTemperature {
+  /// Converts this [HealthConnectSkinTemperature] instance to a list of [OpenMHealthBodyTemperature] objects.
+  ///
+  /// Returns a list of [OpenMHealthBodyTemperature] objects, one for each
+  /// temperature delta in the source data.
   List<OpenMHealthBodyTemperature> toOpenMHealthBodyTemperature() {
     List<OpenMHealthBodyTemperature> result = [];
     var baseTemp = baseline;

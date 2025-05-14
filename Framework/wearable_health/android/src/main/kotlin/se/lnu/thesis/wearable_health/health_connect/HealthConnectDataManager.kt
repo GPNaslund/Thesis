@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.HeartRateVariabilityRmssdRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SkinTemperatureRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
@@ -62,6 +63,10 @@ class HealthConnectDataManager {
                                     dataMap[HealthPermission.getReadPermission(record::class)]!!.add(serialized)
                                 }
                                 is SkinTemperatureRecord -> {
+                                    val serialized = record.serialize()
+                                    dataMap[HealthPermission.getReadPermission(record::class)]!!.add(serialized)
+                                }
+                                is HeartRateVariabilityRmssdRecord -> {
                                     val serialized = record.serialize()
                                     dataMap[HealthPermission.getReadPermission(record::class)]!!.add(serialized)
                                 }
@@ -150,6 +155,7 @@ class HealthConnectDataManager {
         return when (value) {
             HealthPermission.getReadPermission(HeartRateRecord::class) -> HeartRateRecord::class
             HealthPermission.getReadPermission(SkinTemperatureRecord::class) -> SkinTemperatureRecord::class
+            HealthPermission.getReadPermission(HeartRateVariabilityRmssdRecord::class) -> HeartRateVariabilityRmssdRecord::class
             else -> null
         }
     }

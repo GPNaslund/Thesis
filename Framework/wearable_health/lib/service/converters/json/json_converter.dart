@@ -1,6 +1,10 @@
 import 'package:wearable_health/service/converters/json/json_converter_interface.dart';
 
+/// Implementation of the JsonConverter interface for safe type extraction and conversion
+/// from dynamic JSON data to strongly typed Dart objects.
 class JsonConverterImpl implements JsonConverter {
+  /// Extracts and validates a Map from dynamic value.
+  /// Throws FormatException if value is not a Map.
   @override
   Map<dynamic, dynamic> extractMap(dynamic value, String errMsg) {
     if (value is! Map) {
@@ -11,6 +15,8 @@ class JsonConverterImpl implements JsonConverter {
     return value;
   }
 
+  /// Converts a Map with dynamic keys to a Map with String keys.
+  /// Throws FormatException if any key is not a String.
   @override
   Map<String, dynamic> extractJsonObject(
     Map<dynamic, dynamic> data,
@@ -24,6 +30,8 @@ class JsonConverterImpl implements JsonConverter {
     return data.cast<String, dynamic>();
   }
 
+  /// Extracts and validates a List from dynamic value.
+  /// Throws FormatException if value is not a List.
   @override
   List<dynamic> extractList(dynamic value, String errMsg) {
     if (value is! List) {
@@ -34,6 +42,9 @@ class JsonConverterImpl implements JsonConverter {
     return value;
   }
 
+  /// Extracts a List of JSON objects (Map<String, dynamic>) from dynamic value.
+  /// Validates both the list structure and that all elements are properly formatted.
+  /// Throws FormatException for invalid types.
   @override
   List<Map<String, dynamic>> extractListOfJsonObjects(
     dynamic value,
@@ -65,6 +76,8 @@ class JsonConverterImpl implements JsonConverter {
     return resultList;
   }
 
+  /// Extracts a nested structure: a Map with String keys and values as Lists of JSON objects.
+  /// Validates all levels of the structure.
   @override
   Map<String, List<Map<String, dynamic>>>
   extractJsonObjectWithListOfJsonObjects(dynamic value, String errMsg) {
@@ -78,6 +91,8 @@ class JsonConverterImpl implements JsonConverter {
     return result;
   }
 
+  /// Extracts and validates a String value.
+  /// Throws FormatException if value is not a String.
   @override
   String extractStringValue(dynamic value, String errMsg) {
     if (value is! String) {
@@ -88,6 +103,8 @@ class JsonConverterImpl implements JsonConverter {
     return value;
   }
 
+  /// Extracts and validates an int value.
+  /// Throws FormatException if value is not a number or not an int.
   @override
   int extractIntValue(dynamic value, String errMsg) {
     if (value is! num) {
@@ -104,6 +121,8 @@ class JsonConverterImpl implements JsonConverter {
     return value;
   }
 
+  /// Extracts and validates a double value.
+  /// Throws FormatException if value is not a number or not a double.
   @override
   double extractDoubleValue(dynamic value, String errMsg) {
     if (value is! num) {
@@ -120,6 +139,8 @@ class JsonConverterImpl implements JsonConverter {
     return value;
   }
 
+  /// Parses a String into DateTime.
+  /// Throws FormatException if value is not a valid date string.
   @override
   DateTime extractDateTime(dynamic value, String errMsg) {
     if (value is! String) {
@@ -130,6 +151,8 @@ class JsonConverterImpl implements JsonConverter {
     return DateTime.parse(value);
   }
 
+  /// Creates a DateTime from epoch milliseconds.
+  /// Throws FormatException if value is not a number.
   @override
   DateTime extractDateTimeFromEpochMs(dynamic value, String errMsg) {
     if (value is! num) {
