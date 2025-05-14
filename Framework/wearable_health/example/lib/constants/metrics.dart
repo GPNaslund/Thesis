@@ -3,4 +3,5 @@
 enum HealthMetric {
   heartRate,
   skinTemperature,
+  heartRateVariability
 }

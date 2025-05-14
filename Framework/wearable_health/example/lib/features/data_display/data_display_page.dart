@@ -1,9 +1,8 @@
-// lib/features/data_display/data_display_page.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
 import '../../../constants/metrics.dart';
+import '../../../constants/metrics_mapper.dart';
 
 class DataDisplayPage extends StatefulWidget {
   final HealthMetric metric;
@@ -19,6 +18,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   bool _isLoading = false;
   bool _useConverter = false;
   List<String> _fetchedResults = [];
+  String _resultLabel = '';
 
   Future<void> _fetchData() async {
     setState(() {
@@ -37,23 +37,26 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         convert: _useConverter,
       );
 
+      final label = 'Showing ${getMetricLabel(widget.metric)} data in '
+          '${_useConverter ? "OpenMHealth" : "Raw"} format:';
+
       if (healthData.isEmpty) {
         setState(() {
+          _resultLabel = label;
           _fetchedResults = [
             'No data fetched.',
-            'Make sure ${widget.metric.name} is allowed in settings.'
+            'Make sure ${getMetricLabel(widget.metric)} is allowed in settings.'
           ];
         });
       } else {
         setState(() {
+          _resultLabel = label;
           _fetchedResults = healthData.map((e) {
             try {
-              // if openMHealth
               if (_useConverter) {
                 final encoder = JsonEncoder.withIndent('  ');
                 return '${encoder.convert(e.toJson())}\n';
               }
-              // else just get raw data
               return '${e.toString()}\n';
             } catch (err) {
               return 'Error parsing item: $err\n';
@@ -64,6 +67,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     } catch (e) {
       setState(() {
         _fetchedResults = ['Error while fetching data: $e'];
+        _resultLabel = '';
       });
     } finally {
       setState(() => _isLoading = false);
@@ -71,26 +75,29 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   }
 
   void _clearConsole() {
-    setState(() => _fetchedResults = []);
+    setState(() {
+      _fetchedResults = [];
+      _resultLabel = '';
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Data for ${widget.metric.name}')),
+      appBar: AppBar(title: Text('Data for ${getMetricLabel(widget.metric)}')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Output:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+            if (_resultLabel.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  _resultLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -130,7 +137,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               value: _useConverter,
               onChanged: (val) {
                 if (val != null) {
-                  setState(() => _useConverter = val);
+                  setState(() {
+                    _useConverter = val;
+                  });
                 }
               },
               items: const [

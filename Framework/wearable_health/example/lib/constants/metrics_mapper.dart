@@ -8,6 +8,8 @@ String getMetricLabel(HealthMetric metric) {
       return 'Heart Rate';
     case HealthMetric.skinTemperature:
       return 'Skin Temperature';
+    case HealthMetric.heartRateVariability:
+      return 'Heart Rate Variability';
   }
 }
 
@@ -18,6 +20,8 @@ dynamic mapMetricToPlatformMetric(HealthMetric metric, {required bool isAndroid}
         return HealthConnectHealthMetric.heartRate;
       case HealthMetric.skinTemperature:
         return HealthConnectHealthMetric.skinTemperature;
+      case HealthMetric.heartRateVariability:
+        return HealthConnectHealthMetric.heartRateVariability;
     }
   } else {
     switch (metric) {
@@ -25,6 +29,8 @@ dynamic mapMetricToPlatformMetric(HealthMetric metric, {required bool isAndroid}
         return HealthKitHealthMetric.heartRate;
       case HealthMetric.skinTemperature:
         return HealthKitHealthMetric.bodyTemperature;
+      case HealthMetric.heartRateVariability:
+        return HealthKitHealthMetric.heartRateVariability;
     }
   }
   return null;
