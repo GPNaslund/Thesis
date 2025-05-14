@@ -22,7 +22,9 @@ class HealthKitApp extends StatefulWidget {
 class _MyAppState extends State<HealthKitApp> {
   String _platformVersion = 'Unknown';
   String _consoleOutput = '';
-  List<HealthKitHealthMetric> dataTypes = [HealthKitHealthMetric.heartRate];
+  List<HealthKitHealthMetric> dataTypes = [
+    HealthKitHealthMetric.heartRateVariability,
+  ];
 
   HealthKit hk = WearableHealth().getAppleHealthKit();
 

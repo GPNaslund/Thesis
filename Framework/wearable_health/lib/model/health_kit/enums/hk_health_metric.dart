@@ -9,7 +9,13 @@ enum HealthKitHealthMetric {
 
   /// Body temperature measurement data.
   /// HealthKit identifier: HKQuantityTypeIdentifierBodyTemperature
-  bodyTemperature(value: "HKQuantityTypeIdentifierBodyTemperature");
+  bodyTemperature(value: "HKQuantityTypeIdentifierBodyTemperature"),
+
+  /// Heart rate variability measurement data.
+  /// HealthKit identifier: HKQuantityTypeIdentifierHeartRateVariabilitySDNN
+  heartRateVariability(
+    value: "HKQuantityTypeIdentifierHeartRateVariabilitySDNN",
+  );
 
   /// Creates a new [HealthKitHealthMetric] with the associated HealthKit identifier.
   const HealthKitHealthMetric({required this.value});

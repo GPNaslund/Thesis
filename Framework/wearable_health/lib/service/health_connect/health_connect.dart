@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/constants.dart';
 import 'package:wearable_health/model/health_connect/enums/hc_availability.dart';
+import 'package:wearable_health/model/health_connect/hc_entities/heart_rate_variability_rmssd.dart';
 import 'package:wearable_health/service/converters/json/json_converter_interface.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health/service/health_connect/health_connect_interface.dart';
@@ -97,6 +98,14 @@ class HealthConnectImpl implements HealthConnect {
         for (final element in value) {
           var skinTemp = dataFactory.createSkinTemperature(element);
           result.add(skinTemp);
+        }
+      } else if (healthMetric ==
+          HealthConnectHealthMetric.heartRateVariability) {
+        for (final element in value) {
+          var heartRateVariability = dataFactory.createHeartRateVariability(
+            element,
+          );
+          result.add(heartRateVariability);
         }
       } else {
         throw UnimplementedError(

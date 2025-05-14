@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.HeartRateVariabilityRmssdRecord
 import androidx.health.connect.client.records.SkinTemperatureRecord
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import java.time.Duration
@@ -29,6 +30,7 @@ import java.time.temporal.ChronoUnit
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.units.Temperature
 import androidx.health.connect.client.units.TemperatureDelta
+import java.time.LocalDateTime
 import kotlin.math.abs
 
 /** DataSeederPlugin */
@@ -52,7 +54,8 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private val permissions = setOf(
         HealthPermission.getWritePermission(HeartRateRecord::class),
-        HealthPermission.getWritePermission(SkinTemperatureRecord::class)
+        HealthPermission.getWritePermission(SkinTemperatureRecord::class),
+        HealthPermission.getWritePermission(HeartRateVariabilityRmssdRecord::class),
     )
 
     companion object {
@@ -62,6 +65,7 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         private const val CLIENT_ID_PREFIX_HR = "SEEDER_HR_"
         private const val CLIENT_ID_PREFIX_SKIN_TEMP = "SEEDER_SKINTEMP_"
+        private const val CLIENT_ID_PREFIX_HRV = "SEEDER_HRV_"
 
         private const val BASE_BPM = 70L
         private const val BASELINE_TEMP_CELSIUS = 34.0
@@ -104,11 +108,14 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             Log.d("DataSeederPlugin", "seedData called")
             val heartRateData = generateHistoricalHeartRateData()
             val skinTempData = generateHistoricalSkinTemperatureData()
+            val heartRateVariabilityData = generateHistoricalHeartRateVariabilityData()
             try {
                 Log.d("DataSeederPlugin", "Inserting heart rate data..")
                 healthConnectClient.insertRecords(heartRateData)
                 Log.d("DataSeederPlugin", "Inserting skin temperature data..")
                 healthConnectClient.insertRecords(skinTempData)
+                Log.d("DataSeederPlugin", "Inserting heart rate variability data...")
+                healthConnectClient.insertRecords(heartRateVariabilityData)
                 Log.d("DataSeederPlugin", "Data inserted")
                 result.success(true)
             } catch (e: Exception) {
@@ -230,6 +237,65 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             recordStartTime = recordEndTime
         }
         Log.d("DataSeederPlugin", "Generated ${records.size} skin temperature records.")
+        return records
+    }
+
+    private fun generateHistoricalHeartRateVariabilityData(): List<HeartRateVariabilityRmssdRecord> {
+        Log.d("DataSeederPlugin", "Generating historical heart rate variability data...")
+        val records = mutableListOf<HeartRateVariabilityRmssdRecord>()
+        val overallEndTime = Instant.now()
+        val overallStartTime = overallEndTime.minus(GENERATION_PERIOD_DAYS, ChronoUnit.DAYS)
+
+        var recordStartTime = overallStartTime
+        val systemZoneId = ZoneOffset.systemDefault()
+        val rules = systemZoneId.rules
+
+        val baseRmssd = 35.0
+
+        while (recordStartTime.isBefore(overallEndTime)) {
+            val recordEndTime = recordStartTime.plus(RECORD_INTERVAL_AND_DURATION).let {
+                if (it.isAfter(overallEndTime)) overallEndTime else it
+            }
+
+            if (recordStartTime == recordEndTime || Duration.between(recordStartTime, recordEndTime) < SAMPLE_INTERVAL) {
+                if (recordStartTime.isAfter(overallEndTime)) break
+                recordStartTime = recordEndTime
+                continue
+            }
+
+            val timeVariation = abs(recordStartTime.epochSecond % 15 - 7)
+
+            val localDateTime = LocalDateTime.ofInstant(recordStartTime, systemZoneId)
+            val hourOfDay = localDateTime.hour
+            val dailyVariation = when {
+                hourOfDay < 6 -> 10.0
+                hourOfDay < 12 -> 5.0
+                hourOfDay < 18 -> -5.0
+                else -> 0.0
+            }
+
+            val dayOfWeek = localDateTime.dayOfWeek.value
+            val weeklyVariation = if (dayOfWeek > 5) 3.0 else -1.0
+
+            val rmssd = (baseRmssd + timeVariation + dailyVariation + weeklyVariation)
+                .coerceIn(15.0, 65.0)
+
+            val startOffset: ZoneOffset = rules.getOffset(recordStartTime)
+            val metadata = Metadata.manualEntryWithId("$CLIENT_ID_PREFIX_HRV${recordStartTime.epochSecond}")
+
+            records.add(
+                HeartRateVariabilityRmssdRecord(
+                    time = recordStartTime,
+                    zoneOffset = startOffset,
+                    heartRateVariabilityMillis = rmssd,
+                    metadata = metadata
+                )
+            )
+
+            recordStartTime = recordEndTime
+        }
+
+        Log.d("DataSeederPlugin", "Generated ${records.size} heart rate variability records.")
         return records
     }
 
