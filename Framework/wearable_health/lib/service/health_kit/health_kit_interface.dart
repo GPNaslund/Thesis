@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wearable_health/model/health_data.dart';
 import 'package:wearable_health/model/health_kit/enums/hk_availability.dart';
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health/model/health_kit/health_kit_data.dart';
@@ -16,6 +17,8 @@ abstract class HealthKit {
     List<HealthKitHealthMetric> metrics,
     DateTimeRange timeRange,
   );
+
+  Future<HealthData> getRawData(List<HealthKitHealthMetric> metrics, DateTimeRange timeRange);
 
   /// Gets the iOS platform version.
   /// Useful for compatibility checks.
