@@ -18,6 +18,8 @@ extension HKQuantityType {
              return HKUnit.count().unitDivided(by: .minute())
           case HKQuantityTypeIdentifier.bodyTemperature.rawValue:
                 return .degreeCelsius()
+         case HKQuantityTypeIdentifier.heartRateVariabilitySDNN.rawValue:
+             return .secondUnit(with: .milli)
          default:
              print("Warning [getStandardUnit]: Called for an unsupported quantity type: \(identifier).")
              return nil
