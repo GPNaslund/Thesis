@@ -1,5 +1,6 @@
 import 'package:wearable_health/model/health_connect/hc_entities/heart_rate.dart';
 import 'package:wearable_health/model/health_connect/hc_entities/heart_rate_record_sample.dart';
+import 'package:wearable_health/model/health_connect/hc_entities/heart_rate_variability_rmssd.dart';
 import 'package:wearable_health/model/health_connect/hc_entities/metadata.dart';
 import 'package:wearable_health/model/health_connect/hc_entities/skin_temperature.dart';
 import 'package:wearable_health/model/health_connect/hc_entities/skin_temperature_delta.dart';
@@ -149,6 +150,35 @@ class HCDataFactoryImpl implements HCDataFactory {
       startZoneOffset: startZoneOffset,
       endZoneOffset: endZoneOffset,
       measurementLocation: measurementLocation,
+      metadata: metadata,
+    );
+  }
+
+  /// Creates a HealthConnectHeartRateVariabilityRmssd object from JSON map data.
+  /// Extracts heart rate variability, time details and metadata.
+  @override
+  HealthConnectHeartRateVariabilityRmssd createHeartRateVariability(
+    Map<String, dynamic> data,
+  ) {
+    var errMsg =
+        "Error occured when extracting data for health connect heart rate variability";
+    var time = converter.extractDateTimeFromEpochMs(data["timeEpochMs"], errMsg);
+    var zoneOffset =
+        data["zoneOffset"] != null
+            ? converter.extractIntValue(data["zoneOffsetSeconds"], errMsg)
+            : null;
+    var heartRateVariabilityMillis = converter.extractDoubleValue(
+      data["heartRateVariabilityMillis"],
+      errMsg,
+    );
+
+    var metadataMap = converter.extractJsonObject(data["metadata"], errMsg);
+    var metadata = _extractMetaData(metadataMap, errMsg);
+
+    return HealthConnectHeartRateVariabilityRmssd(
+      time: time,
+      zoneOffset: zoneOffset,
+      heartRateVariabilityMillis: heartRateVariabilityMillis,
       metadata: metadata,
     );
   }

@@ -23,7 +23,7 @@ class _MyAppState extends State<HealthConnectApp> {
   String _platformVersion = 'Unknown';
   String _consoleOutput = '';
   List<HealthConnectHealthMetric> dataTypes = [
-    HealthConnectHealthMetric.heartRate,
+    HealthConnectHealthMetric.heartRateVariability,
   ];
 
   HealthConnect hc = WearableHealth().getGoogleHealthConnect();

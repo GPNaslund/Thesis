@@ -4,6 +4,7 @@ import 'package:wearable_health/model/health_kit/hk_entities/hk_quantity.dart';
 import 'package:wearable_health/model/health_kit/hk_entities/hk_quantity_sample.dart';
 import 'package:wearable_health/model/health_kit/hk_entities/hk_sample_type.dart';
 import 'package:wearable_health/model/health_kit/hk_heart_rate.dart';
+import 'package:wearable_health/model/health_kit/hk_heart_rate_variability.dart';
 import 'package:wearable_health/service/converters/json/json_converter_interface.dart';
 import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
 
@@ -32,6 +33,14 @@ class HKDataFactoryImpl implements HKDataFactory {
     var errMsg = "Error occured when extracting hk heart rate data";
     var quantitySample = _createQuantitySample(data, errMsg);
     return HKHeartRate(quantitySample);
+  }
+
+  /// Creates an HKHeartRateVariability object from JSON map data.
+  /// Extracts and validates required fields for heart rate variability measurements.
+  HkHeartRateVariability createHeartRateVariability(Map<String, dynamic> data) {
+    var errMsg = "Error occured when extracting hk heart rate variability data";
+    var quantitySample = _createQuantitySample(data, errMsg);
+    return HkHeartRateVariability(quantitySample);
   }
 
   /// Helper method to create an HKQuantitySample from JSON map data.

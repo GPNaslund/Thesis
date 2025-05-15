@@ -8,7 +8,13 @@ enum HealthConnectHealthMetric {
 
   /// Skin temperature measurement data.
   /// Permission: android.permission.health.READ_SKIN_TEMPERATURE
-  skinTemperature(value: "android.permission.health.READ_SKIN_TEMPERATURE");
+  skinTemperature(value: "android.permission.health.READ_SKIN_TEMPERATURE"),
+
+  /// Heart rate variability data.
+  /// Permission: android.permission.health-READ_HEART_RATE_VARIABILITY
+  heartRateVariability(
+    value: "android.permission.health.READ_HEART_RATE_VARIABILITY",
+  );
 
   /// Creates a new [HealthConnectHealthMetric] with the associated permission value.
   const HealthConnectHealthMetric({required this.value});

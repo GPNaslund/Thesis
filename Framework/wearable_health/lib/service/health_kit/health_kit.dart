@@ -95,6 +95,12 @@ class HealthKitImpl implements HealthKit {
           var hkBodyTemperature = dataFactory.createBodyTemperature(element);
           result.add(hkBodyTemperature);
         }
+      } else if (healthMetric == HealthKitHealthMetric.heartRateVariability) {
+        for (final element in value) {
+          log(element.toString());
+          var hkHeartRateVariability = dataFactory.createHeartRateVariability(element);
+          result.add(hkHeartRateVariability);
+        }
       } else {
         throw UnimplementedError(
           "[HealthKit] Failed to convert: $key into HealthKitData type",
