@@ -60,10 +60,10 @@ void main() {
       ).thenAnswer((_) async => null);
 
       expect(
-        () => healthKit.checkHealthStoreAvailability(),
+            () => healthKit.checkHealthStoreAvailability(),
         throwsA(
           isA<Exception>().having(
-            (e) => e.toString(),
+                (e) => e.toString(),
             'message',
             contains(
               '[HealthKit] checkHealthStoreAvailability received null result',
@@ -152,10 +152,10 @@ void main() {
       ).thenAnswer((_) async => null);
 
       expect(
-        () => healthKit.getData(metrics, timeRange),
+            () => healthKit.getData(metrics, timeRange),
         throwsA(
           isA<Exception>().having(
-            (e) => e.toString(),
+                (e) => e.toString(),
             'message',
             contains('[HealthKit] getData returned null'),
           ),
@@ -165,7 +165,7 @@ void main() {
 
     test(
       'throws UnimplementedError for unsupported health metric type',
-      () async {
+          () async {
         final responseMap = {
           'unsupportedMetric': [
             {'value': 75, 'timestamp': '2023-01-01T12:00:00.000Z'},
@@ -189,10 +189,10 @@ void main() {
         });
 
         expect(
-          () => healthKit.getData(metrics, timeRange),
+              () => healthKit.getData(metrics, timeRange),
           throwsA(
             isA<UnimplementedError>().having(
-              (e) => e.toString(),
+                  (e) => e.toString(),
               'message',
               contains(
                 '[HealthKitHealthMetric] Received unknown metric string: unsupportedMetric',
@@ -203,6 +203,183 @@ void main() {
       },
     );
   });
+
+  group('getRawData', () {
+  final now = DateTime.now();
+  final timeRange = DateTimeRange(
+    start: now.subtract(const Duration(days: 7)),
+    end: now,
+  );
+  final metrics = [
+    HealthKitHealthMetric.heartRate,
+    HealthKitHealthMetric.bodyTemperature,
+  ];
+  final types = metrics.map((m) => m.definition).toList();
+  final requestMap = {
+    'start': timeRange.start.toUtc().toIso8601String(),
+    'end': timeRange.end.toUtc().toIso8601String(),
+    'types': types,
+  };
+
+  test('returns HealthData when successful', () async {
+    final responseMap = {
+      "HKQuantityTypeIdentifierHeartRate": [
+        {'value': 75, 'timestamp': '2023-01-01T12:00:00.000Z'},
+      ],
+      "HKQuantityTypeIdentifierBodyTemperature": [
+        {'value': 37.0, 'timestamp': '2023-01-01T12:00:00.000Z'},
+      ],
+    };
+
+    when(
+      methodChannel.invokeMapMethod(
+        '$healthKitPrefix/$getDataSuffix',
+        requestMap,
+      ),
+    ).thenAnswer((_) async => responseMap);
+
+    final convertedData = {
+      "HKQuantityTypeIdentifierHeartRate": [
+        {'value': 75, 'timestamp': '2023-01-01T12:00:00.000Z'},
+      ],
+      "HKQuantityTypeIdentifierBodyTemperature": [
+        {'value': 37.0, 'timestamp': '2023-01-01T12:00:00.000Z'},
+      ],
+    };
+
+    when(
+      jsonConverter.extractJsonObjectWithListOfJsonObjects(responseMap, any),
+    ).thenReturn(convertedData);
+
+    final mockHealthData = MockHealthKitData();
+    when(
+      dataFactory.createHealthData(convertedData),
+    ).thenReturn(mockHealthData);
+
+    final result = await healthKit.getRawData(metrics, timeRange);
+
+    expect(result, equals(mockHealthData));
+    verify(
+      methodChannel.invokeMapMethod(
+        '$healthKitPrefix/$getDataSuffix',
+        requestMap,
+      ),
+    ).called(1);
+    verify(
+      jsonConverter.extractJsonObjectWithListOfJsonObjects(responseMap, any),
+    ).called(1);
+    verify(
+      dataFactory.createHealthData(convertedData),
+    ).called(1);
+  });
+
+  test('should correctly format date ranges and metrics in request', () async {
+    final startDate = DateTime(2025, 1, 1);
+    final endDate = DateTime(2025, 1, 2);
+    final customTimeRange = DateTimeRange(start: startDate, end: endDate);
+    final customMetrics = [
+      HealthKitHealthMetric.heartRate,
+      HealthKitHealthMetric.bodyTemperature,
+    ];
+
+    final expectedRequestMap = {
+      'start': startDate.toUtc().toIso8601String(),
+      'end': endDate.toUtc().toIso8601String(),
+      'types': customMetrics.map((m) => m.definition).toList(),
+    };
+
+    final responseMap = {
+      "HKQuantityTypeIdentifierHeartRate": [],
+      "HKQuantityTypeIdentifierBodyTemperature": [],
+    };
+
+    when(
+      methodChannel.invokeMapMethod(
+        '$healthKitPrefix/$getDataSuffix',
+        expectedRequestMap,
+      ),
+    ).thenAnswer((_) async => responseMap);
+
+    when(
+      jsonConverter.extractJsonObjectWithListOfJsonObjects(responseMap, any),
+    ).thenReturn({
+      "HKQuantityTypeIdentifierHeartRate": [],
+      "HKQuantityTypeIdentifierBodyTemperature": [],
+    });
+
+    final mockHealthData = MockHealthKitData();
+    when(
+      dataFactory.createHealthData(any),
+    ).thenReturn(mockHealthData);
+
+    await healthKit.getRawData(customMetrics, customTimeRange);
+
+    verify(
+      methodChannel.invokeMapMethod(
+        '$healthKitPrefix/$getDataSuffix',
+        expectedRequestMap,
+      ),
+    ).called(1);
+  });
+
+  test('throws exception when response is null', () async {
+    when(
+      methodChannel.invokeMapMethod(
+        '$healthKitPrefix/$getDataSuffix',
+        requestMap,
+      ),
+    ).thenAnswer((_) async => null);
+
+    expect(
+      () => healthKit.getRawData(metrics, timeRange),
+      throwsA(
+        isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('[HealthKit] getRawData returned null'),
+        ),
+      ),
+    );
+  });
+
+  test('should handle empty data sets', () async {
+    final emptyResponseMap = {
+      "HKQuantityTypeIdentifierHeartRate": [],
+      "HKQuantityTypeIdentifierBodyTemperature": [],
+    };
+
+    when(
+      methodChannel.invokeMapMethod(
+        '$healthKitPrefix/$getDataSuffix',
+        requestMap,
+      ),
+    ).thenAnswer((_) async => emptyResponseMap);
+
+    final emptyConvertedData = {
+      "HKQuantityTypeIdentifierHeartRate": [],
+      "HKQuantityTypeIdentifierBodyTemperature": [],
+    };
+
+    when(
+      jsonConverter.extractJsonObjectWithListOfJsonObjects(emptyResponseMap, any),
+    ).thenReturn(emptyConvertedData);
+
+    final mockEmptyHealthData = MockHealthKitData();
+    when(
+      dataFactory.createHealthData(emptyConvertedData),
+    ).thenReturn(mockEmptyHealthData);
+
+    final result = await healthKit.getRawData(metrics, timeRange);
+
+    expect(result, equals(mockEmptyHealthData));
+    verify(
+      methodChannel.invokeMapMethod(
+        '$healthKitPrefix/$getDataSuffix',
+        requestMap,
+      ),
+    ).called(1);
+  });
+});
 
   group('getPlatformVersion', () {
     test('returns platform version when successful', () async {
@@ -269,10 +446,10 @@ void main() {
       ).thenAnswer((_) async => null);
 
       expect(
-        () => healthKit.requestPermissions(metrics),
+            () => healthKit.requestPermissions(metrics),
         throwsA(
           isA<Exception>().having(
-            (e) => e.toString(),
+                (e) => e.toString(),
             'message',
             contains('[HealthKit] requestPermissions returned null'),
           ),
