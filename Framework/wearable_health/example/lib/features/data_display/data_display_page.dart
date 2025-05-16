@@ -1,3 +1,5 @@
+// lib/features/data_display/data_display_page.dart
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
@@ -53,20 +55,17 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           _resultLabel = label;
           _fetchedResults = healthData.map((e) {
             try {
-              if (_useConverter) {
-                final encoder = JsonEncoder.withIndent('  ');
-                return '${encoder.convert(e.toJson())}\n';
-              }
-              return '${e.toString()}\n';
+              final encoder = JsonEncoder.withIndent('  ');
+              return encoder.convert(e is Map ? e : e.toJson());
             } catch (err) {
-              return 'Error parsing item: $err\n';
+              return 'Error parsing item: $err';
             }
           }).toList();
         });
       }
     } catch (e) {
       setState(() {
-        _fetchedResults = ['Error while fetching data: $e'];
+        _fetchedResults = ['There was an error when trying to fetch data. Make sure you have allowed permission for this metric in the app settings.'];
         _resultLabel = '';
       });
     } finally {
@@ -108,7 +107,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   color: Colors.grey.shade100,
                 ),
                 child: SingleChildScrollView(
-                  child: SelectableText(_fetchedResults.join('\n')),
+                  child: SelectableText(_fetchedResults.join('\n\n')),
                 ),
               ),
             ),

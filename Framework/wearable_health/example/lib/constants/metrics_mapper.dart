@@ -4,8 +4,6 @@ import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 
 String getMetricLabel(HealthMetric metric) {
   switch (metric) {
-    case HealthMetric.heartRate:
-      return 'Heart Rate';
     case HealthMetric.skinTemperature:
       return 'Skin Temperature';
     case HealthMetric.heartRateVariability:
@@ -16,8 +14,6 @@ String getMetricLabel(HealthMetric metric) {
 dynamic mapMetricToPlatformMetric(HealthMetric metric, {required bool isAndroid}) {
   if (isAndroid) {
     switch (metric) {
-      case HealthMetric.heartRate:
-        return HealthConnectHealthMetric.heartRate;
       case HealthMetric.skinTemperature:
         return HealthConnectHealthMetric.skinTemperature;
       case HealthMetric.heartRateVariability:
@@ -25,8 +21,6 @@ dynamic mapMetricToPlatformMetric(HealthMetric metric, {required bool isAndroid}
     }
   } else {
     switch (metric) {
-      case HealthMetric.heartRate:
-        return HealthKitHealthMetric.heartRate;
       case HealthMetric.skinTemperature:
         return HealthKitHealthMetric.bodyTemperature;
       case HealthMetric.heartRateVariability:
