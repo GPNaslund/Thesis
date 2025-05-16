@@ -6,7 +6,9 @@ import '../../../services/wearable_health_service.dart';
 import '../../../constants/metrics.dart';
 import '../../../constants/metrics_mapper.dart';
 
+/// Page for displaying fetched health data for a selected metric
 class DataDisplayPage extends StatefulWidget {
+
   final HealthMetric metric;
 
   const DataDisplayPage({super.key, required this.metric});
@@ -18,30 +20,39 @@ class DataDisplayPage extends StatefulWidget {
 class _DataDisplayPageState extends State<DataDisplayPage> {
   final WearableHealthService _wearableHealthService = WearableHealthService();
   bool _isLoading = false;
+  /// converter for knowing if converting data into Open MHealth format
   bool _useConverter = false;
+  /// results to display in the UI
   List<String> _fetchedResults = [];
+  /// label to display, what is being shown to the UI
   String _resultLabel = '';
 
+  /// Fetches health data using the WearableHealthService
   Future<void> _fetchData() async {
+    /// Show loading UI and clear old results
     setState(() {
       _isLoading = true;
       _fetchedResults = ['Fetching data...'];
     });
 
     try {
+      /// Define a time range from now minus 1 day to now
       final now = DateTime.now();
       final start = now.subtract(const Duration(days: 1));
       final range = DateTimeRange(start: start, end: now);
 
+      /// Request health data from the service using (health metric, date range, converted to open Mhealth or not)
       final healthData = await _wearableHealthService.getHealthData(
         widget.metric,
         range,
         convert: _useConverter,
       );
 
+      /// label to show what data is being displayed
       final label = 'Showing ${getMetricLabel(widget.metric)} data in '
           '${_useConverter ? "OpenMHealth" : "Raw"} format:';
 
+      /// If no data is returned, inform the user
       if (healthData.isEmpty) {
         setState(() {
           _resultLabel = label;
@@ -51,6 +62,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           ];
         });
       } else {
+        /// Else convert each data entry to formatted JSON and display
         setState(() {
           _resultLabel = label;
           _fetchedResults = healthData.map((e) {
@@ -64,6 +76,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         });
       }
     } catch (e) {
+      /// Catch permission or data errors and display a custom message
       setState(() {
         _fetchedResults = ['There was an error when trying to fetch data. Make sure you have allowed permission for this metric in the app settings.'];
         _resultLabel = '';
@@ -73,6 +86,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     }
   }
 
+  /// Clears UI output area
   void _clearConsole() {
     setState(() {
       _fetchedResults = [];
@@ -80,6 +94,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     });
   }
 
+  /// Builds the UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,6 +112,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
+
+            /// Container box to display results
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -112,6 +129,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               ),
             ),
             const SizedBox(height: 16),
+
+            /// Button to fetch data
             ElevatedButton(
               onPressed: _isLoading ? null : _fetchData,
               child: _isLoading
@@ -126,11 +145,15 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   : const Text('Fetch Data'),
             ),
             const SizedBox(height: 12),
+
+            /// Button to clear console/output
             ElevatedButton(
               onPressed: _clearConsole,
               child: const Text('Clear Console'),
             ),
             const SizedBox(height: 12),
+
+            /// Dropdown to toggle between Raw and OpenMHealth formats
             DropdownButton<bool>(
               isExpanded: true,
               value: _useConverter,

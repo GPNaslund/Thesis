@@ -5,6 +5,7 @@ import '../../../constants/metrics.dart';
 import '../../../constants/metrics_mapper.dart';
 import '../data_display/data_display_page.dart';
 
+/// Page for selecting which health metric to view data for
 class MetricSelectionPage extends StatelessWidget {
   const MetricSelectionPage({super.key});
 

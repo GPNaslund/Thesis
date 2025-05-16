@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../permissions/permissions_page.dart';
 
+/// home/landing page
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
