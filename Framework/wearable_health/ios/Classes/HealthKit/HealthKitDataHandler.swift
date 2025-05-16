@@ -1,13 +1,21 @@
 import Flutter
 import HealthKit
 
+/// Handles HealthKit data queries and processing for the Flutter plugin
 public class HealthKitDataHandler {
+    /// The HealthKit store instance used for all health data operations
     let healthStore: HKHealthStore
 
+    /// Initializes the handler with a HealthKit store
+    /// - Parameter store: The HKHealthStore instance to use for data access
     init(_ store: HKHealthStore) {
         healthStore = store
     }
 
+    /// Retrieves health data based on specified parameters from Flutter
+    /// - Parameters:
+    ///   - call: The Flutter method call containing query parameters (types, start/end dates)
+    ///   - result: Callback to return the query results or errors to Flutter
     public func getData(
         call: FlutterMethodCall, result: @escaping FlutterResult
     ) {
@@ -202,7 +210,7 @@ public class HealthKitDataHandler {
                         )
                     }
                 }
-                
+
                 if groupedResult.isEmpty && !objectTypesToQuery.isEmpty
                     && allMappedSamplesFromQueries.isEmpty
                 {
@@ -212,12 +220,16 @@ public class HealthKitDataHandler {
                 }
                 print(
                     "[HealthKitDataHandler]: Data grouped. Sending to Flutter.")
-                
+
                 result(groupedResult)
             }
         }
     }
 
+    /// Converts an ISO8601 formatted string to a Date object
+    /// - Parameter dateString: ISO8601 formatted date string
+    /// - Returns: Date object if parsing succeeds, nil otherwise
+    /// - Note: Tries parsing with fractional seconds first, falls back to without
     private func dateFromISO8601String(_ dateString: String) -> Date? {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [

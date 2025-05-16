@@ -70,6 +70,28 @@ class HealthKitImpl implements HealthKit {
     return result;
   }
 
+  @override
+  Future<HealthData> getRawData(List<HealthKitHealthMetric> metrics, DateTimeRange timeRange) async {
+    final start = timeRange.start.toUtc().toIso8601String();
+    final end = timeRange.end.toUtc().toIso8601String();
+    List<String> types = [];
+    for (final metric in metrics) {
+      types.add(metric.definition);
+    }
+
+    Map<String, List<dynamic>>? response = await methodChannel.invokeMapMethod(
+      "$healthKitPrefix/$getDataSuffix",
+      {"start": start, "end": end, "types": types},
+    );
+
+    if (response == null) {
+      throw Exception("[HealthKit] getRawData returned null");
+    }
+
+    HealthData result = _convertToHealthData(response);
+    return result;
+  }
+
   /// Converts raw JSON response from the platform to typed HealthKitData objects.
   /// Handles different metric types and creates appropriate data objects.
   List<HealthKitData> _convertToHealthKitData(
@@ -95,6 +117,12 @@ class HealthKitImpl implements HealthKit {
           var hkBodyTemperature = dataFactory.createBodyTemperature(element);
           result.add(hkBodyTemperature);
         }
+      } else if (healthMetric == HealthKitHealthMetric.heartRateVariability) {
+        for (final element in value) {
+          log(element.toString());
+          var hkHeartRateVariability = dataFactory.createHeartRateVariability(element);
+          result.add(hkHeartRateVariability);
+        }
       } else {
         throw UnimplementedError(
           "[HealthKit] Failed to convert: $key into HealthKitData type",
@@ -102,6 +130,13 @@ class HealthKitImpl implements HealthKit {
       }
     });
 
+    return result;
+  }
+
+  HealthData _convertToHealthData(Map<String, List<dynamic>> response) {
+    var errMsg = "Error occured when creating health data";
+    var healthData = jsonConverter.extractJsonObjectWithListOfJsonObjects(response, errMsg);
+    var result = HealthData(healthData);
     return result;
   }
 

@@ -73,6 +73,28 @@ class HealthConnectImpl implements HealthConnect {
     return result;
   }
 
+  @override
+  Future<HealthData> getRawData(List<HealthConnectHealthMetric> metrics, DateTimeRange timeRange) async {
+    final start = timeRange.start.toUtc().toIso8601String();
+    final end = timeRange.end.toUtc().toIso8601String();
+    List<String> types = [];
+    for (final metric in metrics) {
+      types.add(metric.definition);
+    }
+
+    Map<String, List<dynamic>>? response = await methodChannel.invokeMapMethod(
+      "$healthConnectPrefix/$getDataSuffix",
+      {"start": start, "end": end, "types": types},
+    );
+
+    if (response == null) {
+      throw Exception("[HealthConnect] getRawData returned null");
+    }
+
+    HealthData result = _convertToHealthData(response);
+    return result;
+  }
+
   /// Converts raw JSON response from the platform to typed HealthConnectData objects.
   /// Handles different metric types and creates appropriate data objects.
   List<HealthConnectData> _convertToHealthConnectData(
@@ -115,6 +137,15 @@ class HealthConnectImpl implements HealthConnect {
     });
 
     return result;
+  }
+
+  HealthData _convertToHealthData(Map<String, List<dynamic>> response) {
+    var rawData = jsonConverter.extractJsonObjectWithListOfJsonObjects(
+      response,
+      "Error when extracting data for health data creation",
+    );
+
+    return HealthData(rawData);
   }
 
   /// Retrieves the platform version of the Android device.

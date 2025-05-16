@@ -1,8 +1,8 @@
 package se.lnu.thesis.wearable_health.record_extension
 
-import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.HeartRateVariabilityRmssdRecord
 
+/** Converts a HeartRateVariabilityRmssdRecord to a serializable map for Flutter. */
 fun HeartRateVariabilityRmssdRecord.serialize(): Map<String, Any?> {
     val metadata = this.extractMetadata()
     return mapOf(
@@ -13,6 +13,7 @@ fun HeartRateVariabilityRmssdRecord.serialize(): Map<String, Any?> {
     )
 }
 
+/** Converts record metadata to a serializable map. */
 fun HeartRateVariabilityRmssdRecord.extractMetadata(): Map<String, Any?> {
     val result: Map<String, Any?> = mapOf(
         "clientRecordId" to this.metadata.clientRecordId,

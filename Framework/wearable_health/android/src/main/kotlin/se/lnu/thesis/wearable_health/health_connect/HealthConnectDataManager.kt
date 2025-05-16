@@ -20,8 +20,14 @@ import se.lnu.thesis.wearable_health.record_extension.serialize
 import java.time.Instant
 import kotlin.reflect.KClass
 
+/** Manages data retrieval operations from Android's Health Connect API. */
 class HealthConnectDataManager {
     private val tag = "HCDataManager"
+
+    /**
+     * Retrieves health data based on specified parameters and time range.
+     * Executes on a background thread and returns serialized health records.
+     */
     fun getData(call: MethodCall, result: Result, pluginScope: CoroutineScope, healthConnectClient: HealthConnectClient) {
         pluginScope.launch {
             try {
@@ -98,6 +104,7 @@ class HealthConnectDataManager {
         }
     }
 
+    /** Extracts and validates the requested health data types from the method call arguments. */
     private fun extractDataTypes(arguments: Any, result: Result): Set<String>? {
         if (arguments !is Map<*, *>) {
             result.error("INVALID_ARGUMENT", "Expected Map, got: ${arguments::class}", null)
@@ -126,6 +133,7 @@ class HealthConnectDataManager {
         return stringList.toSet()
     }
 
+    /** Extracts and parses a time instant from the method call arguments. */
     private fun extractInstant(arguments: Any, result: Result, key: String): Instant? {
         if (arguments !is Map<*, *>) {
             result.error("INVALID_ARGUMENT", "Expected Map, got: ${arguments::class}", null)
@@ -151,6 +159,7 @@ class HealthConnectDataManager {
         }
     }
 
+    /** Converts a permission string to its corresponding Health Connect record class. */
     private fun permissionToClass(value: String): KClass<out Record>? {
         return when (value) {
             HealthPermission.getReadPermission(HeartRateRecord::class) -> HeartRateRecord::class

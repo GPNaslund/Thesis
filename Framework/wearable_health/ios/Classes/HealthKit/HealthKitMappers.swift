@@ -1,12 +1,15 @@
 import Foundation
 import HealthKit
 
+/// Groups an array of HealthKit samples by their type identifiers
+/// - Parameter samples: Array of HKSample objects to be grouped
+/// - Returns: Dictionary with type identifiers as keys and arrays of mapped samples as values
 public func groupHealthKitSamplesByType(_ samples: [HKSample]) -> [String: [[String: Any?]]] {
     var groupedSamples: [String: [[String: Any?]]] = [:]
-    
+
     for sample in samples {
         let typeIdentifierKey = sample.sampleType.identifier
-        
+
         if let mappedSample = mapHKSampleToDictionary(sample) {
             if groupedSamples[typeIdentifierKey] == nil {
                 groupedSamples[typeIdentifierKey] = []
@@ -17,47 +20,47 @@ public func groupHealthKitSamplesByType(_ samples: [HKSample]) -> [String: [[Str
     return groupedSamples
 }
 
+/// Converts an HKSample to a serializable dictionary for Flutter
+/// - Parameter sample: The HKSample to convert
+/// - Returns: Dictionary containing the sample's data, or nil if mapping fails
 func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
     var map: [String: Any?] = [:]
-    
+
     // HKSample properties
     map["uuid"] = sample.uuid.uuidString
     map["startDate"] = sample.startDate.toISO8601String()
     map["endDate"] = sample.endDate.toISO8601String()
     map["sampleType"] = sample.sampleType.identifier
-    
+
+
+
     // Source information
     let sourceRevision = sample.sourceRevision
-    map["sourceBundleId"] = sourceRevision.source.bundleIdentifier
-    map["sourceName"] = sourceRevision.source.name
-    map["sourceVersion"] = sourceRevision.version
-    map["sourceProductType"] = sourceRevision.productType
+    var sourceRevMap: [String: Any?] = [:]
+    sourceRevMap["sourceBundleId"] = sourceRevision.source.bundleIdentifier
+    sourceRevMap["sourceName"] = sourceRevision.source.name
+    sourceRevMap["sourceVersion"] = sourceRevision.version
+    sourceRevMap["sourceProductType"] = sourceRevision.productType
     if #available(iOS 9.0, *) {
         let osVersion = sourceRevision.operatingSystemVersion
-        map["sourceOperatingSystemVersion"] = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
+        sourceRevMap["sourceOperatingSystemVersion"] = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
     } else {
-        map["sourceOperatingSystemVersion"] = nil
+        sourceRevMap["sourceOperatingSystemVersion"] = nil
     }
-    
+    map["sourceRevision"] = sourceRevMap
+
     // Device information
     if let device = sample.device {
-        map["deviceName"] = device.name
-        map["deviceManufacturer"] = device.manufacturer
-        map["deviceModel"] = device.model
-        map["deviceHardwareVersion"] = device.hardwareVersion
-        map["deviceFirmwareVersion"] = device.firmwareVersion
-        map["deviceSoftwareVersion"] = device.softwareVersion
-        map["deviceLocalIdentifier"] = device.localIdentifier
-        map["deviceUDIDeviceIdentifier"] = device.udiDeviceIdentifier
-    } else {
-        map["deviceName"] = nil
-        map["deviceManufacturer"] = nil
-        map["deviceModel"] = nil
-        map["deviceHardwareVersion"] = nil
-        map["deviceFirmwareVersion"] = nil
-        map["deviceSoftwareVersion"] = nil
-        map["deviceLocalIdentifier"] = nil
-        map["deviceUDIDeviceIdentifier"] = nil
+        var deviceMap: [String: Any?] = [:]
+        deviceMap["deviceName"] = device.name
+        deviceMap["deviceManufacturer"] = device.manufacturer
+        deviceMap["deviceModel"] = device.model
+        deviceMap["deviceHardwareVersion"] = device.hardwareVersion
+        deviceMap["deviceFirmwareVersion"] = device.firmwareVersion
+        deviceMap["deviceSoftwareVersion"] = device.softwareVersion
+        deviceMap["deviceLocalIdentifier"] = device.localIdentifier
+        deviceMap["deviceUDIDeviceIdentifier"] = device.udiDeviceIdentifier
+        map["device"] = deviceMap
     }
 
     if let metadata = sample.metadata, !metadata.isEmpty {
@@ -75,7 +78,7 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
     } else {
         map["metadata"] = nil
     }
-    
+
     // Type specific data
     if let quantitySample = sample as? HKQuantitySample {
         addQuantitySampleData(quantitySample, to: &map)
@@ -86,17 +89,28 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
 }
 
 
+/// Adds quantity-specific data to a sample dictionary
+/// - Parameters:
+///   - quantitySample: The HKQuantitySample containing quantity data
+///   - map: The dictionary to populate with quantity data (passed as inout)
 private func addQuantitySampleData(_ quantitySample: HKQuantitySample, to map: inout [String: Any?]) {
-    if let standardUnit = quantitySample.quantityType.getStandardUnit() {
+    let quantityType = quantitySample.quantityType
+
+    if let standardUnit = quantityType.getStandardUnit() {
         map["value"] = quantitySample.quantity.doubleValue(for: standardUnit)
         map["unit"] = standardUnit.unitString
     } else {
-        print("[addQuantitySampleData]: No standard unit from getStandardUnit() for \(quantitySample.quantityType.identifier). 'value' and 'unit' fields might be nil. UUID: \(quantitySample.uuid)")
+        print("[addQuantitySampleData]: No standard unit for \(quantityType.identifier). 'value' and 'unit' fields might be nil. UUID: \(quantitySample.uuid)")
         map["value"] = nil
         map["unit"] = nil
     }
 
-    if quantitySample.quantityType.aggregationStyle == .discrete {
+    let nonCountBasedTypes: Set<String> = [
+        HKQuantityTypeIdentifier.heartRateVariabilitySDNN.rawValue,
+        HKQuantityTypeIdentifier.bodyTemperature.rawValue,
+    ]
+
+    if quantityType.aggregationStyle == .discrete && !nonCountBasedTypes.contains(quantityType.identifier) {
         let countSpecificUnit = HKUnit.count()
 
         if quantitySample.quantity.is(compatibleWith: countSpecificUnit) {
@@ -107,11 +121,11 @@ private func addQuantitySampleData(_ quantitySample: HKQuantitySample, to map: i
                doubleCountValue <= Double(Int.max) {
                 map["count"] = Int(doubleCountValue)
             } else {
-                print("[addQuantitySampleData]: Discrete quantity \(quantitySample.quantityType.identifier) value (\(doubleCountValue)) is not a whole number or is out of Int range. 'count' will be nil. UUID: \(quantitySample.uuid)")
+                print("[addQuantitySampleData]: Discrete quantity \(quantityType.identifier) value (\(doubleCountValue)) is not a whole number or is out of Int range. 'count' will be nil. UUID: \(quantitySample.uuid)")
                 map["count"] = nil
             }
         } else {
-            print("[addQuantitySampleData]: Discrete quantity \(quantitySample.quantityType.identifier) is not compatible with HKUnit.count(). Skipping 'count' field. UUID: \(quantitySample.uuid)")
+            print("[addQuantitySampleData]: Discrete quantity \(quantityType.identifier) is not compatible with HKUnit.count(). Skipping 'count' field. UUID: \(quantitySample.uuid)")
             map["count"] = nil
         }
     } else {
