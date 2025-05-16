@@ -11,9 +11,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 
+/** Handles Health Connect permissions checking and requesting. */
 class HealthConnectPermissionsManager() {
     private val TAG = "HCPermissionManager"
 
+    /** Retrieves currently granted Health Connect permissions asynchronously. */
     fun checkPermissions(result: Result, pluginScope: CoroutineScope, healthConnectClient: HealthConnectClient) {
         Log.d(TAG, "checkPermissions called")
         pluginScope.launch {
@@ -34,6 +36,7 @@ class HealthConnectPermissionsManager() {
         }
     }
 
+    /** Initiates the system permission request dialog for the specified health data types. */
     fun requestPermissions(call: MethodCall, result: Result, requestPermissionLauncher: ActivityResultLauncher<Set<String>>?) {
         Log.d(TAG, "handleRequestPermissions called")
 
@@ -48,6 +51,7 @@ class HealthConnectPermissionsManager() {
         requestPermissionLauncher.launch(dataTypes)
     }
 
+    /** Extracts and validates health data types from the method call arguments. */
     private fun extractDataTypes(arguments: Any, result: Result): Set<String>? {
         if (arguments !is Map<*, *>) {
             result.error("INVALID_ARGUMENT", "Expected Map, got: ${arguments::class}", null)

@@ -1,12 +1,15 @@
 import Foundation
 import HealthKit
 
+/// Groups an array of HealthKit samples by their type identifiers
+/// - Parameter samples: Array of HKSample objects to be grouped
+/// - Returns: Dictionary with type identifiers as keys and arrays of mapped samples as values
 public func groupHealthKitSamplesByType(_ samples: [HKSample]) -> [String: [[String: Any?]]] {
     var groupedSamples: [String: [[String: Any?]]] = [:]
-    
+
     for sample in samples {
         let typeIdentifierKey = sample.sampleType.identifier
-        
+
         if let mappedSample = mapHKSampleToDictionary(sample) {
             if groupedSamples[typeIdentifierKey] == nil {
                 groupedSamples[typeIdentifierKey] = []
@@ -17,17 +20,20 @@ public func groupHealthKitSamplesByType(_ samples: [HKSample]) -> [String: [[Str
     return groupedSamples
 }
 
+/// Converts an HKSample to a serializable dictionary for Flutter
+/// - Parameter sample: The HKSample to convert
+/// - Returns: Dictionary containing the sample's data, or nil if mapping fails
 func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
     var map: [String: Any?] = [:]
-    
+
     // HKSample properties
     map["uuid"] = sample.uuid.uuidString
     map["startDate"] = sample.startDate.toISO8601String()
     map["endDate"] = sample.endDate.toISO8601String()
     map["sampleType"] = sample.sampleType.identifier
-    
-    
-    
+
+
+
     // Source information
     let sourceRevision = sample.sourceRevision
     var sourceRevMap: [String: Any?] = [:]
@@ -42,7 +48,7 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
         sourceRevMap["sourceOperatingSystemVersion"] = nil
     }
     map["sourceRevision"] = sourceRevMap
-    
+
     // Device information
     if let device = sample.device {
         var deviceMap: [String: Any?] = [:]
@@ -56,7 +62,7 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
         deviceMap["deviceUDIDeviceIdentifier"] = device.udiDeviceIdentifier
         map["device"] = deviceMap
     }
-    
+
     if let metadata = sample.metadata, !metadata.isEmpty {
         var serializableMetadata: [String: Any] = [:]
         for (key, value) in metadata {
@@ -72,7 +78,7 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
     } else {
         map["metadata"] = nil
     }
-    
+
     // Type specific data
     if let quantitySample = sample as? HKQuantitySample {
         addQuantitySampleData(quantitySample, to: &map)
@@ -83,9 +89,13 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
 }
 
 
+/// Adds quantity-specific data to a sample dictionary
+/// - Parameters:
+///   - quantitySample: The HKQuantitySample containing quantity data
+///   - map: The dictionary to populate with quantity data (passed as inout)
 private func addQuantitySampleData(_ quantitySample: HKQuantitySample, to map: inout [String: Any?]) {
     let quantityType = quantitySample.quantityType
-    
+
     if let standardUnit = quantityType.getStandardUnit() {
         map["value"] = quantitySample.quantity.doubleValue(for: standardUnit)
         map["unit"] = standardUnit.unitString
@@ -94,18 +104,18 @@ private func addQuantitySampleData(_ quantitySample: HKQuantitySample, to map: i
         map["value"] = nil
         map["unit"] = nil
     }
-    
+
     let nonCountBasedTypes: Set<String> = [
         HKQuantityTypeIdentifier.heartRateVariabilitySDNN.rawValue,
         HKQuantityTypeIdentifier.bodyTemperature.rawValue,
     ]
-    
+
     if quantityType.aggregationStyle == .discrete && !nonCountBasedTypes.contains(quantityType.identifier) {
         let countSpecificUnit = HKUnit.count()
-        
+
         if quantitySample.quantity.is(compatibleWith: countSpecificUnit) {
             let doubleCountValue = quantitySample.quantity.doubleValue(for: countSpecificUnit)
-            
+
             if floor(doubleCountValue) == doubleCountValue &&
                doubleCountValue >= Double(Int.min) &&
                doubleCountValue <= Double(Int.max) {

@@ -1,14 +1,21 @@
 import Flutter
 import HealthKit
 
+/// Handles the authorization requests for HealthKit data access
 public class HealthKitPermissionsHandler {
+    /// The HealthKit store instance used for requesting permissions
     let healthStore: HKHealthStore
-    
+
+    /// Initializes the handler with a HealthKit store
+    /// - Parameter store: The HKHealthStore instance to use for permission requests
     init(_ store: HKHealthStore) {
         healthStore = store
     }
-    
-    
+
+    /// Requests HealthKit permissions for the specified data types
+    /// - Parameters:
+    ///   - call: The Flutter method call containing data types to request access for
+    ///   - result: Callback to return the authorization result or errors to Flutter
     public func requestPermissions(
         call: FlutterMethodCall,
         result: @escaping FlutterResult
@@ -17,14 +24,14 @@ public class HealthKitPermissionsHandler {
             if let types = arguments["types"] as? [String] {
                 var typesToRead: Set<HKObjectType> = []
                 let typesToWrite: Set<HKSampleType>? = nil
-                
+
                 for element in types {
                     if let converted = rawValueConverter(rawValue: element)
                     {
                         typesToRead.insert(converted)
                     }
                 }
-                
+
                 guard
                     !typesToRead.isEmpty
                         || (typesToWrite != nil && !typesToWrite!.isEmpty)
@@ -40,16 +47,16 @@ public class HealthKitPermissionsHandler {
                             details: nil))
                     return
                 }
-                
+
                 print(
                     "[HealthKitPermissionsHandler]: Requesting auth for read types: \(typesToRead.map { $0.identifier })"
                 )
-                
+
                 healthStore.requestAuthorization(
                     toShare: typesToWrite, read: typesToRead
                 ) { [weak self] (success, error) in
                     guard let self = self else { return }
-                    
+
                     DispatchQueue.main.async {
                         if let error = error {
                             print(
@@ -63,19 +70,19 @@ public class HealthKitPermissionsHandler {
                                     details: nil))
                             return
                         }
-                        
+
                         print(
                             "[HealthKitPermissionsHandler]: Auth request process completed. Success flag: \(success). Checking actual status..."
                         )
-                        
+
                         result(true)
                     }
                 }
-                
+
             }
         } else {
             result(FlutterError(code: "INVALID_ARGUMENT", message: "Expected arguments to be a Map with string keys", details: nil))
         }
-        
+
     }
 }
