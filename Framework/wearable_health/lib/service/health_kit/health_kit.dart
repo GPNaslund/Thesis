@@ -183,7 +183,7 @@ class HealthKitImpl implements HealthKit {
   @override
   Future<bool> redirectToPermissionsSettings() async {
     final result = await methodChannel.invokeMethod(
-      "$healthKitPrefix/$redirectToPermissionsSettings",
+      "$healthKitPrefix/$redirectToPermissionsSettingsSuffix",
     );
 
     if (result == null) {
