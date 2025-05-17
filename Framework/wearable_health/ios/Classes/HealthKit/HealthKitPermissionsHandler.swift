@@ -83,6 +83,31 @@ public class HealthKitPermissionsHandler {
         } else {
             result(FlutterError(code: "INVALID_ARGUMENT", message: "Expected arguments to be a Map with string keys", details: nil))
         }
-
+    }
+    
+    public func redirectToPermissionsSettings(result: @escaping FlutterResult) {
+        print("[HealthKitPermissionManager]: Starting redirect to permissions settings")
+        
+        if let appSettingsURL = URL(string: UIApplication.openSettingsURLString) {
+            if UIApplication.shared.canOpenURL(appSettingsURL) {
+                UIApplication.shared.open(appSettingsURL, options: [:]) { success in
+                    print("[HealthKitPermissionManager]: Opening app settings success: \(success)")
+                    result(success)
+                }
+                return
+            }
+        }
+        if let healthSettingsURL = URL(string: "App-prefs:root=HEALTH") {
+            if UIApplication.shared.canOpenURL(healthSettingsURL) {
+                UIApplication.shared.open(healthSettingsURL, options: [:]) { success in
+                    print("[HealthKitPermissionManager]: Opening Health settings success: \(success)")
+                    result(success)
+                }
+                return
+            }
+        }
+        
+        print("[HealthKitPermissionManager]: Failed to open any settings")
+        result(false)
     }
 }

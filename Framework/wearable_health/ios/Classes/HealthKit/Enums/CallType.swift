@@ -8,6 +8,7 @@ enum CallType: String {
     case checkDataStoreAvailability
     /// Call to fetch health data from the device
     case getData
+    case redirectToPermissionsSettings
     /// Represents an unrecognized or unsupported call type
     case unknown
 

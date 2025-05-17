@@ -75,7 +75,10 @@ class HealthConnectImpl implements HealthConnect {
   /// Retrieves raw health data for specified metrics within the given time range.
   /// Returns a HealthData object containing the unprocessed data grouped by metric type.
   @override
-  Future<HealthData> getRawData(List<HealthConnectHealthMetric> metrics, DateTimeRange timeRange) async {
+  Future<HealthData> getRawData(
+    List<HealthConnectHealthMetric> metrics,
+    DateTimeRange timeRange,
+  ) async {
     final start = timeRange.start.toUtc().toIso8601String();
     final end = timeRange.end.toUtc().toIso8601String();
     List<String> types = [];
@@ -202,5 +205,20 @@ class HealthConnectImpl implements HealthConnect {
     }
 
     return HealthConnectAvailability.fromString(result);
+  }
+
+  @override
+  Future<bool> redirectToPermissionsSettings() async {
+    final result = await methodChannel.invokeMethod(
+      "$healthConnectPrefix/$redirectToPermissionsSettingsSuffix",
+    );
+
+    if (result == null) {
+      throw Exception(
+        "[HealthConnect] redirectToPermissionsSettings received null result",
+      );
+    }
+
+    return result;
   }
 }

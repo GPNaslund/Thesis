@@ -6,3 +6,4 @@ const requestPermissionsSuffix = "requestPermissions";
 const getDataSuffix = "getData";
 const platformVersionSuffix = "platformVersion";
 const checkPermissionsSuffix = "checkPermissions";
+const redirectToPermissionsSettingsSuffix = "redirectToPermissionsSettings";
