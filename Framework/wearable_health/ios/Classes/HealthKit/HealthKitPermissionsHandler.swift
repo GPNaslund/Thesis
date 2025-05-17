@@ -97,7 +97,6 @@ public class HealthKitPermissionsHandler {
                 return
             }
         }
-        
         if let healthSettingsURL = URL(string: "App-prefs:root=HEALTH") {
             if UIApplication.shared.canOpenURL(healthSettingsURL) {
                 UIApplication.shared.open(healthSettingsURL, options: [:]) { success in
