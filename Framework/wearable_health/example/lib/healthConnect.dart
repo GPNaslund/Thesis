@@ -174,6 +174,27 @@ class _MyAppState extends State<HealthConnectApp> {
     super.dispose();
   }
 
+
+  Future<void> _redirectToSettings() async {
+    _appendToConsole('Redirecting to app settings for permissions...');
+    try {
+      final result = await hc.redirectToPermissionsSettings();
+      if (mounted) {
+        _appendToConsole('Settings redirection ${result ? 'successful' : 'failed'}');
+      }
+    } on PlatformException catch (e) {
+      debugPrint('PlatformException during settings redirection: ${e.message}');
+      if (mounted) {
+        _appendToConsole('Error during settings redirection: ${e.message}');
+      }
+    } catch (e) {
+      debugPrint('Error during settings redirection: $e');
+      if (mounted) {
+        _appendToConsole('Error during settings redirection: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -200,6 +221,17 @@ class _MyAppState extends State<HealthConnectApp> {
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              // Add a new row with the settings redirection button
+              Center(
+                child: ElevatedButton(
+                  onPressed: _redirectToSettings,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber, // Different color to stand out
+                  ),
+                  child: const Text('Open permissions settings'),
+                ),
+              ),
               const SizedBox(height: 20),
 
               const Text(
@@ -207,6 +239,7 @@ class _MyAppState extends State<HealthConnectApp> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
+              // Rest of your code remains the same
               Expanded(
                 child: Container(
                   width: double.infinity,

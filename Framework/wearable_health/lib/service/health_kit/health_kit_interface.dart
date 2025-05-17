@@ -18,7 +18,10 @@ abstract class HealthKit {
     DateTimeRange timeRange,
   );
 
-  Future<HealthData> getRawData(List<HealthKitHealthMetric> metrics, DateTimeRange timeRange);
+  Future<HealthData> getRawData(
+    List<HealthKitHealthMetric> metrics,
+    DateTimeRange timeRange,
+  );
 
   /// Gets the iOS platform version.
   /// Useful for compatibility checks.
@@ -27,4 +30,6 @@ abstract class HealthKit {
   /// Requests permissions for specific health metrics.
   /// Prompts the user with a permission dialog and returns success status.
   Future<bool> requestPermissions(List<HealthKitHealthMetric> metrics);
+
+  Future<bool> redirectToPermissionsSettings();
 }

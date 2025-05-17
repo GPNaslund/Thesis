@@ -44,6 +44,7 @@ class HealthConnectManager (
             MethodCallType.REQUEST_PERMISSIONS -> handleRequestPermissions(call, result)
             MethodCallType.DATA_STORE_AVAILABILITY -> checkDataStoreAvailability(result)
             MethodCallType.GET_DATA -> getData(call, result)
+            MethodCallType.REDIRECT_TO_PERMISSIONS_SETTINGS -> redirectToPermissionsSettings(result)
             MethodCallType.UNDEFINED -> {
                 Log.d("HealthConnectManager", "Received undefined method call: $methodCallString")
                 result.notImplemented()
@@ -93,6 +94,11 @@ class HealthConnectManager (
     /** Retrieves health data using the HealthConnectDataManager. */
     private fun getData(call: MethodCall, result: Result) {
         healthConnectDataManager.getData(call, result, pluginScope, healthConnectClient)
+    }
+
+    private fun redirectToPermissionsSettings(result: Result) {
+        val permissionContext = activityPluginBinding?.activity ?: context
+        healthConnectPermissionsManager.redirectToPermissionsSettings(result, permissionContext);
     }
 
     /** Sets up the activity binding and permission launcher when attached to an activity. */

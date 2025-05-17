@@ -1,5 +1,9 @@
 package se.lnu.thesis.wearable_health.health_connect
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.health.connect.client.HealthConnectClient
@@ -49,6 +53,55 @@ class HealthConnectPermissionsManager() {
         val dataTypes = extractDataTypes(call.arguments, result) ?: return
         Log.d(TAG, "Launching Health Connect permission request")
         requestPermissionLauncher.launch(dataTypes)
+    }
+
+    fun redirectToPermissionsSettings(result: Result, context: Context) {
+        try {
+            Log.d(TAG, "Creating intent for launching settings screen")
+
+            val intent = Intent("android.health.connect.action.HEALTH_CONNECT_SETTINGS").apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            if (intent.resolveActivity(context.packageManager) != null) {
+                Log.d(TAG, "Starting health connect settings activity")
+                context.startActivity(intent);
+                result.success(true);
+            } else {
+                openAppSettings(result, context)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to open Health Connect settings: ${e.message}", e)
+            result.success(false)
+        }
+    }
+
+     private fun openAppSettings(result: Result, context: Context) {
+        try {
+            val packageName = context.packageName
+            val intent = Intent().apply {
+                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                data = Uri.parse("package:$packageName")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            context.startActivity(intent)
+            result.success(true)
+            Log.d(TAG, "App settings opened successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to open settings: ${e.message}", e)
+
+            try {
+                val intent = Intent(Settings.ACTION_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+                result.success(true)
+                Log.d(TAG, "Opened general settings as fallback")
+            } catch (e2: Exception) {
+                Log.e(TAG, "Failed to open even general settings: ${e2.message}", e2)
+                result.success(false)
+            }
+        }
     }
 
     /** Extracts and validates health data types from the method call arguments. */

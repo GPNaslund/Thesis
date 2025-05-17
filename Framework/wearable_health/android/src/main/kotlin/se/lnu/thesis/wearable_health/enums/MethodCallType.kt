@@ -36,6 +36,8 @@ enum class MethodCallType(val value: String) {
      */
     GET_DATA("getData"),
 
+    REDIRECT_TO_PERMISSIONS_SETTINGS("redirectToPermissionsSettings"),
+
     /**
      * Represents an undefined or unrecognized method call.
      * Used as a fallback when the method string doesn't match any known value.
@@ -59,6 +61,7 @@ enum class MethodCallType(val value: String) {
                 "requestPermissions" -> REQUEST_PERMISSIONS
                 "dataStoreAvailability" -> DATA_STORE_AVAILABILITY
                 "getData" -> GET_DATA
+                "redirectToPermissionsSettings" -> REDIRECT_TO_PERMISSIONS_SETTINGS
                 else -> UNDEFINED
             }
         }
