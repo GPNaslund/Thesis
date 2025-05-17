@@ -70,6 +70,8 @@ class HealthKitImpl implements HealthKit {
     return result;
   }
 
+  /// Retrieves raw health data for specified metrics within the given time range.
+  /// Returns a HealthData object containing the unprocessed data grouped by metric type.
   @override
   Future<HealthData> getRawData(List<HealthKitHealthMetric> metrics, DateTimeRange timeRange) async {
     final start = timeRange.start.toUtc().toIso8601String();

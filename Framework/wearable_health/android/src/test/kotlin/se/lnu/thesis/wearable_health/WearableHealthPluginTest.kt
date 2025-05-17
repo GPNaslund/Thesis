@@ -1,9 +1,16 @@
 package se.lnu.thesis.wearable_health
 
 import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import kotlin.test.Test
-import org.mockito.Mockito
+import io.flutter.plugin.common.MethodChannel.Result
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import java.util.concurrent.CompletableFuture
+
 
 /*
  * This demonstrates a simple unit test of the Kotlin portion of this plugin's implementation.
@@ -12,16 +19,7 @@ import org.mockito.Mockito
  * line by running `./gradlew testDebugUnitTest` in the `example/android/` directory, or
  * you can run them directly from IDEs that support JUnit such as Android Studio.
  */
+class WearableHealthPluginTest {
 
-internal class WearableHealthPluginTest {
-  @Test
-  fun onMethodCall_getPlatformVersion_returnsExpectedValue() {
-    val plugin = WearableHealthPlugin()
 
-    val call = MethodCall("getPlatformVersion", null)
-    val mockResult: MethodChannel.Result = Mockito.mock(MethodChannel.Result::class.java)
-    plugin.onMethodCall(call, mockResult)
-
-    Mockito.verify(mockResult).success("Android " + android.os.Build.VERSION.RELEASE)
-  }
 }

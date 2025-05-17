@@ -2,6 +2,7 @@ package se.lnu.thesis.wearable_health.record_extension
 
 import androidx.health.connect.client.records.HeartRateRecord
 
+/** Converts a HeartRateRecord to a serializable map for Flutter communication. */
 fun HeartRateRecord.serialize(): Map<String, Any?> {
     val samples = this.extractSamples()
     val metaData = this.extractMetadata()
@@ -16,6 +17,7 @@ fun HeartRateRecord.serialize(): Map<String, Any?> {
     )
 }
 
+/** Extracts heart rate samples into a list of serializable maps. */
 fun HeartRateRecord.extractSamples(): List<Map<String, Any?>> {
     val result: MutableList<Map<String, Any?>> = mutableListOf()
     for (sample in this.samples) {
@@ -27,6 +29,7 @@ fun HeartRateRecord.extractSamples(): List<Map<String, Any?>> {
     return result
 }
 
+/** Converts record metadata to a serializable map. */
 fun HeartRateRecord.extractMetadata(): Map<String, Any?> {
     val result: Map<String, Any?> = mapOf(
         "clientRecordId" to this.metadata.clientRecordId,

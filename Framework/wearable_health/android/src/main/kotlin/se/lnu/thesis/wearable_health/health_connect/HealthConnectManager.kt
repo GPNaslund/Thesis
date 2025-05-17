@@ -16,7 +16,7 @@ import kotlinx.coroutines.SupervisorJob
 import se.lnu.thesis.wearable_health.enums.DataStoreAvailabilityResult
 import se.lnu.thesis.wearable_health.enums.MethodCallType
 
-/** HealthConnectManager */
+/** Manages Health Connect integration, handling permissions and data operations. */
 class HealthConnectManager (
     private val context: Context,
     private val healthConnectClient: HealthConnectClient
@@ -34,6 +34,7 @@ class HealthConnectManager (
 
     private val tag = "HealthConnectManager"
 
+    /** Handles method calls from Flutter and routes them to appropriate functions. */
     fun onMethodCall(call: MethodCall, result: Result) {
         val methodCallString = call.method.split("/")[1]
         val callType = MethodCallType.fromString(methodCallString)
@@ -50,7 +51,7 @@ class HealthConnectManager (
         }
     }
 
-
+    /** Checks availability status of Health Connect and returns the result. */
     private fun checkDataStoreAvailability(result: Result) {
         val availabilityStatus = HealthConnectClient.getSdkStatus(context)
         var status: DataStoreAvailabilityResult = DataStoreAvailabilityResult.AVAILABLE
@@ -65,11 +66,13 @@ class HealthConnectManager (
         result.success(status.toString())
     }
 
+    /** Verifies current permissions status for requested health data types. */
     private fun checkPermissions(result: Result) {
         Log.d(tag, "checkPermissions called")
         healthConnectPermissionsManager.checkPermissions(result, pluginScope, healthConnectClient)
     }
 
+    /** Initiates the permission request flow if no request is already pending. */
     private fun handleRequestPermissions(call: MethodCall, result: Result) {
         if (pendingPermissionsResult != null) {
             Log.d(tag, "Permission request attempted while another is pending.")
@@ -87,11 +90,12 @@ class HealthConnectManager (
         healthConnectPermissionsManager.requestPermissions(call, result, requestPermissionLauncher)
     }
 
+    /** Retrieves health data using the HealthConnectDataManager. */
     private fun getData(call: MethodCall, result: Result) {
         healthConnectDataManager.getData(call, result, pluginScope, healthConnectClient)
     }
 
-
+    /** Sets up the activity binding and permission launcher when attached to an activity. */
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         Log.d("WearableHealthPlugin", "onAttachedToActivity")
         this.activityPluginBinding = binding
@@ -126,15 +130,17 @@ class HealthConnectManager (
         }
     }
 
-
+    /** Handles activity detachment during configuration changes. */
     override fun onDetachedFromActivityForConfigChanges() {
         onDetachedFromActivity()
     }
 
+    /** Reattaches to activity after configuration changes. */
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
         onAttachedToActivity(binding)
     }
 
+    /** Cleans up resources when detached from activity. */
     override fun onDetachedFromActivity() {
         Log.d("WearableHealthPlugin", "onDetachedFromActivity")
         activityPluginBinding = null

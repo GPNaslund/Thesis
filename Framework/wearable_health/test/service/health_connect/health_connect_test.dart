@@ -7,6 +7,7 @@ import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart
 import 'package:wearable_health/model/health_connect/hc_entities/heart_rate.dart';
 import 'package:wearable_health/model/health_connect/hc_entities/metadata.dart';
 import 'package:wearable_health/model/health_connect/hc_entities/skin_temperature.dart';
+import 'package:wearable_health/model/health_data.dart';
 import 'package:wearable_health/service/converters/json/json_converter_interface.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health/service/health_connect/health_connect.dart';
@@ -214,6 +215,181 @@ void main() {
         expect(result.contains(skinTemp1), isTrue);
       },
     );
+  });
+
+  group('getRawData', () {
+    test('should return raw health data for the specified metrics and time range', () async {
+      final startDate = DateTime(2025, 1, 1);
+      final endDate = DateTime(2025, 1, 2);
+      final timeRange = DateTimeRange(start: startDate, end: endDate);
+      final metrics = [
+        HealthConnectHealthMetric.heartRate,
+        HealthConnectHealthMetric.skinTemperature,
+      ];
+
+      final Map<String, List<dynamic>> channelResponse = {
+        'android.permission.health.READ_HEART_RATE': [
+          {'id': 'heart_rate_1'},
+          {'id': 'heart_rate_2'},
+        ],
+        'android.permission.health.READ_SKIN_TEMPERATURE': [
+          {'id': 'skin_temp_1'},
+        ],
+      };
+
+      final Map<String, List<Map<String, dynamic>>> convertedData = {
+        'android.permission.health.READ_HEART_RATE': [
+          {'id': 'heart_rate_1'},
+          {'id': 'heart_rate_2'},
+        ],
+        'android.permission.health.READ_SKIN_TEMPERATURE': [
+          {'id': 'skin_temp_1'},
+        ],
+      };
+
+      final expectedHealthData = HealthData(convertedData);
+
+      when(
+            () => mockMethodChannel.invokeMapMethod<String, List<dynamic>>(
+          '$healthConnectPrefix/$getDataSuffix',
+          any(),
+        ),
+      ).thenAnswer((_) => Future.value(channelResponse));
+
+      when(
+            () => mockJsonConverter.extractJsonObjectWithListOfJsonObjects(
+          channelResponse,
+          any(),
+        ),
+      ).thenReturn(convertedData);
+
+      final result = await healthConnect.getRawData(metrics, timeRange);
+
+      expect(result, isA<HealthData>());
+      expect(result.data, equals(convertedData));
+
+      verify(
+            () => mockMethodChannel.invokeMapMethod<String, List<dynamic>>(
+          '$healthConnectPrefix/$getDataSuffix',
+          any(),
+        ),
+      ).called(1);
+
+      verify(
+            () => mockJsonConverter.extractJsonObjectWithListOfJsonObjects(
+          channelResponse,
+          any(),
+        ),
+      ).called(1);
+    });
+
+    test('should correctly format date ranges and metrics in getRawData', () async {
+      final startDate = DateTime(2025, 1, 1);
+      final endDate = DateTime(2025, 1, 2);
+      final timeRange = DateTimeRange(start: startDate, end: endDate);
+      final metrics = [
+        HealthConnectHealthMetric.heartRate,
+        HealthConnectHealthMetric.skinTemperature,
+      ];
+
+      Map<String, dynamic>? capturedArguments;
+
+      when(
+            () => mockMethodChannel.invokeMapMethod<String, List<dynamic>>(
+          '$healthConnectPrefix/$getDataSuffix',
+          any(),
+        ),
+      ).thenAnswer((invocation) {
+        capturedArguments = invocation.positionalArguments[1] as Map<String, dynamic>?;
+        return Future.value({
+          'android.permission.health.READ_HEART_RATE': [],
+          'android.permission.health.READ_SKIN_TEMPERATURE': [],
+        });
+      });
+
+      when(
+            () => mockJsonConverter.extractJsonObjectWithListOfJsonObjects(
+          any(),
+          any(),
+        ),
+      ).thenReturn({
+        'android.permission.health.READ_HEART_RATE': [],
+        'android.permission.health.READ_SKIN_TEMPERATURE': [],
+      });
+
+      await healthConnect.getRawData(metrics, timeRange);
+
+      expect(capturedArguments, isNotNull);
+      expect(
+        capturedArguments!['start'],
+        equals(startDate.toUtc().toIso8601String()),
+      );
+      expect(
+        capturedArguments!['end'],
+        equals(endDate.toUtc().toIso8601String()),
+      );
+      expect(
+        capturedArguments!['types'],
+        containsAll([
+          'android.permission.health.READ_HEART_RATE',
+          'android.permission.health.READ_SKIN_TEMPERATURE',
+        ]),
+      );
+      expect(capturedArguments!['types'].length, equals(2));
+    });
+
+    test('should throw exception when channel returns null', () async {
+      final startDate = DateTime(2025, 1, 1);
+      final endDate = DateTime(2025, 1, 2);
+      final timeRange = DateTimeRange(start: startDate, end: endDate);
+      final metrics = [HealthConnectHealthMetric.heartRate];
+
+      when(
+            () => mockMethodChannel.invokeMapMethod<String, List<dynamic>>(
+          '$healthConnectPrefix/$getDataSuffix',
+          any(),
+        ),
+      ).thenAnswer((_) => Future.value(null));
+
+      expect(
+            () => healthConnect.getRawData(metrics, timeRange),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('should handle empty data sets', () async {
+      final startDate = DateTime(2025, 1, 1);
+      final endDate = DateTime(2025, 1, 2);
+      final timeRange = DateTimeRange(start: startDate, end: endDate);
+      final metrics = [HealthConnectHealthMetric.heartRate];
+
+      final Map<String, List<dynamic>> emptyChannelResponse = {
+        'android.permission.health.READ_HEART_RATE': [],
+      };
+
+      final Map<String, List<Map<String, dynamic>>> emptyConvertedData = {
+        'android.permission.health.READ_HEART_RATE': [],
+      };
+
+      when(
+            () => mockMethodChannel.invokeMapMethod<String, List<dynamic>>(
+          '$healthConnectPrefix/$getDataSuffix',
+          any(),
+        ),
+      ).thenAnswer((_) => Future.value(emptyChannelResponse));
+
+      when(
+            () => mockJsonConverter.extractJsonObjectWithListOfJsonObjects(
+          any(),
+          any(),
+        ),
+      ).thenReturn(emptyConvertedData);
+
+      final result = await healthConnect.getRawData(metrics, timeRange);
+
+      expect(result, isA<HealthData>());
+      expect(result.data, equals(emptyConvertedData));
+    });
   });
 
   group('getPlatformVersion', () {

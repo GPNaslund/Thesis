@@ -2,6 +2,7 @@ package se.lnu.thesis.wearable_health.record_extension
 
 import androidx.health.connect.client.records.SkinTemperatureRecord
 
+/** Converts a SkinTemperatureRecord to a serializable map for Flutter. */
 fun SkinTemperatureRecord.serialize(): Map<String, Any?> {
     val deltas = this.extractDeltas()
     val metadata = this.extractMetadata()
@@ -18,6 +19,7 @@ fun SkinTemperatureRecord.serialize(): Map<String, Any?> {
     )
 }
 
+/** Extracts temperature delta measurements into a list of serializable maps. */
 fun SkinTemperatureRecord.extractDeltas(): List<Map<String, Any?>> {
     val resultList: MutableList<Map<String, Any?>> = mutableListOf()
     for (delta in this.deltas) {
@@ -35,6 +37,7 @@ fun SkinTemperatureRecord.extractDeltas(): List<Map<String, Any?>> {
     return resultList
 }
 
+/** Converts record metadata to a serializable map. */
 fun SkinTemperatureRecord.extractMetadata(): Map<String, Any?> {
     val result: Map<String, Any?> =
             mapOf(

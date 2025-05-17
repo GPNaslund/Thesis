@@ -24,7 +24,7 @@ class HKQuantitySample extends HKSample {
     required super.startDate,
     required super.endDate,
     super.metadata,
-    HKDevice? super.device,
+    super.device,
     super.sourceRevision,
     required this.quantity,
     required super.sampleType,
