@@ -3,5 +3,6 @@
 /// Enums for available metrics
 enum HealthMetric {
   skinTemperature,
-  heartRateVariability
+  heartRateVariability,
+  heartRate
 }

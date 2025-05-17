@@ -1,14 +1,12 @@
-// lib/features/data_display/data_display_page.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
 import '../../../constants/metrics.dart';
 import '../../../constants/metrics_mapper.dart';
+import '../../services/metric_filters/skin_temperature.dart';
+import 'package:wearable_health/extensions/open_m_health/schemas/body_temperature.dart';
 
-/// Page for displaying fetched health data for a selected metric
 class DataDisplayPage extends StatefulWidget {
-
   final HealthMetric metric;
 
   const DataDisplayPage({super.key, required this.metric});
@@ -19,74 +17,117 @@ class DataDisplayPage extends StatefulWidget {
 
 class _DataDisplayPageState extends State<DataDisplayPage> {
   final WearableHealthService _wearableHealthService = WearableHealthService();
-  bool _isLoading = false;
-  /// converter for knowing if converting data into Open MHealth format
-  bool _useConverter = false;
-  /// results to display in the UI
-  List<String> _fetchedResults = [];
-  /// label to display, what is being shown to the UI
-  String _resultLabel = '';
 
-  /// Fetches health data using the WearableHealthService
+  DateTime? _startDate;
+  DateTime? _endDate;
+  bool _useConverter = false;
+  bool _isLoading = false;
+  String _resultLabel = '';
+  List<String> _fetchedResults = [];
+
+  Future<void> _pickDateTime({required bool isStart}) async {
+    final now = DateTime.now();
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(now.year - 5),
+      lastDate: now,
+    );
+
+    if (pickedDate == null) return;
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime == null) return;
+
+    final fullDateTime = DateTime( // ✅ Use UTC for consistent filtering
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+
+    setState(() {
+      if (isStart) {
+        _startDate = fullDateTime;
+      } else {
+        _endDate = fullDateTime;
+      }
+    });
+  }
+
   Future<void> _fetchData() async {
-    /// Show loading UI and clear old results
+    if (_startDate == null || _endDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select start and end time')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
-      _fetchedResults = ['Fetching data...'];
+      _resultLabel = 'Fetching data...';
     });
 
-    try {
-      /// Define a time range from now minus 1 day to now
-      final now = DateTime.now();
-      final start = now.subtract(const Duration(days: 1));
-      final range = DateTimeRange(start: start, end: now);
+    final range = DateTimeRange(start: _startDate!, end: _endDate!);
 
-      /// Request health data from the service using (health metric, date range, converted to open Mhealth or not)
-      final healthData = await _wearableHealthService.getHealthData(
+    try {
+      final data = await _wearableHealthService.getHealthData(
         widget.metric,
         range,
         convert: _useConverter,
       );
 
-      /// label to show what data is being displayed
-      final label = 'Showing ${getMetricLabel(widget.metric)} data in '
-          '${_useConverter ? "OpenMHealth" : "Raw"} format:';
-
-      /// If no data is returned, inform the user
-      if (healthData.isEmpty) {
-        setState(() {
-          _resultLabel = label;
-          _fetchedResults = [
-            'No data fetched.',
-            'Make sure ${getMetricLabel(widget.metric)} is allowed in settings.'
-          ];
-        });
-      } else {
-        /// Else convert each data entry to formatted JSON and display
-        setState(() {
-          _resultLabel = label;
-          _fetchedResults = healthData.map((e) {
-            try {
-              final encoder = JsonEncoder.withIndent('  ');
-              return encoder.convert(e is Map ? e : e.toJson());
-            } catch (err) {
-              return 'Error parsing item: $err';
-            }
-          }).toList();
-        });
+      if (!_useConverter && widget.metric == HealthMetric.skinTemperature) {
+        debugPrint('Raw Skin Temperature Data:');
+        for (var entry in data) {
+          debugPrint(jsonEncode(entry));
+        }
       }
-    } catch (e) {
-      /// Catch permission or data errors and display a custom message
+
+      List<dynamic> filteredData;
+
+      // ✅ Metric-specific filtering logic
+      if (widget.metric == HealthMetric.skinTemperature) {
+        if (_useConverter) {
+          filteredData = filterOpenMHealthSkinTemperature(
+            entries: data.cast<OpenMHealthBodyTemperature>(),
+            range: range,
+          );
+        } else {
+          filteredData = filterRawSkinTemperatureWithTrimmedDeltas(
+            rawEntries: data,
+            range: range,
+          );
+        }
+      } else {
+        filteredData = data;
+      }
+
       setState(() {
-        _fetchedResults = ['There was an error when trying to fetch data. Make sure you have allowed permission for this metric in the app settings.'];
-        _resultLabel = '';
+        _fetchedResults = filteredData.map((e) {
+          if (e is OpenMHealthBodyTemperature) {
+            return const JsonEncoder.withIndent('  ').convert(e.toJson());
+          } else {
+            return const JsonEncoder.withIndent('  ').convert(e);
+          }
+        }).toList();
+        _resultLabel = 'Fetched ${filteredData.length} entries';
+      });
+    } catch (e) {
+      setState(() {
+        _fetchedResults = ['Error: $e'];
+        _resultLabel = 'Error occurred';
       });
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  /// Clears UI output area
   void _clearConsole() {
     setState(() {
       _fetchedResults = [];
@@ -94,7 +135,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     });
   }
 
-  /// Builds the UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,11 +152,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-
-            /// Container box to display results
             Expanded(
               child: Container(
-                width: double.infinity,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
@@ -129,8 +166,34 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               ),
             ),
             const SizedBox(height: 16),
-
-            /// Button to fetch data
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _pickDateTime(isStart: true),
+                    child: Text(
+                      _startDate != null
+                          ? '${_startDate!.toString().substring(0, 16)}'
+                          : 'Select Start Time',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _pickDateTime(isStart: false),
+                    child: Text(
+                      _endDate != null
+                          ? '${_endDate!.toString().substring(0, 16)}'
+                          : 'Select End Time',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _isLoading ? null : _fetchData,
               child: _isLoading
@@ -145,15 +208,11 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   : const Text('Fetch Data'),
             ),
             const SizedBox(height: 12),
-
-            /// Button to clear console/output
             ElevatedButton(
               onPressed: _clearConsole,
               child: const Text('Clear Console'),
             ),
             const SizedBox(height: 12),
-
-            /// Dropdown to toggle between Raw and OpenMHealth formats
             DropdownButton<bool>(
               isExpanded: true,
               value: _useConverter,
