@@ -222,12 +222,11 @@ class _MyAppState extends State<HealthConnectApp> {
                 ],
               ),
               const SizedBox(height: 10),
-              // Add a new row with the settings redirection button
               Center(
                 child: ElevatedButton(
                   onPressed: _redirectToSettings,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber, // Different color to stand out
+                    backgroundColor: Colors.amber,
                   ),
                   child: const Text('Open permissions settings'),
                 ),
@@ -239,7 +238,6 @@ class _MyAppState extends State<HealthConnectApp> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              // Rest of your code remains the same
               Expanded(
                 child: Container(
                   width: double.infinity,
