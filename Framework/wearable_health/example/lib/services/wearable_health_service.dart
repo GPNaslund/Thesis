@@ -1,16 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:wearable_health/controller/wearable_health.dart';
 import '../constants/metrics.dart';
 import '../constants/metrics_mapper.dart';
-import 'package:wearable_health/model/health_data.dart';
 import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart';
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
-import 'metric_filters/heart_rate.dart';
-import 'metric_filters/heart_rate_variability.dart';
-import 'metric_filters/skin_temperature.dart';
-
-// Import modular metric-specific handlers
 import 'metric_fetches/heart_rate.dart';
 import 'metric_fetches/heart_rate_variability.dart';
 import 'metric_fetches/skin_temperature.dart';
@@ -49,6 +44,75 @@ class WearableHealthService {
         platformMetrics.cast<HealthKitHealthMetric>(),
       );
     }
+  }
+
+  Future<dynamic> getFirstRecordRaw(HealthMetric metric) async {
+    final now = DateTime.now();
+    final range = DateTimeRange(
+      start: now.subtract(const Duration(days: 0, hours: 0, minutes: 20)),
+      end: now,
+    );
+
+    debugPrint('🔍 Fetching first record for metric: $metric');
+    debugPrint('📅 Time range: ${range.start} → ${range.end}');
+
+    final data = await getHealthData(metric, range, convert: false);
+
+    debugPrint('📦 Retrieved ${data.length} entries');
+
+    if (data.isEmpty) {
+      debugPrint('⚠️ No data found for the given range.');
+      return null;
+    }
+
+    final first = data.first;
+    debugPrint('🧪 First record:\n${const JsonEncoder.withIndent('  ').convert(first)}');
+
+    if (metric == HealthMetric.skinTemperature &&
+        first is Map<String, dynamic> &&
+        first.containsKey('deltas')) {
+      final deltas = first['deltas'];
+      if (deltas is List && deltas.isNotEmpty) {
+        debugPrint('📏 First delta inside record:\n${const JsonEncoder.withIndent('  ').convert(deltas.first)}');
+      } else {
+        debugPrint('📭 No deltas found inside first record.');
+      }
+    }
+
+    return first;
+  }
+
+  Future<dynamic> getFirstOpenMHealthRecord(HealthMetric metric) async {
+    final now = DateTime.now();
+    final range = DateTimeRange(
+      start: now.subtract(const Duration(days: 0, hours: 0, minutes: 20)),
+      end: now,
+    );
+
+    debugPrint('🔍 Fetching first OpenMHealth record for metric: $metric');
+    debugPrint('📅 Time range: ${range.start} → ${range.end}');
+
+    final data = await getHealthData(metric, range, convert: true);
+
+    debugPrint('📦 Retrieved ${data.length} OpenMHealth entries');
+
+    if (data.isEmpty) {
+      debugPrint('⚠️ No OpenMHealth data found for the given range.');
+      return null;
+    }
+
+    final first = data.first;
+
+    try {
+      final jsonString = const JsonEncoder.withIndent('  ').convert(
+        first.toJson(), // This assumes all OpenMHealth models implement `.toJson()`
+      );
+      debugPrint('🧪 First OpenMHealth record:\n$jsonString');
+    } catch (e) {
+      debugPrint('⚠️ Failed to serialize first OpenMHealth record: $e');
+    }
+
+    return first;
   }
 
   Future<List<dynamic>> getHealthData(

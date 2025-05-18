@@ -1,3 +1,5 @@
+// lib/services/metric_filters/skin_temperature.dart
+
 import 'package:flutter/material.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/body_temperature.dart';
 
@@ -6,27 +8,38 @@ List<OpenMHealthBodyTemperature> filterOpenMHealthSkinTemperature({
   required List<OpenMHealthBodyTemperature> entries,
   required DateTimeRange range,
 }) {
-  return entries.where((entry) {
+  final filtered = entries.where((entry) {
     final time = entry.effectiveTimeFrame.dateTime;
-    if (time == null) return false; // 🔐 safe null check
-
+    if (time == null) return false;
     return time.isAfter(range.start) && time.isBefore(range.end);
   }).toList();
+
+  filtered.sort((a, b) {
+    final t1 = a.effectiveTimeFrame.dateTime;
+    final t2 = b.effectiveTimeFrame.dateTime;
+    if (t1 == null || t2 == null) return 0;
+    return t1.compareTo(t2);
+  });
+
+  return filtered;
 }
 
-List<Map<String, dynamic>> filterRawSkinTemperatureWithTrimmedDeltas({
+Map<String, List<Map<String, dynamic>>> filterRawSkinTemperature({
   required List<dynamic> rawEntries,
   required DateTimeRange range,
 }) {
-  if (rawEntries.isEmpty) return [];
+  if (rawEntries.isEmpty) return {};
 
-  final List<Map<String, dynamic>> filtered = [];
+  final Map<String, List<Map<String, dynamic>>> filtered = {};
 
   for (var entry in rawEntries) {
     if (entry is Map<String, dynamic>) {
-      for (var value in entry.values) {
-        if (value is List) {
-          for (var record in value) {
+      for (var permissionKey in entry.keys) {
+        final records = entry[permissionKey];
+        if (records is List) {
+          final List<Map<String, dynamic>> trimmed = [];
+
+          for (var record in records) {
             if (record is Map<String, dynamic> && record['deltas'] is List) {
               final deltas = record['deltas'] as List;
 
@@ -38,22 +51,39 @@ List<Map<String, dynamic>> filterRawSkinTemperatureWithTrimmedDeltas({
                     parsedTime.isBefore(range.end);
               }).toList();
 
+              /// Sort deltas by time
+              matchingDeltas.sort((a, b) {
+                final t1 = DateTime.tryParse(a['time'] ?? '');
+                final t2 = DateTime.tryParse(b['time'] ?? '');
+                if (t1 == null || t2 == null) return 0;
+                return t1.compareTo(t2);
+              });
+
               if (matchingDeltas.isNotEmpty) {
-                // Clone the original record and replace only the deltas field
                 final trimmedRecord = Map<String, dynamic>.from(record);
                 trimmedRecord['deltas'] = matchingDeltas;
-
-                filtered.add(trimmedRecord);
+                trimmed.add(trimmedRecord);
               }
             }
+          }
+
+          /// Sort records by first delta time
+          trimmed.sort((a, b) {
+            final t1 = DateTime.tryParse((a['deltas']?[0]?['time']) ?? '');
+            final t2 = DateTime.tryParse((b['deltas']?[0]?['time']) ?? '');
+            if (t1 == null || t2 == null) return 0;
+            return t1.compareTo(t2);
+          });
+
+          if (trimmed.isNotEmpty) {
+            filtered[permissionKey] = trimmed;
           }
         }
       }
     }
   }
 
-  debugPrint('Filtered ${filtered.length} skin temperature records with trimmed deltas');
-
+  debugPrint('✅ Filtered and sorted records under ${filtered.length} permission keys');
   return filtered;
 }
 

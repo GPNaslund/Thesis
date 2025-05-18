@@ -1,10 +1,14 @@
+// lib/features/data_display/data_display_page.dart
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
 import '../../../constants/metrics.dart';
 import '../../../constants/metrics_mapper.dart';
-import '../../services/metric_filters/skin_temperature.dart';
-import 'package:wearable_health/extensions/open_m_health/schemas/body_temperature.dart';
+import '../../../services/metric_handlers/skin_temperature.dart';
+import '../../../services/metric_handlers/heart_rate_variability.dart';
+import '../../../services/metric_handlers/heart_rate.dart';
+
 
 class DataDisplayPage extends StatefulWidget {
   final HealthMetric metric;
@@ -43,7 +47,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
     if (pickedTime == null) return;
 
-    final fullDateTime = DateTime( // ✅ Use UTC for consistent filtering
+    final fullDateTime = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
@@ -82,41 +86,58 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         convert: _useConverter,
       );
 
-      if (!_useConverter && widget.metric == HealthMetric.skinTemperature) {
-        debugPrint('Raw Skin Temperature Data:');
-        for (var entry in data) {
-          debugPrint(jsonEncode(entry));
-        }
-      }
-
-      List<dynamic> filteredData;
-
-      // ✅ Metric-specific filtering logic
+      // ✅ Delegated metric-specific filtering and formatting
       if (widget.metric == HealthMetric.skinTemperature) {
-        if (_useConverter) {
-          filteredData = filterOpenMHealthSkinTemperature(
-            entries: data.cast<OpenMHealthBodyTemperature>(),
-            range: range,
-          );
-        } else {
-          filteredData = filterRawSkinTemperatureWithTrimmedDeltas(
-            rawEntries: data,
-            range: range,
-          );
-        }
-      } else {
-        filteredData = data;
+        _fetchedResults = handleSkinTemperatureData(
+          data: data,
+          range: range,
+          useConverter: _useConverter,
+          onStatusUpdate: (label) {
+            setState(() {
+              _resultLabel = label;
+            });
+          },
+        );
+        setState(() {}); // update the list
+        return;
       }
 
+      if (widget.metric == HealthMetric.heartRateVariability) {
+        _fetchedResults = handleHeartRateVariabilityData(
+          data: data,
+          range: range,
+          useConverter: _useConverter,
+          onStatusUpdate: (label) {
+            setState(() {
+              _resultLabel = label;
+            });
+          },
+        );
+        setState(() {});
+        return;
+      }
+
+      if (widget.metric == HealthMetric.heartRate) {
+        _fetchedResults = handleHeartRateData(
+          data: data,
+          range: range,
+          useConverter: _useConverter,
+          onStatusUpdate: (label) {
+            setState(() {
+              _resultLabel = label;
+            });
+          },
+        );
+        setState(() {});
+        return;
+      }
+
+      // Default fallback for other metrics (not yet handled modularly)
       setState(() {
-        _fetchedResults = filteredData.map((e) {
-          if (e is OpenMHealthBodyTemperature) {
-            return const JsonEncoder.withIndent('  ').convert(e.toJson());
-          } else {
-            return const JsonEncoder.withIndent('  ').convert(e);
-          }
+        _fetchedResults = data.map((e) {
+          return const JsonEncoder.withIndent('  ').convert(e);
         }).toList();
-        _resultLabel = 'Fetched ${filteredData.length} entries';
+        _resultLabel = 'Fetched ${_fetchedResults.length} entries';
       });
     } catch (e) {
       setState(() {
@@ -200,10 +221,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
                   : const Text('Fetch Data'),
             ),
@@ -211,6 +229,64 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
             ElevatedButton(
               onPressed: _clearConsole,
               child: const Text('Clear Console'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true;
+                  _resultLabel = 'Fetching first record...';
+                });
+
+                try {
+                  final record = await _wearableHealthService.getFirstRecordRaw(widget.metric);
+                  setState(() {
+                    _fetchedResults = [
+                      if (record != null)
+                        const JsonEncoder.withIndent('  ').convert(record)
+                      else
+                        'No data found.',
+                    ];
+                    _resultLabel = record != null ? 'Fetched 1 record' : 'No record found';
+                  });
+                } catch (e) {
+                  setState(() {
+                    _fetchedResults = ['Error: $e'];
+                    _resultLabel = 'Error occurred';
+                  });
+                } finally {
+                  setState(() => _isLoading = false);
+                }
+              },
+              child: const Text('Fetch First Record'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true;
+                  _resultLabel = 'Fetching first OpenMHealth record...';
+                });
+
+                try {
+                  final record = await _wearableHealthService.getFirstOpenMHealthRecord(widget.metric);
+                  setState(() {
+                    _fetchedResults = [
+                      if (record != null)
+                        const JsonEncoder.withIndent('  ').convert(record.toJson())
+                      else
+                        'No OpenMHealth data found.',
+                    ];
+                    _resultLabel = record != null ? 'Fetched 1 OpenMHealth record' : 'No record found';
+                  });
+                } catch (e) {
+                  setState(() {
+                    _fetchedResults = ['Error: $e'];
+                    _resultLabel = 'Error occurred';
+                  });
+                } finally {
+                  setState(() => _isLoading = false);
+                }
+              },
+              child: const Text('Fetch First OpenMHealth Record'),
             ),
             const SizedBox(height: 12),
             DropdownButton<bool>(
