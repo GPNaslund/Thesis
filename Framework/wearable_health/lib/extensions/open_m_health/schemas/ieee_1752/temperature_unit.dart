@@ -18,7 +18,7 @@ enum TemperatureUnit implements Ieee1752Schema {
   /// Returns a map with the key "name" and the value as the
   /// string name of this temperature unit.
   @override
-  Map<String, dynamic> toJson() => {"name": name};
+  Map<String, dynamic> toJson() => {"unit": name};
 
   /// Creates a temperature unit from its JSON string representation.
   ///
