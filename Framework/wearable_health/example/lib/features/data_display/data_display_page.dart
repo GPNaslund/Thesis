@@ -263,6 +263,37 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               onPressed: () async {
                 setState(() {
                   _isLoading = true;
+                  _resultLabel = 'Fetching OpenMHealth records...';
+                });
+
+                try {
+                  final records = await _wearableHealthService.getAllOpenMHealthRecords(widget.metric); // or .getAllOpenMHealthJsonStrings()
+
+                  setState(() {
+                    _fetchedResults = records.isNotEmpty
+                        ? records.map((r) => const JsonEncoder.withIndent('  ').convert(r.toJson())).toList()
+                        : ['No OpenMHealth data found.'];
+
+                    _resultLabel = records.isNotEmpty
+                        ? 'Fetched ${records.length} OpenMHealth record(s)'
+                        : 'No records found';
+                  });
+                } catch (e) {
+                  setState(() {
+                    _fetchedResults = ['⚠️ Error while fetching records: $e'];
+                    _resultLabel = 'Fetch failed';
+                  });
+                } finally {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                }
+              }, child: const Text('Fetch First OpenMHealth Record'),
+            ),
+            /* ElevatedButton(
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true;
                   _resultLabel = 'Fetching first OpenMHealth record...';
                 });
 
@@ -288,6 +319,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               },
               child: const Text('Fetch First OpenMHealth Record'),
             ),
+            */
             const SizedBox(height: 12),
             DropdownButton<bool>(
               isExpanded: true,

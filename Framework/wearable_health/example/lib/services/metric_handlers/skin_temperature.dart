@@ -22,7 +22,15 @@ List<String> handleSkinTemperatureData({
     );
 
     results = filtered.map((entry) {
-      return const JsonEncoder.withIndent('  ').convert(entry.toJson());
+      final json = entry.toJson();
+
+      // Optional: override timestamp string to show local time
+      final dt = entry.effectiveTimeFrame.dateTime;
+      if (dt != null) {
+        json['effective_time_frame']['date_time'] = dt.toLocal().toIso8601String();
+      }
+
+      return const JsonEncoder.withIndent('  ').convert(json);
     }).toList();
 
     onStatusUpdate('Fetched ${filtered.length} entries');

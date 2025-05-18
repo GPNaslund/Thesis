@@ -82,7 +82,41 @@ class WearableHealthService {
     return first;
   }
 
-  Future<dynamic> getFirstOpenMHealthRecord(HealthMetric metric) async {
+  Future<List<dynamic>> getAllOpenMHealthRecords(HealthMetric metric) async {
+    final now = DateTime.now();
+    final range = DateTimeRange(
+      start: now.subtract(const Duration(minutes: 20)),
+      end: now,
+    );
+
+    debugPrint('🔍 Fetching OpenMHealth records for metric: $metric');
+    debugPrint('📅 Time range: ${range.start} → ${range.end}');
+
+    final data = await getHealthData(metric, range, convert: true);
+
+    debugPrint('📦 Retrieved ${data.length} OpenMHealth entries');
+
+    if (data.isEmpty) {
+      debugPrint('⚠️ No OpenMHealth data found for the given range.');
+      return [];
+    }
+
+    for (int i = 0; i < data.length; i++) {
+      try {
+        final entry = data[i];
+        final jsonString = const JsonEncoder.withIndent('  ').convert(
+          entry.toJson(), // Assuming OpenMHealth models implement `.toJson()`
+        );
+        debugPrint('🧪 Entry [$i]:\n$jsonString');
+      } catch (e) {
+        debugPrint('⚠️ Failed to serialize entry [$i]: $e');
+      }
+    }
+
+    return data;
+  }
+
+  /*  Future<dynamic> getFirstOpenMHealthRecord(HealthMetric metric) async {
     final now = DateTime.now();
     final range = DateTimeRange(
       start: now.subtract(const Duration(days: 0, hours: 0, minutes: 20)),
@@ -105,7 +139,7 @@ class WearableHealthService {
 
     try {
       final jsonString = const JsonEncoder.withIndent('  ').convert(
-        first.toJson(), // This assumes all OpenMHealth models implement `.toJson()`
+        first.toJson(), // This assumes all OpenMHealth models implement .toJson()
       );
       debugPrint('🧪 First OpenMHealth record:\n$jsonString');
     } catch (e) {
@@ -114,6 +148,8 @@ class WearableHealthService {
 
     return first;
   }
+ */
+
 
   Future<List<dynamic>> getHealthData(
       HealthMetric metric,

@@ -8,10 +8,14 @@ List<OpenMHealthBodyTemperature> filterOpenMHealthSkinTemperature({
   required List<OpenMHealthBodyTemperature> entries,
   required DateTimeRange range,
 }) {
+  // Convert local range to UTC for proper comparison with OpenMHealth timestamps
+  final utcStart = range.start.toUtc();
+  final utcEnd = range.end.toUtc();
+
   final filtered = entries.where((entry) {
     final time = entry.effectiveTimeFrame.dateTime;
     if (time == null) return false;
-    return time.isAfter(range.start) && time.isBefore(range.end);
+    return time.isAfter(utcStart) && time.isBefore(utcEnd);
   }).toList();
 
   filtered.sort((a, b) {
@@ -86,4 +90,3 @@ Map<String, List<Map<String, dynamic>>> filterRawSkinTemperature({
   debugPrint('✅ Filtered and sorted records under ${filtered.length} permission keys');
   return filtered;
 }
-
