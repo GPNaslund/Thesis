@@ -1,33 +1,281 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:wearable_health_example/performance_module.dart';
 
-import 'healthConnect.dart';
-import 'healthKit.dart';
+import 'data_conversion.dart';
+import 'data_retrieval.dart';
+
 
 void main() {
-  Widget appToRun;
+  runApp(const HealthPluginExampleApp());
+}
 
-  if (Platform.isAndroid) {
-    print("Running Android specific App");
-    appToRun = const HealthConnectApp();
+class HealthPluginExampleApp extends StatelessWidget {
+  const HealthPluginExampleApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Health Plugin Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      home: const ExperimentPage(),
+    );
+  }
+}
+
+class ExperimentPage extends StatefulWidget {
+  const ExperimentPage({super.key});
+
+  @override
+  State<ExperimentPage> createState() => _ExperimentPageState();
+}
+
+class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  DateTime _startDate = DateTime.now().subtract(const Duration(days: 7));
+  DateTime _endDate = DateTime.now();
+  bool _dataAvailable = false;
+  bool _isLoading = false;
+  Map<String, dynamic>? _data;
 
 
-  } else if (Platform.isIOS) {
-    print("Running iOS specific App");
-    appToRun = const HealthKitApp();
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
 
-  } else {
-    print("Unsupported platform: ${Platform.operatingSystem}");
-    appToRun = MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text("Unsupported Platform")),
-        body: Center(
-          child: Text("This application is designed for Android or iOS, but is running on ${Platform.operatingSystem}."),
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: isStartDate ? _startDate : _endDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStartDate) {
+          _startDate = picked;
+        } else {
+          _endDate = picked;
+        }
+      });
+    }
+  }
+
+  Future<void> _runExperiment() async {
+    if (_endDate.isBefore(_startDate)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('End date must be after start date')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+
+      if (platform.isAndroid) {
+
+      }
+
+      setState(() {
+        _dataAvailable = true;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error running experiment: ${e.toString()}')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Health Plugin Experiment'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(
+              icon: Icon(
+                Icons.storage,
+                color: _dataAvailable ? Colors.blue : Colors.grey,
+              ),
+              text: 'Data Retrieval',
+            ),
+            Tab(
+              icon: Icon(
+                Icons.transform,
+                color: _dataAvailable ? Colors.blue : Colors.grey,
+              ),
+              text: 'Conversion',
+            ),
+            Tab(
+              icon: Icon(
+                Icons.speed,
+                color: _dataAvailable ? Colors.blue : Colors.grey,
+              ),
+              text: 'Performance',
+            ),
+          ],
         ),
+      ),
+      body: Column(
+        children: [
+          // Experiment tabs content area
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                DataRetrievalModule(data: _data),
+                ConversionModule(data: _data),
+                PerformanceModule(data: _data),
+              ],
+            ),
+          ),
+
+          // Date selection and experiment controls
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildDateSelector(
+                        context,
+                        'Start Date',
+                        _startDate,
+                            () => _selectDate(context, true),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildDateSelector(
+                        context,
+                        'End Date',
+                        _endDate,
+                            () => _selectDate(context, false),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _runExperiment,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                      'Start Experiment',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: OutlinedButton.icon(
+                    onPressed: _dataAvailable ? () {
+                      // TODO: Implement export functionality
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Exporting results...')),
+                      );
+                    } : null,
+                    icon: const Icon(Icons.file_download),
+                    label: const Text('Export Results to File'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.blue,
+                      disabledForegroundColor: Colors.grey.shade400,
+                      side: BorderSide(
+                        color: _dataAvailable ? Colors.blue : Colors.grey.shade300,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  runApp(appToRun);
+  Widget _buildDateSelector(
+      BuildContext context,
+      String label,
+      DateTime date,
+      VoidCallback onTap,
+      ) {
+    final formattedDate = DateFormat('MMM dd, yyyy').format(date);
+
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+            Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 16),
+                const SizedBox(width: 8),
+                Text(
+                  formattedDate,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
