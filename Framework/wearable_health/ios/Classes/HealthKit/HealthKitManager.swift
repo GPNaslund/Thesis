@@ -44,6 +44,8 @@ public class HealthKitManager {
             checkAvailability(result: result)
         case .getData:
             dataHandler.getData(call: call, result: result)
+        case .redirectToPermissionsSettings:
+            permissionsHandler.redirectToPermissionsSettings(result: result)
         case .unknown:
             print("[HealthKitManager] Error - Unknown method call: \(call.method)")
             result(FlutterMethodNotImplemented)

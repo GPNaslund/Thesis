@@ -36,6 +36,6 @@ class TemperatureUnitValue extends Ieee1752Schema {
   /// Returns a map with keys 'value' and 'unit'.
   @override
   Map<String, dynamic> toJson() {
-    return {'value': value, 'unit': unit.toJson()};
+    return {'value': value, 'unit': unit.name };
   }
 }

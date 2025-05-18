@@ -46,6 +46,20 @@ class WearableHealthService {
     }
   }
 
+  Future<bool> redirectToPermissionsSettings() async {
+    if (_isAndroid) {
+      try {
+        return await _provider.redirectToPermissionsSettings();
+      } catch (e) {
+        debugPrint('⚠️ Failed to redirect to settings: $e');
+        return false;
+      }
+    } else {
+      debugPrint('ℹ️ redirectToPermissionsSettings is not supported on iOS.');
+      return false;
+    }
+  }
+
   Future<dynamic> getFirstRecordRaw(HealthMetric metric) async {
     final now = DateTime.now();
     final range = DateTimeRange(

@@ -63,9 +63,6 @@ class MockJsonConverter implements JsonConverter {
     Map<dynamic, dynamic> data,
     String errMsg,
   ) {
-    if (data == null) {
-      return {};
-    }
     return {'source': 'manual'};
   }
 

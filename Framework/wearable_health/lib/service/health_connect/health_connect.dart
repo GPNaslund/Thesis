@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wearable_health/constants.dart';
 import 'package:wearable_health/model/health_connect/enums/hc_availability.dart';
-import 'package:wearable_health/model/health_connect/hc_entities/heart_rate_variability_rmssd.dart';
 import 'package:wearable_health/service/converters/json/json_converter_interface.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health/service/health_connect/health_connect_interface.dart';
@@ -73,8 +72,13 @@ class HealthConnectImpl implements HealthConnect {
     return result;
   }
 
+  /// Retrieves raw health data for specified metrics within the given time range.
+  /// Returns a HealthData object containing the unprocessed data grouped by metric type.
   @override
-  Future<HealthData> getRawData(List<HealthConnectHealthMetric> metrics, DateTimeRange timeRange) async {
+  Future<HealthData> getRawData(
+    List<HealthConnectHealthMetric> metrics,
+    DateTimeRange timeRange,
+  ) async {
     final start = timeRange.start.toUtc().toIso8601String();
     final end = timeRange.end.toUtc().toIso8601String();
     List<String> types = [];
@@ -201,5 +205,20 @@ class HealthConnectImpl implements HealthConnect {
     }
 
     return HealthConnectAvailability.fromString(result);
+  }
+
+  @override
+  Future<bool> redirectToPermissionsSettings() async {
+    final result = await methodChannel.invokeMethod(
+      "$healthConnectPrefix/$redirectToPermissionsSettingsSuffix",
+    );
+
+    if (result == null) {
+      throw Exception(
+        "[HealthConnect] redirectToPermissionsSettings received null result",
+      );
+    }
+
+    return result;
   }
 }

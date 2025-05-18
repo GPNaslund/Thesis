@@ -37,6 +37,7 @@ class HKDataFactoryImpl implements HKDataFactory {
 
   /// Creates an HKHeartRateVariability object from JSON map data.
   /// Extracts and validates required fields for heart rate variability measurements.
+  @override
   HkHeartRateVariability createHeartRateVariability(Map<String, dynamic> data) {
     var errMsg = "Error occured when extracting hk heart rate variability data";
     var quantitySample = _createQuantitySample(data, errMsg);

@@ -20,9 +20,9 @@ abstract class HealthConnect {
   );
 
   Future<HealthData> getRawData(
-      List<HealthConnectHealthMetric> metrics,
-      DateTimeRange timeRange,
-      );
+    List<HealthConnectHealthMetric> metrics,
+    DateTimeRange timeRange,
+  );
 
   /// Gets the Android platform version.
   /// Useful for compatibility checks.
@@ -38,4 +38,5 @@ abstract class HealthConnect {
   /// Returns an availability status indicating if and how Health Connect can be accessed.
   Future<HealthConnectAvailability> checkHealthStoreAvailability();
 
+  Future<bool> redirectToPermissionsSettings();
 }
