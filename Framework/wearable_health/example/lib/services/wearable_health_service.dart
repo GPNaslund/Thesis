@@ -10,7 +10,6 @@ import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'metric_fetches/heart_rate.dart';
 import 'metric_fetches/heart_rate_variability.dart';
-import 'metric_fetches/skin_temperature.dart';
 
 /// Central service for interacting with the wearable_health plugin
 class WearableHealthService {
@@ -83,17 +82,6 @@ class WearableHealthService {
 
     final first = data.first;
     debugPrint('🧪 First record:\n${const JsonEncoder.withIndent('  ').convert(first)}');
-
-    if (metric == HealthMetric.skinTemperature &&
-        first is Map<String, dynamic> &&
-        first.containsKey('deltas')) {
-      final deltas = first['deltas'];
-      if (deltas is List && deltas.isNotEmpty) {
-        debugPrint('📏 First delta inside record:\n${const JsonEncoder.withIndent('  ').convert(deltas.first)}');
-      } else {
-        debugPrint('📭 No deltas found inside first record.');
-      }
-    }
 
     return first;
   }
@@ -182,13 +170,6 @@ class WearableHealthService {
         );
       case HealthMetric.heartRateVariability:
         return await fetchHeartRateVariabilityData(
-          provider: _provider,
-          isAndroid: _isAndroid,
-          range: range,
-          convert: convert,
-        );
-      case HealthMetric.skinTemperature:
-        return await fetchSkinTemperatureData(
           provider: _provider,
           isAndroid: _isAndroid,
           range: range,

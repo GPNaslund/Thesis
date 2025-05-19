@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
 import '../../../constants/metrics.dart';
 import '../../../constants/metrics_mapper.dart';
-import '../../../services/metric_handlers/skin_temperature.dart';
 import '../../../services/metric_handlers/heart_rate_variability.dart';
 import '../../../services/metric_handlers/heart_rate.dart';
-import '../../../services/metric_validators/open_m_health/skin_temperature.dart';
-import 'package:wearable_health/extensions/open_m_health/schemas/body_temperature.dart';
 import '../validation/validation_report_page.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate_variability.dart';
 import '../../../services/metric_validators/open_m_health/heart_rate_variability.dart';
@@ -31,7 +28,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   bool _isLoading = false;
   String _resultLabel = '';
   List<String> _fetchedResults = [];
-  List<OpenMHealthBodyTemperature> _parsedOpenMHealth = [];
   List<OpenMHealthHeartRateVariability> _parsedHRVOpenMHealth = [];
 
   Future<void> _pickDateTime({required bool isStart}) async {
@@ -91,24 +87,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         convert: _useConverter,
       );
 
-      if (widget.metric == HealthMetric.skinTemperature) {
-        if (_useConverter) {
-          _parsedOpenMHealth = data.cast<OpenMHealthBodyTemperature>();
-        }
-        _fetchedResults = handleSkinTemperatureData(
-          data: data,
-          range: range,
-          useConverter: _useConverter,
-          onStatusUpdate: (label) {
-            setState(() {
-              _resultLabel = label;
-            });
-          },
-        );
-        setState(() {});
-        return;
-      }
-
       if (widget.metric == HealthMetric.heartRateVariability) {
         if (_useConverter) {
           _parsedHRVOpenMHealth = data.cast<OpenMHealthHeartRateVariability>();
@@ -161,7 +139,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   void _clearConsole() {
     setState(() {
       _fetchedResults = [];
-      _parsedOpenMHealth = [];
       _resultLabel = '';
     });
   }
@@ -230,32 +207,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                         ),
                       ),
                       if (_useConverter) ...[
-                        if (widget.metric == HealthMetric.skinTemperature)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 12),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                final entry = _parsedOpenMHealth[actualIndex];
-                                final validator = SkinTemperatureValidator(
-                                  expectedRange: (_startDate != null && _endDate != null)
-                                      ? DateTimeRange(start: _startDate!, end: _endDate!)
-                                      : null,
-                                );
-                                final result = validator.validate(entry);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ValidationReportPage(
-                                      recordIndex: actualIndex,
-                                      result: result,
-                                      recordJson: entry.toJson(),
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text('Run Validation'),
-                            ),
-                          ),
                         if (widget.metric == HealthMetric.heartRateVariability)
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0, bottom: 12),
