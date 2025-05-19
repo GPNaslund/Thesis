@@ -1,5 +1,3 @@
-// lib/features/data_display/data_display_page.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
@@ -8,6 +6,11 @@ import '../../../constants/metrics_mapper.dart';
 import '../../../services/metric_handlers/skin_temperature.dart';
 import '../../../services/metric_handlers/heart_rate_variability.dart';
 import '../../../services/metric_handlers/heart_rate.dart';
+import '../../../services/metric_validators/open_m_health/skin_temperature.dart';
+import 'package:wearable_health/extensions/open_m_health/schemas/body_temperature.dart';
+import '../validation/validation_report_page.dart';
+import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate_variability.dart';
+import '../../../services/metric_validators/open_m_health/heart_rate_variability.dart';
 
 
 class DataDisplayPage extends StatefulWidget {
@@ -28,6 +31,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   bool _isLoading = false;
   String _resultLabel = '';
   List<String> _fetchedResults = [];
+  List<OpenMHealthBodyTemperature> _parsedOpenMHealth = [];
+  List<OpenMHealthHeartRateVariability> _parsedHRVOpenMHealth = [];
 
   Future<void> _pickDateTime({required bool isStart}) async {
     final now = DateTime.now();
@@ -86,8 +91,10 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         convert: _useConverter,
       );
 
-      // ✅ Delegated metric-specific filtering and formatting
       if (widget.metric == HealthMetric.skinTemperature) {
+        if (_useConverter) {
+          _parsedOpenMHealth = data.cast<OpenMHealthBodyTemperature>();
+        }
         _fetchedResults = handleSkinTemperatureData(
           data: data,
           range: range,
@@ -98,11 +105,14 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
             });
           },
         );
-        setState(() {}); // update the list
+        setState(() {});
         return;
       }
 
       if (widget.metric == HealthMetric.heartRateVariability) {
+        if (_useConverter) {
+          _parsedHRVOpenMHealth = data.cast<OpenMHealthHeartRateVariability>();
+        }
         _fetchedResults = handleHeartRateVariabilityData(
           data: data,
           range: range,
@@ -132,7 +142,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return;
       }
 
-      // Default fallback for other metrics (not yet handled modularly)
       setState(() {
         _fetchedResults = data.map((e) {
           return const JsonEncoder.withIndent('  ').convert(e);
@@ -152,6 +161,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   void _clearConsole() {
     setState(() {
       _fetchedResults = [];
+      _parsedOpenMHealth = [];
       _resultLabel = '';
     });
   }
@@ -174,16 +184,108 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ),
               ),
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400),
-                  borderRadius: BorderRadius.circular(4),
-                  color: Colors.grey.shade100,
-                ),
-                child: SingleChildScrollView(
-                  child: SelectableText(_fetchedResults.join('\n\n')),
-                ),
+              child: ListView.separated(
+                itemCount: _fetchedResults.length + (_fetchedResults.length > 1 ? 1 : 0),
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  if (_fetchedResults.length > 1 && index == 0) {
+                    final allJson = '[\n${_fetchedResults.join(',\n')}\n]';
+                    return ExpansionTile(
+                      tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      title: const Text(
+                        'All Records',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          color: Colors.grey.shade100,
+                          padding: const EdgeInsets.all(12),
+                          child: SelectableText(
+                            allJson,
+                            style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  final actualIndex = _fetchedResults.length > 1 ? index - 1 : index;
+                  final json = _fetchedResults[actualIndex];
+
+                  return ExpansionTile(
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    title: Text(
+                      'Record #${actualIndex + 1}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        color: Colors.grey.shade100,
+                        padding: const EdgeInsets.all(12),
+                        child: SelectableText(
+                          json,
+                          style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+                        ),
+                      ),
+                      if (_useConverter) ...[
+                        if (widget.metric == HealthMetric.skinTemperature)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0, bottom: 12),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                final entry = _parsedOpenMHealth[actualIndex];
+                                final validator = SkinTemperatureValidator(
+                                  expectedRange: (_startDate != null && _endDate != null)
+                                      ? DateTimeRange(start: _startDate!, end: _endDate!)
+                                      : null,
+                                );
+                                final result = validator.validate(entry);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ValidationReportPage(
+                                      recordIndex: actualIndex,
+                                      result: result,
+                                      recordJson: entry.toJson(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Text('Run Validation'),
+                            ),
+                          ),
+                        if (widget.metric == HealthMetric.heartRateVariability)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0, bottom: 12),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                final entry = _parsedHRVOpenMHealth[actualIndex];
+                                final validator = HeartRateVariabilityValidator(
+                                  expectedRange: (_startDate != null && _endDate != null)
+                                      ? DateTimeRange(start: _startDate!, end: _endDate!)
+                                      : null,
+                                );
+                                final result = validator.validate(entry);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ValidationReportPage(
+                                      recordIndex: actualIndex,
+                                      result: result,
+                                      recordJson: entry.toJson(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Text('Run Validation'),
+                            ),
+                          ),
+                      ],
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -214,7 +316,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _isLoading ? null : _fetchData,
               child: _isLoading
@@ -225,7 +326,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               )
                   : const Text('Fetch Data'),
             ),
-            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _clearConsole,
               child: const Text('Clear Console'),
@@ -320,7 +420,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               child: const Text('Fetch First OpenMHealth Record'),
             ),
             */
-            const SizedBox(height: 12),
             DropdownButton<bool>(
               isExpanded: true,
               value: _useConverter,

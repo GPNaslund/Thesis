@@ -41,16 +41,28 @@ List<String> handleSkinTemperatureData({
       range: range,
     );
 
+    final recordCount = filteredMap.values.fold(0, (total, list) => total + list.length);
+    final deltaCount = _countAllDeltas(filteredMap);
+
     results = [
       const JsonEncoder.withIndent('  ').convert(filteredMap),
     ];
 
-    onStatusUpdate('Fetched ${_countAllRecords(filteredMap)} record(s)');
+    onStatusUpdate('Fetched $recordCount internal record(s), $deltaCount delta(s)');
   }
 
   return results;
 }
 
-int _countAllRecords(Map<String, List<Map<String, dynamic>>> map) {
-  return map.values.fold(0, (total, list) => total + list.length);
+int _countAllDeltas(Map<String, List<Map<String, dynamic>>> map) {
+  int count = 0;
+  for (final recordList in map.values) {
+    for (final record in recordList) {
+      final deltas = record['deltas'];
+      if (deltas is List) {
+        count += deltas.length;
+      }
+    }
+  }
+  return count;
 }
