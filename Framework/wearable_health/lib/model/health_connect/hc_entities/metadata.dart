@@ -29,7 +29,7 @@ class HealthConnectMetadata {
   /// Creates a new metadata instance with the specified parameters.
   HealthConnectMetadata({
     this.clientRecordId,
-    required this.clientRecordVersion,
+    this.clientRecordVersion,
     required this.dataOrigin,
     this.device,
     required this.id,

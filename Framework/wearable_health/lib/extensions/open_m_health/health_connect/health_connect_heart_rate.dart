@@ -18,10 +18,8 @@ extension OpenMHealthHeartRateConverter on HealthConnectHeartRate {
         unit: "beatsPerMinute",
       );
 
-      TimeInterval timeInterval = TimeInterval(
-        startTime: startTime,
-        endTime: endTime,
-      );
+      TimeInterval timeInterval = TimeInterval(startTime: element.time);
+
       TimeFrame timeFrame = TimeFrame(timeInterval: timeInterval);
 
       result.add(

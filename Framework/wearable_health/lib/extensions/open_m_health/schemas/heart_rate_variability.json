@@ -1,0 +1,88 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "This schema represents a person's heart rate variability, which measures the variation in time intervals between consecutive heartbeats.",
+    "type": "object",
+    "references": [
+        {
+            "description": "The SNOMED code represents Heart rate variability (observable entity)",
+            "url": "http://purl.bioontology.org/ontology/SNOMEDCT/78639003"
+        }
+    ],
+    "definitions": {
+        "unit_value": {
+            "$ref": "unit-value-1.x.json"
+        },
+        "time_frame": {
+            "$ref": "time-frame-1.x.json"
+        },
+        "descriptive_statistic": {
+            "$ref": "descriptive-statistic-1.x.json"
+        },
+        "temporal_relationship_to_physical_activity": {
+            "$ref": "temporal-relationship-to-physical-activity-1.x.json"
+        },
+        "temporal_relationship_to_sleep": {
+            "$ref": "temporal-relationship-to-sleep-1.x.json"
+        },
+        "heart_rate_variability_algorithm": {
+            "type": "string",
+            "enum": ["RMSSD", "SDNN", "pNN50", "triangular_index", "HF", "LF", "LF_HF_ratio", "other"]
+        },
+        "heart_rate_variability_measurement_method": {
+            "type": "string",
+            "enum": ["ECG", "PPG", "other"]
+        }
+    },
+    "properties": {
+        "heart_rate_variability": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/unit_value"
+                },
+                {
+                    "properties": {
+                        "unit": {
+                            "enum": [
+                                "ms", "ms^2", "nu", "ratio", "%"
+                            ]
+                        }
+                    }
+                }
+            ],
+            "description": "The measured heart rate variability value with its unit."
+        },
+        "algorithm": {
+            "description": "The algorithm used to calculate the heart rate variability.",
+            "$ref": "#/definitions/heart_rate_variability_algorithm"
+        },
+        "algorithm_details": {
+            "type": "string",
+            "description": "Additional details about the algorithm used to calculate heart rate variability."
+        },
+        "measurement_method": {
+            "description": "The method used to measure the heart rate from which variability was calculated.",
+            "$ref": "#/definitions/heart_rate_variability_measurement_method"
+        },
+        "effective_time_frame": {
+            "$ref": "#/definitions/time_frame",
+            "description": "The time frame to which the heart rate variability measurement applies."
+        },
+        "descriptive_statistic": {
+            "$ref": "#/definitions/descriptive_statistic",
+            "description": "The descriptive statistic applied to heart rate variability measurements."
+        },
+        "temporal_relationship_to_physical_activity": {
+            "$ref": "#/definitions/temporal_relationship_to_physical_activity",
+            "description": "The relationship of the measurement to physical activity."
+        },
+        "temporal_relationship_to_sleep": {
+            "$ref": "#/definitions/temporal_relationship_to_sleep",
+            "description": "The relationship of the measurement to sleep."
+        }
+    },
+    "required": [
+        "heart_rate_variability",
+        "algorithm",
+        "effective_time_frame"
+    ]
+}

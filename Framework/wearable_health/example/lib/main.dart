@@ -1,10 +1,16 @@
+import 'dart:io';
+import "dart:developer";
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wearable_health/controller/wearable_health.dart';
+import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart';
+import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health_example/performance_module.dart';
 
 import 'data_conversion.dart';
 import 'data_retrieval.dart';
-
+import 'healthConnect.dart';
 
 void main() {
   runApp(const HealthPluginExampleApp());
@@ -17,10 +23,7 @@ class HealthPluginExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Health Plugin Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const ExperimentPage(),
     );
   }
@@ -33,14 +36,14 @@ class ExperimentPage extends StatefulWidget {
   State<ExperimentPage> createState() => _ExperimentPageState();
 }
 
-class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProviderStateMixin {
+class _ExperimentPageState extends State<ExperimentPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 7));
   DateTime _endDate = DateTime.now();
   bool _dataAvailable = false;
   bool _isLoading = false;
-  Map<String, dynamic>? _data;
-
+  Map<String, List<Map<String, dynamic>>>? _data;
 
   @override
   void initState() {
@@ -86,9 +89,10 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
     });
 
     try {
-
-      if (platform.isAndroid) {
-
+      if (Platform.isAndroid) {
+        await _fetchDataAndroid();
+      } else {
+        await _fetchDataIOS();
       }
 
       setState(() {
@@ -104,6 +108,40 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
         SnackBar(content: Text('Error running experiment: ${e.toString()}')),
       );
     }
+  }
+
+  _fetchDataAndroid() async {
+    var dataTypes = [
+      HealthConnectHealthMetric.heartRate,
+      HealthConnectHealthMetric.heartRateVariability,
+    ];
+    var sut = WearableHealth().getGoogleHealthConnect();
+    await sut.requestPermissions(dataTypes);
+    var result = await sut.getRawData(
+      dataTypes,
+      DateTimeRange(start: _startDate, end: _endDate),
+    );
+
+    setState(() {
+      _data = result.data;
+    });
+  }
+
+  _fetchDataIOS() async {
+    var dataTypes = [
+      HealthKitHealthMetric.heartRate,
+      HealthKitHealthMetric.heartRateVariability,
+    ];
+    var sut = WearableHealth().getAppleHealthKit();
+    await sut.requestPermissions(dataTypes);
+    var result = await sut.getRawData(
+      dataTypes,
+      DateTimeRange(start: _startDate, end: _endDate),
+    );
+
+    setState(() {
+      _data = result.data;
+    });
   }
 
   @override
@@ -175,7 +213,7 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
                         context,
                         'Start Date',
                         _startDate,
-                            () => _selectDate(context, true),
+                        () => _selectDate(context, true),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -184,7 +222,7 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
                         context,
                         'End Date',
                         _endDate,
-                            () => _selectDate(context, false),
+                        () => _selectDate(context, false),
                       ),
                     ),
                   ],
@@ -199,12 +237,15 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
                     ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                      'Start Experiment',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    child:
+                        _isLoading
+                            ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                            : const Text(
+                              'Start Experiment',
+                              style: TextStyle(fontSize: 16),
+                            ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -212,19 +253,25 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
                   width: double.infinity,
                   height: 40,
                   child: OutlinedButton.icon(
-                    onPressed: _dataAvailable ? () {
-                      // TODO: Implement export functionality
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Exporting results...')),
-                      );
-                    } : null,
+                    onPressed:
+                        _dataAvailable
+                            ? () {
+                              // TODO: Implement export functionality
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Exporting results...'),
+                                ),
+                              );
+                            }
+                            : null,
                     icon: const Icon(Icons.file_download),
                     label: const Text('Export Results to File'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.blue,
                       disabledForegroundColor: Colors.grey.shade400,
                       side: BorderSide(
-                        color: _dataAvailable ? Colors.blue : Colors.grey.shade300,
+                        color:
+                            _dataAvailable ? Colors.blue : Colors.grey.shade300,
                       ),
                     ),
                   ),
@@ -238,11 +285,11 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
   }
 
   Widget _buildDateSelector(
-      BuildContext context,
-      String label,
-      DateTime date,
-      VoidCallback onTap,
-      ) {
+    BuildContext context,
+    String label,
+    DateTime date,
+    VoidCallback onTap,
+  ) {
     final formattedDate = DateFormat('MMM dd, yyyy').format(date);
 
     return InkWell(
@@ -258,19 +305,13 @@ class _ExperimentPageState extends State<ExperimentPage> with SingleTickerProvid
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Row(
               children: [
                 const Icon(Icons.calendar_today, size: 16),
                 const SizedBox(width: 8),
-                Text(
-                  formattedDate,
-                  style: const TextStyle(fontSize: 16),
-                ),
+                Text(formattedDate, style: const TextStyle(fontSize: 16)),
               ],
             ),
           ],
