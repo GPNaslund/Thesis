@@ -1,5 +1,3 @@
-// lib/services/metric_validators/open_m_health/heart_rate_variability.dart
-
 import 'package:flutter/material.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate_variability.dart';
 import '../metric_validator.dart';
@@ -25,47 +23,61 @@ class HeartRateVariabilityValidator extends MetricValidator<OpenMHealthHeartRate
     final algorithm = entry.algorithm;
     final time = entry.effectiveTimeFrame.dateTime;
 
-    // --- Check HRV value ---
-    if (hrv == null || hrv.value == null || hrv.value is! num) {
+    // === Validating keys ===
+    final keyChecks = <String, dynamic>{};
+    keyChecks['"heartRateVariability" key exists'] = hrv != null;
+    keyChecks['"value" key exists'] = hrv?.value != null;
+    keyChecks['"unit" key exists'] = hrv?.unit != null;
+    keyChecks['"algorithm" key exists'] = algorithm != null;
+    keyChecks['"effectiveTimeFrame" key exists'] = entry.effectiveTimeFrame != null;
+    keyChecks['"date_time" key exists'] = time != null;
+
+    // === Validating values ===
+    final valueChecks = <String, dynamic>{};
+    valueChecks['"value" value'] = hrv?.value;
+    valueChecks['"unit" value'] = hrv?.unit;
+    valueChecks['"algorithm" value'] = algorithm;
+    valueChecks['"date_time" value'] = time?.toIso8601String();
+
+    if (hrv?.value == null || hrv?.value is! num) {
       problems.add('Missing or invalid heartRateVariability value');
     } else {
-      final val = hrv.value!;
-      details['value'] = val;
+      final val = hrv!.value!;
       if (val < 5 || val > 250) {
         problems.add('Suspicious HRV value: $val');
       }
     }
 
-    // --- Check unit ---
-    final unit = hrv?.unit;
-    details['unit'] = unit;
-    if (unit != 'hrv/ms') {
-      problems.add('Unexpected unit: $unit');
+    if (hrv?.unit != 'hrv/ms') {
+      problems.add('Unexpected unit: ${hrv?.unit}');
     }
 
-    // --- Check algorithm ---
     if (algorithm == null) {
       problems.add('Missing algorithm field');
     }
-    details['algorithm'] = algorithm;
 
-    // --- Check timestamp ---
+    // === Validating record ===
+    final recordChecks = <String, dynamic>{};
+
     if (time == null) {
       problems.add('Missing effectiveTimeFrame.dateTime');
     } else {
       final iso = time.toIso8601String();
-      details['timestamp'] = iso;
+      final isDuplicate = _timestampsSeen.contains(iso);
+      recordChecks['Record is not a duplicate'] = !isDuplicate;
 
-      if (_timestampsSeen.contains(iso)) {
+      if (isDuplicate) {
         problems.add('Duplicate timestamp: $iso');
       } else {
         _timestampsSeen.add(iso);
       }
 
-      if (expectedRange != null) {
-        if (time.isBefore(expectedRange!.start) || time.isAfter(expectedRange!.end)) {
-          problems.add('Timestamp outside expected range');
-        }
+      final inRange = expectedRange == null ||
+          (!time.isBefore(expectedRange!.start) && !time.isAfter(expectedRange!.end));
+      recordChecks['Is record within fetched time range'] = inRange;
+
+      if (!inRange) {
+        problems.add('Timestamp outside expected range');
       }
     }
 
@@ -73,8 +85,10 @@ class HeartRateVariabilityValidator extends MetricValidator<OpenMHealthHeartRate
       isValid: problems.isEmpty,
       summary: problems.isEmpty ? 'Valid HRV record' : 'Validation issues found',
       details: {
+        'Validating keys': keyChecks,
+        'Validating values': valueChecks,
+        'Validating record': recordChecks,
         'problems': problems,
-        ...details,
       },
     );
   }

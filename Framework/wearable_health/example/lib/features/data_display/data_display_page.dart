@@ -8,6 +8,9 @@ import '../../../services/metric_handlers/heart_rate.dart';
 import '../validation/validation_report_page.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate_variability.dart';
 import '../../../services/metric_validators/open_m_health/heart_rate_variability.dart';
+import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate.dart';
+import '../../../services/metric_validators/open_m_health/heart_rate.dart';
+
 
 
 class DataDisplayPage extends StatefulWidget {
@@ -29,6 +32,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   String _resultLabel = '';
   List<String> _fetchedResults = [];
   List<OpenMHealthHeartRateVariability> _parsedHRVOpenMHealth = [];
+  List<OpenMHealthHeartRate> _parsedHeartRateOpenMHealth = [];
 
   Future<void> _pickDateTime({required bool isStart}) async {
     final now = DateTime.now();
@@ -106,6 +110,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       }
 
       if (widget.metric == HealthMetric.heartRate) {
+        if (_useConverter) {
+          _parsedHeartRateOpenMHealth = data.cast<OpenMHealthHeartRate>();
+        }
         _fetchedResults = handleHeartRateData(
           data: data,
           range: range,
@@ -233,6 +240,32 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                               child: const Text('Run Validation'),
                             ),
                           ),
+                        if (widget.metric == HealthMetric.heartRate)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0, bottom: 12),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                final entry = _parsedHeartRateOpenMHealth[actualIndex];
+                                final validator = HeartRateValidator(
+                                  expectedRange: (_startDate != null && _endDate != null)
+                                      ? DateTimeRange(start: _startDate!, end: _endDate!)
+                                      : null,
+                                );
+                                final result = validator.validate(entry);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ValidationReportPage(
+                                      recordIndex: actualIndex,
+                                      result: result,
+                                      recordJson: entry.toJson(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Text('Run Validation'),
+                            ),
+                          ),
                       ],
                     ],
                   );
@@ -281,96 +314,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               onPressed: _clearConsole,
               child: const Text('Clear Console'),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                  _resultLabel = 'Fetching first record...';
-                });
-
-                try {
-                  final record = await _wearableHealthService.getFirstRecordRaw(widget.metric);
-                  setState(() {
-                    _fetchedResults = [
-                      if (record != null)
-                        const JsonEncoder.withIndent('  ').convert(record)
-                      else
-                        'No data found.',
-                    ];
-                    _resultLabel = record != null ? 'Fetched 1 record' : 'No record found';
-                  });
-                } catch (e) {
-                  setState(() {
-                    _fetchedResults = ['Error: $e'];
-                    _resultLabel = 'Error occurred';
-                  });
-                } finally {
-                  setState(() => _isLoading = false);
-                }
-              },
-              child: const Text('Fetch First Record'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                  _resultLabel = 'Fetching OpenMHealth records...';
-                });
-
-                try {
-                  final records = await _wearableHealthService.getAllOpenMHealthRecords(widget.metric); // or .getAllOpenMHealthJsonStrings()
-
-                  setState(() {
-                    _fetchedResults = records.isNotEmpty
-                        ? records.map((r) => const JsonEncoder.withIndent('  ').convert(r.toJson())).toList()
-                        : ['No OpenMHealth data found.'];
-
-                    _resultLabel = records.isNotEmpty
-                        ? 'Fetched ${records.length} OpenMHealth record(s)'
-                        : 'No records found';
-                  });
-                } catch (e) {
-                  setState(() {
-                    _fetchedResults = ['⚠️ Error while fetching records: $e'];
-                    _resultLabel = 'Fetch failed';
-                  });
-                } finally {
-                  setState(() {
-                    _isLoading = false;
-                  });
-                }
-              }, child: const Text('Fetch First OpenMHealth Record'),
-            ),
-            /* ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                  _resultLabel = 'Fetching first OpenMHealth record...';
-                });
-
-                try {
-                  final record = await _wearableHealthService.getFirstOpenMHealthRecord(widget.metric);
-                  setState(() {
-                    _fetchedResults = [
-                      if (record != null)
-                        const JsonEncoder.withIndent('  ').convert(record.toJson())
-                      else
-                        'No OpenMHealth data found.',
-                    ];
-                    _resultLabel = record != null ? 'Fetched 1 OpenMHealth record' : 'No record found';
-                  });
-                } catch (e) {
-                  setState(() {
-                    _fetchedResults = ['Error: $e'];
-                    _resultLabel = 'Error occurred';
-                  });
-                } finally {
-                  setState(() => _isLoading = false);
-                }
-              },
-              child: const Text('Fetch First OpenMHealth Record'),
-            ),
-            */
             DropdownButton<bool>(
               isExpanded: true,
               value: _useConverter,

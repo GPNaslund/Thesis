@@ -5,7 +5,7 @@ import '../../../services/metric_validators/metric_validator.dart';
 class ValidationReportPage extends StatelessWidget {
   final int recordIndex;
   final ValidationResult result;
-  final Map<String, dynamic> recordJson; // Make it generic
+  final Map<String, dynamic> recordJson;
 
   const ValidationReportPage({
     super.key,
@@ -16,15 +16,17 @@ class ValidationReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final problems = result.details?['problems'] as List? ?? [];
+    final problems = (result.details?['problems'] as List?)?.cast<String>() ?? [];
+    final messages = (result.details?['messages'] as List?)?.cast<String>() ?? [];
     final details = Map<String, dynamic>.from(result.details ?? {});
-    details.remove('problems'); // Exclude 'problems' from checks
+    details.remove('problems');
+    details.remove('messages');
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Validation Report – Record #${recordIndex + 1}'),
       ),
-      body: Padding(
+      body: SingleChildScrollView( // ✅ Enables scrolling
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,22 +46,43 @@ class ValidationReportPage extends StatelessWidget {
             const SizedBox(height: 16),
             Text('Checks:', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            ...details.entries.map((entry) {
-              final key = entry.key;
-              final value = entry.value;
-              final passed = !problems.any((p) => p.toString().toLowerCase().contains(key.toLowerCase()));
+            ...details.entries.expand((entry) {
+              final section = entry.key;
+              final sectionData = entry.value;
 
-              return _buildCheckTile(
-                title: key,
-                result: passed,
-                detail: (value is bool) ? '' : '$value',
-              );
+              if (sectionData is Map<String, dynamic>) {
+                return [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0, bottom: 4),
+                    child: Text('$section:', style: Theme.of(context).textTheme.titleSmall),
+                  ),
+                  ...sectionData.entries.map((check) {
+                    final checkKey = check.key;
+                    final checkVal = check.value;
+                    final passed = !problems.contains(checkKey);
+                    return _buildCheckTile(
+                      title: checkKey,
+                      result: passed,
+                      detail: '$checkVal',
+                    );
+                  }),
+                ];
+              } else {
+                final passed = !problems.contains(section);
+                return [
+                  _buildCheckTile(
+                    title: section,
+                    result: passed,
+                    detail: sectionData.toString(),
+                  )
+                ];
+              }
             }),
-            if (problems.isNotEmpty) ...[
+            if (messages.isNotEmpty) ...[
               const SizedBox(height: 16),
               Text('Issues:', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
-              ...problems.map((p) => Text('- $p')),
+              ...messages.map((msg) => Text('- $msg')),
             ],
           ],
         ),
@@ -83,7 +106,11 @@ class ValidationReportPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCheckTile({required String title, required bool result, required String detail}) {
+  Widget _buildCheckTile({
+    required String title,
+    required bool result,
+    required String detail,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
