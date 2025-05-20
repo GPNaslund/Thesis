@@ -12,10 +12,8 @@ import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate_vari
 import '../../../services/metric_validators/open_m_health/heart_rate_variability.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate.dart';
 import '../../../services/metric_validators/open_m_health/heart_rate.dart';
-import '../../../services/metric_validators/metric_validator.dart';
 import '../validation/validation_report_all_page.dart';
-
-
+import '../../../services/metric_filters/heart_rate.dart';
 
 class DataDisplayPage extends StatefulWidget {
   final HealthMetric metric;
@@ -120,7 +118,11 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
       if (widget.metric == HealthMetric.heartRate) {
         if (_useConverter) {
-          _parsedHeartRateOpenMHealth = data.cast<OpenMHealthHeartRate>();
+          final filtered = filterOpenMHealthHeartRate(
+            entries: data.cast<OpenMHealthHeartRate>(),
+            range: range,
+          );
+          _parsedHeartRateOpenMHealth = filtered; // ← filtered list only
         } else {
           _parsedHeartRateOpenMHealth = [];
         }
@@ -159,40 +161,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       _fetchedResults = [];
       _resultLabel = '';
     });
-  }
-
-  ValidationResult _combineResults(List<ValidationResult> results) {
-    final allProblems = <String>{};
-    final allMessages = <String>[];
-    final detailSections = <String, dynamic>{};
-
-    for (var i = 0; i < results.length; i++) {
-      final res = results[i];
-      final prefix = 'Record #${i + 1}';
-
-      final localProblems = (res.details?['problems'] as List?)?.cast<String>() ?? [];
-      final localMessages = (res.details?['messages'] as List?)?.cast<String>() ?? [];
-
-      allProblems.addAll(localProblems);
-      allMessages.addAll(localMessages);
-
-      for (var key in res.details?.keys ?? []) {
-        if (key == 'problems' || key == 'messages') continue;
-        detailSections['$prefix – $key'] = res.details?[key];
-      }
-    }
-
-    return ValidationResult(
-      isValid: allProblems.isEmpty,
-      summary: allProblems.isEmpty
-          ? 'All records are valid'
-          : '${results.where((r) => !r.isValid).length} record(s) had issues',
-      details: {
-        ...detailSections,
-        'problems': allProblems.toList(),
-        'messages': allMessages,
-      },
-    );
   }
 
   @override
@@ -241,9 +209,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             padding: const EdgeInsets.only(top: 8.0, bottom: 12),
                             child: ElevatedButton(
                               onPressed: () {
-                                DateTimeRange? range = (_startDate != null && _endDate != null)
-                                    ? DateTimeRange(start: _startDate!, end: _endDate!)
-                                    : null;
+                                final DateTimeRange range = DateTimeRange(start: _startDate!, end: _endDate!);
 
                                 if (widget.metric == HealthMetric.heartRateVariability) {
                                   final validator = HeartRateVariabilityValidator(expectedRange: range);
@@ -263,14 +229,18 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
                                 if (widget.metric == HealthMetric.heartRate) {
                                   final validator = HeartRateValidator(expectedRange: range);
-                                  final results = validator.validateAll(_parsedHeartRateOpenMHealth);
+                                  final filtered = filterOpenMHealthHeartRate(
+                                    entries: _parsedHeartRateOpenMHealth,
+                                    range: range,
+                                  );
+                                  final results = validator.validateAll(filtered);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => ValidationReportAllPage(
                                         results: results,
                                         recordJson: {
-                                          'records': _parsedHeartRateOpenMHealth.map((e) => e.toJson()).toList(),
+                                          'records': filtered.map((e) => e.toJson()).toList(),
                                         },
                                       ),
                                     ),

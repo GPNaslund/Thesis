@@ -9,15 +9,15 @@ List<OpenMHealthHeartRate> filterOpenMHealthHeartRate({
   required DateTimeRange range,
 }) {
   final filtered = entries.where((entry) {
-    final start = entry.effectiveTimeFrame.timeInterval?.startDateTime;
-    return start != null &&
-        start.isAfter(range.start) &&
-        start.isBefore(range.end);
+    final point = entry.effectiveTimeFrame.dateTime;
+    return point != null &&
+        point.isAfter(range.start) &&
+        point.isBefore(range.end);
   }).toList();
 
   filtered.sort((a, b) {
-    final t1 = a.effectiveTimeFrame.timeInterval?.startDateTime;
-    final t2 = b.effectiveTimeFrame.timeInterval?.startDateTime;
+    final t1 = a.effectiveTimeFrame.dateTime;
+    final t2 = b.effectiveTimeFrame.dateTime;
     if (t1 == null || t2 == null) return 0;
     return t1.compareTo(t2);
   });
