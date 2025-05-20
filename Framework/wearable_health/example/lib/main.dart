@@ -1,16 +1,17 @@
 import 'dart:io';
-import "dart:developer";
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wearable_health/controller/wearable_health.dart';
 import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart';
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
+import 'package:wearable_health/service/converters/json/json_converter.dart';
+import 'package:wearable_health/service/health_connect/data_factory.dart';
+import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health_example/performance_module.dart';
 
 import 'data_conversion.dart';
 import 'data_retrieval.dart';
-import 'healthConnect.dart';
 
 void main() {
   runApp(const HealthPluginExampleApp());
@@ -44,11 +45,14 @@ class _ExperimentPageState extends State<ExperimentPage>
   bool _dataAvailable = false;
   bool _isLoading = false;
   Map<String, List<Map<String, dynamic>>>? _data;
+  late HCDataFactory hcDataFactory;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    var jsonConverter = JsonConverterImpl();
+    hcDataFactory = HCDataFactoryImpl(jsonConverter);
   }
 
   @override
@@ -184,7 +188,7 @@ class _ExperimentPageState extends State<ExperimentPage>
               controller: _tabController,
               children: [
                 DataRetrievalModule(data: _data),
-                ConversionModule(data: _data),
+                ConversionModule(data: _data, hcDataFactory: hcDataFactory),
                 PerformanceModule(data: _data),
               ],
             ),

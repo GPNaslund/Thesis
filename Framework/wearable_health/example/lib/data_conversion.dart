@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health_example/hc_heart_rate_conversion_validation.dart';
+import 'package:wearable_health_example/hc_heart_rate_variability_conversion_validation.dart';
 import 'package:wearable_health_example/placeholder.dart';
 
 class ConversionModule extends StatelessWidget {
@@ -21,7 +22,7 @@ class ConversionModule extends StatelessWidget {
     var validConversionHR = 0;
     var validConversionHRV = 0;
 
-    data.forEach((key, value) {
+    data!.forEach((key, value) {
       if (value is! List<dynamic>) {
         print("value was not a List, got: ${value.runtimeType}");
       }
@@ -34,7 +35,27 @@ class ConversionModule extends StatelessWidget {
           }
         }
       }
+
+      if (key == HealthConnectHealthMetric.heartRateVariability.definition) {
+        for (final element in value) {
+          var isValid = isValidHeartRateVariabilityConversion(
+            element,
+            hcDataFactory,
+          );
+          amountHRV += 1;
+          if (isValid) {
+            validConversionHRV += 1;
+          }
+        }
+      }
     });
+
+    return ConversionValidityResults(
+      amountHR,
+      validConversionHR,
+      amountHRV,
+      validConversionHRV,
+    );
   }
 
   @override
@@ -45,6 +66,15 @@ class ConversionModule extends StatelessWidget {
         icon: Icons.transform,
       );
     } else {
+      var result = performConversionValidation();
+      var totalAmountOfRecords =
+          result.totalAmountOfHeartRateObjects +
+          result.totalAmountOfHeartRateVariabilityObjects;
+      var totalValidated =
+          result.correctlyConvertedHeartRateObjects +
+          result.correctlyConvertedHeartRateVariabilityObjects;
+      var accuracyPercentage = totalValidated / totalAmountOfRecords * 100;
+
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -52,13 +82,19 @@ class ConversionModule extends StatelessWidget {
             const Icon(Icons.transform, size: 64, color: Colors.green),
             const SizedBox(height: 16),
             Text(
-              'Conversion Module\nAccuracy: ${(data!['accuracyRate'] * 100).toStringAsFixed(1)}%',
+              'Conversion Module\nAccuracy: ${accuracyPercentage.toStringAsFixed(1)}%',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'This is a placeholder for the full Conversion Module widget\nthat would be implemented in a separate file.',
+              "Got ${result.totalAmountOfHeartRateObjects} amount of heart rate records. ${result.correctlyConvertedHeartRateObjects} got validated.",
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Got ${result.totalAmountOfHeartRateVariabilityObjects} amount of heart rate variability records. ${result.correctlyConvertedHeartRateVariabilityObjects} got validated.",
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               textAlign: TextAlign.center,
             ),
