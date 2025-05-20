@@ -1,3 +1,5 @@
+// lib/features/data_display/data_display_page.dart
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../services/wearable_health_service.dart';
@@ -10,6 +12,8 @@ import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate_vari
 import '../../../services/metric_validators/open_m_health/heart_rate_variability.dart';
 import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate.dart';
 import '../../../services/metric_validators/open_m_health/heart_rate.dart';
+import '../../../services/metric_validators/metric_validator.dart';
+import '../validation/validation_report_all_page.dart';
 
 
 
@@ -77,6 +81,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       return;
     }
 
+    _parsedHRVOpenMHealth.clear();
+    _parsedHeartRateOpenMHealth.clear();
+
     setState(() {
       _isLoading = true;
       _resultLabel = 'Fetching data...';
@@ -94,6 +101,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       if (widget.metric == HealthMetric.heartRateVariability) {
         if (_useConverter) {
           _parsedHRVOpenMHealth = data.cast<OpenMHealthHeartRateVariability>();
+        } else {
+          _parsedHRVOpenMHealth = [];
         }
         _fetchedResults = handleHeartRateVariabilityData(
           data: data,
@@ -112,6 +121,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       if (widget.metric == HealthMetric.heartRate) {
         if (_useConverter) {
           _parsedHeartRateOpenMHealth = data.cast<OpenMHealthHeartRate>();
+        } else {
+          _parsedHeartRateOpenMHealth = [];
         }
         _fetchedResults = handleHeartRateData(
           data: data,
@@ -150,6 +161,40 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     });
   }
 
+  ValidationResult _combineResults(List<ValidationResult> results) {
+    final allProblems = <String>{};
+    final allMessages = <String>[];
+    final detailSections = <String, dynamic>{};
+
+    for (var i = 0; i < results.length; i++) {
+      final res = results[i];
+      final prefix = 'Record #${i + 1}';
+
+      final localProblems = (res.details?['problems'] as List?)?.cast<String>() ?? [];
+      final localMessages = (res.details?['messages'] as List?)?.cast<String>() ?? [];
+
+      allProblems.addAll(localProblems);
+      allMessages.addAll(localMessages);
+
+      for (var key in res.details?.keys ?? []) {
+        if (key == 'problems' || key == 'messages') continue;
+        detailSections['$prefix – $key'] = res.details?[key];
+      }
+    }
+
+    return ValidationResult(
+      isValid: allProblems.isEmpty,
+      summary: allProblems.isEmpty
+          ? 'All records are valid'
+          : '${results.where((r) => !r.isValid).length} record(s) had issues',
+      details: {
+        ...detailSections,
+        'problems': allProblems.toList(),
+        'messages': allMessages,
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,6 +219,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 itemBuilder: (context, index) {
                   if (_fetchedResults.length > 1 && index == 0) {
                     final allJson = '[\n${_fetchedResults.join(',\n')}\n]';
+
                     return ExpansionTile(
                       tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       title: const Text(
@@ -190,6 +236,50 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
                           ),
                         ),
+                        if (_useConverter)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0, bottom: 12),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                DateTimeRange? range = (_startDate != null && _endDate != null)
+                                    ? DateTimeRange(start: _startDate!, end: _endDate!)
+                                    : null;
+
+                                if (widget.metric == HealthMetric.heartRateVariability) {
+                                  final validator = HeartRateVariabilityValidator(expectedRange: range);
+                                  final results = validator.validateAll(_parsedHRVOpenMHealth);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ValidationReportAllPage(
+                                        results: results,
+                                        recordJson: {
+                                          'records': _parsedHRVOpenMHealth.map((e) => e.toJson()).toList(),
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                if (widget.metric == HealthMetric.heartRate) {
+                                  final validator = HeartRateValidator(expectedRange: range);
+                                  final results = validator.validateAll(_parsedHeartRateOpenMHealth);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ValidationReportAllPage(
+                                        results: results,
+                                        recordJson: {
+                                          'records': _parsedHeartRateOpenMHealth.map((e) => e.toJson()).toList(),
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Text('Run Validation for All'),
+                            ),
+                          ),
                       ],
                     );
                   }

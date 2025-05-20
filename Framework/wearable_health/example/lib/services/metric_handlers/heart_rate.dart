@@ -23,7 +23,7 @@ List<String> handleHeartRateData({
       return const JsonEncoder.withIndent('  ').convert(entry.toJson());
     }).toList();
 
-    onStatusUpdate('Fetched ${results.length} entries');
+    onStatusUpdate('Fetched ${results.length} Open mHealth records');
   } else {
     final filteredMap = filterRawHeartRate(
       rawEntries: data,
@@ -34,7 +34,7 @@ List<String> handleHeartRateData({
       const JsonEncoder.withIndent('  ').convert(filteredMap),
     ];
 
-    onStatusUpdate('Fetched ${_countAllRecords(filteredMap)} record(s)');
+    onStatusUpdate('Fetched ${results.length} raw entry with ${_countAllRecords(filteredMap)} record(s)');
   }
 
   return results;

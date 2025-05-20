@@ -1,3 +1,5 @@
+// lib/features/validation_validation_report_page.dart
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../services/metric_validators/metric_validator.dart';
@@ -26,7 +28,7 @@ class ValidationReportPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Validation Report – Record #${recordIndex + 1}'),
       ),
-      body: SingleChildScrollView( // ✅ Enables scrolling
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
