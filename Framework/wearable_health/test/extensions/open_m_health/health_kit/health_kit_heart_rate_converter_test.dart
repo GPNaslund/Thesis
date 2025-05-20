@@ -72,12 +72,8 @@ void main() {
       final result = hkHeartRate.toOpenMHealthHeartRate();
 
       expect(
-        result[0].effectiveTimeFrame.timeInterval!.startDateTime,
+        result[0].effectiveTimeFrame.dateTime,
         equals(startTime),
-      );
-      expect(
-        result[0].effectiveTimeFrame.timeInterval!.endDateTime,
-        equals(endTime),
       );
     });
 
