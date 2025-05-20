@@ -19,8 +19,8 @@ extension OpenMHealthHeartRateConverter on HealthConnectHeartRate {
       );
 
       TimeInterval timeInterval = TimeInterval(
-        startTime: startTime,
-        endTime: endTime,
+        startTime: element.time,
+        endTime: element.time,
       );
       TimeFrame timeFrame = TimeFrame(timeInterval: timeInterval);
 
