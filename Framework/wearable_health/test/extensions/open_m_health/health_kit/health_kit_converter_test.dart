@@ -129,17 +129,8 @@ void main() {
       );
       expect(
         (result[0] as OpenMHealthHeartRate)
-            .effectiveTimeFrame
-            .timeInterval!
-            .startDateTime,
+            .effectiveTimeFrame.dateTime,
         equals(startTime),
-      );
-      expect(
-        (result[0] as OpenMHealthHeartRate)
-            .effectiveTimeFrame
-            .timeInterval!
-            .endDateTime,
-        equals(endTime),
       );
     });
 

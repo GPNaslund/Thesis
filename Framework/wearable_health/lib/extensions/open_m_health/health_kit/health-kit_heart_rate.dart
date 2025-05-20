@@ -19,12 +19,7 @@ extension OpenMHealthHeartRateConverter on HKHeartRate {
       unit: "beatsPerMinute",
     );
 
-    var timeInterval = TimeInterval(
-      startTime: data.startDate,
-      endTime: data.endDate,
-    );
-
-    var timeFrame = TimeFrame(timeInterval: timeInterval);
+    var timeFrame = TimeFrame(dateTime: data.startDate);
 
     result.add(
       OpenMHealthHeartRate(heartRate: unitValue, effectiveTimeFrame: timeFrame),

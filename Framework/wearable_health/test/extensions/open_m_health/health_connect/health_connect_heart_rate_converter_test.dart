@@ -50,7 +50,7 @@ void main() {
       expect(result[2].heartRate.value, equals(78));
 
       for (final item in result) {
-        expect(item.heartRate.unit, equals("beatsPerMinute"));
+        expect(item.heartRate.unit, equals("beats/min"));
       }
     });
 
@@ -59,14 +59,10 @@ void main() {
       () {
         final result = sampleHeartRateData.toOpenMHealthHeartRate();
 
-        for (final item in result) {
+        for (var i = 0; i < result.length; i++) {
           expect(
-            item.effectiveTimeFrame.timeInterval!.startDateTime,
-            equals(sampleHeartRateData.startTime),
-          );
-          expect(
-            item.effectiveTimeFrame.timeInterval!.endDateTime,
-            equals(sampleHeartRateData.endTime),
+            result[i].effectiveTimeFrame.dateTime,
+            equals(sampleHeartRateData.samples[i].time),
           );
         }
       },
