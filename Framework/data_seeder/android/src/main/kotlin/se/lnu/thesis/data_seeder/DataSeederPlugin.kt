@@ -21,7 +21,6 @@ import kotlinx.coroutines.withContext
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.HeartRateVariabilityRmssdRecord
-import androidx.health.connect.client.records.SkinTemperatureRecord
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import java.time.Duration
 import java.time.Instant
@@ -54,7 +53,6 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private val permissions = setOf(
         HealthPermission.getWritePermission(HeartRateRecord::class),
-        HealthPermission.getWritePermission(SkinTemperatureRecord::class),
         HealthPermission.getWritePermission(HeartRateVariabilityRmssdRecord::class),
     )
 
@@ -64,7 +62,6 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         private val SAMPLE_INTERVAL: Duration = Duration.ofMinutes(1)
 
         private const val CLIENT_ID_PREFIX_HR = "SEEDER_HR_"
-        private const val CLIENT_ID_PREFIX_SKIN_TEMP = "SEEDER_SKINTEMP_"
         private const val CLIENT_ID_PREFIX_HRV = "SEEDER_HRV_"
 
         private const val BASE_BPM = 70L
@@ -107,13 +104,10 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         pluginScope.launch {
             Log.d("DataSeederPlugin", "seedData called")
             val heartRateData = generateHistoricalHeartRateData()
-            val skinTempData = generateHistoricalSkinTemperatureData()
             val heartRateVariabilityData = generateHistoricalHeartRateVariabilityData()
             try {
                 Log.d("DataSeederPlugin", "Inserting heart rate data..")
                 healthConnectClient.insertRecords(heartRateData)
-                Log.d("DataSeederPlugin", "Inserting skin temperature data..")
-                healthConnectClient.insertRecords(skinTempData)
                 Log.d("DataSeederPlugin", "Inserting heart rate variability data...")
                 healthConnectClient.insertRecords(heartRateVariabilityData)
                 Log.d("DataSeederPlugin", "Data inserted")
@@ -176,67 +170,6 @@ class DataSeederPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             recordStartTime = recordEndTime
         }
         Log.d("DataSeederPlugin", "Generated ${records.size} heart rate records.")
-        return records
-    }
-
-    private fun generateHistoricalSkinTemperatureData(): List<SkinTemperatureRecord> {
-        Log.d("DataSeederPlugin", "Generating historical skin temperature data...")
-        val records = mutableListOf<SkinTemperatureRecord>()
-        val overallEndTime = Instant.now()
-        val overallStartTime = overallEndTime.minus(GENERATION_PERIOD_DAYS, ChronoUnit.DAYS)
-
-        var recordStartTime = overallStartTime
-        val systemZoneId = ZoneOffset.systemDefault()
-        val rules = systemZoneId.rules
-        val baselineTemp = Temperature.celsius(BASELINE_TEMP_CELSIUS)
-
-        while (recordStartTime.isBefore(overallEndTime)) {
-            val recordEndTime = recordStartTime.plus(RECORD_INTERVAL_AND_DURATION).let {
-                if (it.isAfter(overallEndTime)) overallEndTime else it
-            }
-
-            if (recordStartTime == recordEndTime || Duration.between(recordStartTime, recordEndTime) <= SAMPLE_INTERVAL) {
-                if (recordStartTime.isAfter(overallEndTime)) break
-                recordStartTime = recordEndTime
-                continue
-            }
-
-            val deltas = mutableListOf<SkinTemperatureRecord.Delta>()
-            var sampleTime = recordStartTime.plus(SAMPLE_INTERVAL)
-
-            while (sampleTime.isBefore(recordEndTime)) {
-                val minuteOfHour = sampleTime.atZone(systemZoneId).minute
-                val deltaValue = BASE_DELTA_TEMP_CELSIUS + (minuteOfHour * 0.005)
-                val deltaTemp = TemperatureDelta.celsius(deltaValue)
-
-                deltas.add(
-                    SkinTemperatureRecord.Delta(
-                        time = sampleTime,
-                        delta = deltaTemp
-                    )
-                )
-                sampleTime = sampleTime.plus(SAMPLE_INTERVAL)
-            }
-
-            if (deltas.isNotEmpty()) {
-                val startOffset: ZoneOffset = rules.getOffset(recordStartTime)
-                val endOffset: ZoneOffset = rules.getOffset(recordEndTime)
-                val metadata = Metadata.manualEntryWithId("$CLIENT_ID_PREFIX_SKIN_TEMP${recordStartTime.epochSecond}")
-
-                val record = SkinTemperatureRecord(
-                    startTime = recordStartTime,
-                    startZoneOffset = startOffset,
-                    endTime = recordEndTime,
-                    endZoneOffset = endOffset,
-                    baseline = baselineTemp,
-                    deltas = deltas,
-                    metadata = metadata
-                )
-                records.add(record)
-            }
-            recordStartTime = recordEndTime
-        }
-        Log.d("DataSeederPlugin", "Generated ${records.size} skin temperature records.")
         return records
     }
 
