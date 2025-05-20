@@ -35,13 +35,13 @@ class HCDataFactoryImpl implements HCDataFactory {
     );
 
     var startZoneOffset =
-        data["startZoneOffset"] != null
-            ? converter.extractIntValue(data["startZoneOffset"], errMsg)
+        data["startZoneOffsetSeconds"] != null
+            ? converter.extractIntValue(data["startZoneOffsetSeconds"], errMsg)
             : null;
 
     var endZoneOffset =
-        data["endZoneOffset"] != null
-            ? converter.extractIntValue(data["endZoneOffset"], errMsg)
+        data["endZoneOffsetSeconds"] != null
+            ? converter.extractIntValue(data["endZoneOffsetSeconds"], errMsg)
             : null;
 
     var samplesDataList = converter.extractList(data["samples"], errMsg);
@@ -164,7 +164,7 @@ class HCDataFactoryImpl implements HCDataFactory {
         "Error occured when extracting data for health connect heart rate variability";
     var time = converter.extractDateTimeFromEpochMs(data["timeEpochMs"], errMsg);
     var zoneOffset =
-        data["zoneOffset"] != null
+        data["zoneOffsetSeconds"] != null
             ? converter.extractIntValue(data["zoneOffsetSeconds"], errMsg)
             : null;
     var heartRateVariabilityMillis = converter.extractDoubleValue(

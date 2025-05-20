@@ -17,6 +17,8 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.18.1
+  pdf: ^3.10.4
+  path_provider: ^2.1.5
 
   wearable_health:
     # When depending on this package from a real application you should use:

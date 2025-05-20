@@ -8,10 +8,18 @@ import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health/service/converters/json/json_converter.dart';
 import 'package:wearable_health/service/health_connect/data_factory.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
-import 'package:wearable_health_example/performance_module.dart';
+import 'package:wearable_health_example/models/conversion_validity_result.dart';
+import 'package:wearable_health_example/models/experimentation_result.dart';
+import 'package:wearable_health_example/models/performance_test_result.dart';
+import 'package:wearable_health_example/models/record_count_result.dart';
+import 'package:wearable_health_example/services/data_export.dart';
+import 'package:wearable_health_example/services/health_connect/hc_data_conversion_validation.dart';
+import 'package:wearable_health_example/services/health_connect/hc_performance_test.dart';
+import 'package:wearable_health_example/services/health_connect/hc_record_count.dart';
+import 'package:wearable_health_example/widgets/performance_module.dart';
 
-import 'data_conversion.dart';
-import 'data_retrieval.dart';
+import 'widgets/data_conversion.dart';
+import 'widgets/data_retrieval.dart';
 
 void main() {
   runApp(const HealthPluginExampleApp());
@@ -23,7 +31,7 @@ class HealthPluginExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Health Plugin Example',
+      title: 'Health Plugin Experiment',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const ExperimentPage(),
     );
@@ -45,14 +53,25 @@ class _ExperimentPageState extends State<ExperimentPage>
   bool _dataAvailable = false;
   bool _isLoading = false;
   Map<String, List<Map<String, dynamic>>>? _data;
-  late HCDataFactory hcDataFactory;
+  Stopwatch stopWatch = Stopwatch();
+  ConversionValidityResult? conversionValidityResult;
+  PerformanceTestResult? performanceTestResult;
+  RecordCountResult? recordCountResult;
+  late HCDataConversionValidation conversionValidator;
+  late HCPerformanceTest performanceTester;
+  late HCRecordCount recordCounter;
+  late ResultExporter resultExporter;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     var jsonConverter = JsonConverterImpl();
-    hcDataFactory = HCDataFactoryImpl(jsonConverter);
+    HCDataFactory hcDataFactory = HCDataFactoryImpl(jsonConverter);
+    conversionValidator = HCDataConversionValidation(hcDataFactory);
+    performanceTester = HCPerformanceTest(hcDataFactory);
+    recordCounter = HCRecordCount();
+    resultExporter = ResultExporter();
   }
 
   @override
@@ -121,13 +140,19 @@ class _ExperimentPageState extends State<ExperimentPage>
     ];
     var sut = WearableHealth().getGoogleHealthConnect();
     await sut.requestPermissions(dataTypes);
+    stopWatch.start();
     var result = await sut.getRawData(
       dataTypes,
       DateTimeRange(start: _startDate, end: _endDate),
     );
+    stopWatch.stop();
 
     setState(() {
       _data = result.data;
+      recordCountResult = recordCounter.calculateRecordCount(_data!);
+      conversionValidityResult = conversionValidator.performConversionValidation(_data!);
+      performanceTestResult = performanceTester.getPerformanceResults(_data!, stopWatch.elapsedMilliseconds, stopWatch);
+      stopWatch.reset();
     });
   }
 
@@ -146,6 +171,28 @@ class _ExperimentPageState extends State<ExperimentPage>
     setState(() {
       _data = result.data;
     });
+  }
+
+  Future<void> _exportDataToFile() async {
+    try {
+      var results = ExperimentationResult(
+          amountOfRecords: recordCountResult!.totalAmountOfRecords,
+          amountOfHRRecords: recordCountResult!.amountOfHRRecords,
+          amountOfValidatedHR: conversionValidityResult!.correctlyConvertedHeartRateObjects,
+          amountOfHRVRecords: recordCountResult!.amountOfHRVRecords,
+          amountOfValidatedHRV: conversionValidityResult!.correctlyConvertedHeartRateVariabilityObjects,
+          totalFetchTimeMs: performanceTestResult!.totalExecutionTimeMs,
+          rawDataFetchTimeMs: performanceTestResult!.dataFetchExecutionInMs,
+          conversionFetchTimeMs: performanceTestResult!.conversionExecutionInMs
+      );
+
+      await resultExporter.createAndSaveResults(results, context);
+    } catch (e) {
+      print("Error exporting data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error exporting results: $e')),
+      );
+    }
   }
 
   @override
@@ -187,9 +234,9 @@ class _ExperimentPageState extends State<ExperimentPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                DataRetrievalModule(data: _data),
-                ConversionModule(data: _data, hcDataFactory: hcDataFactory),
-                PerformanceModule(data: _data),
+                DataRetrievalModule(data: recordCountResult),
+                ConversionModule(stats: conversionValidityResult),
+                PerformanceModule(data: performanceTestResult),
               ],
             ),
           ),
@@ -260,7 +307,7 @@ class _ExperimentPageState extends State<ExperimentPage>
                     onPressed:
                         _dataAvailable
                             ? () {
-                              // TODO: Implement export functionality
+                              _exportDataToFile();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Exporting results...'),

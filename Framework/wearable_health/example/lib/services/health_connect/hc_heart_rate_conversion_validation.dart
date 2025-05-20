@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:wearable_health/extensions/open_m_health/health_connect/health_connect_heart_rate.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
-import 'package:wearable_health_example/hc_metadata_conversion_validation.dart';
+import 'package:wearable_health_example/services/health_connect/hc_metadata_conversion_validation.dart';
 
 bool isValidHeartRateConversion(
   Map<String, dynamic> rawData,
@@ -23,7 +23,7 @@ bool isValidHeartRateConversion(
   int? rawStartZoneOffsetSeconds = rawData["startZoneOffsetSeconds"];
   int? rawEndZoneOffsetSeconds = rawData["endZoneOffsetSeconds"];
 
-  List<Map<String, dynamic>> rawSamples = rawData["samples"];
+  List<Object?> rawSamples = rawData["samples"];
 
   // Validate raw object against created object
   if (!rawStartDate.isAtSameMomentAs(obj.startTime)) {
@@ -40,12 +40,13 @@ bool isValidHeartRateConversion(
     return !isValid;
   }
 
-  if (rawStartZoneOffsetSeconds != null &&
-      rawStartZoneOffsetSeconds != obj.startZoneOffset!) {
-    log(
-      "Found discrepancy: raw start zone offset: $rawStartZoneOffsetSeconds - ${obj.startZoneOffset}",
-    );
-    return !isValid;
+  if (rawStartZoneOffsetSeconds != null) {
+    if (rawStartZoneOffsetSeconds != obj.endZoneOffset) {
+      log(
+        "Found discrepancy: raw start zone offset: $rawStartZoneOffsetSeconds - ${obj.startZoneOffset}",
+      );
+      return !isValid;
+    }
   }
 
   if (rawEndZoneOffsetSeconds != null &&
@@ -58,24 +59,49 @@ bool isValidHeartRateConversion(
 
   for (var i = 0; i < rawSamples.length; i++) {
     var rawSample = rawSamples[i];
+    Map<String, dynamic> rawSampleMap = {};
+
+    if (rawSample is Map<Object?, Object?>) {
+      rawSample.forEach((key, value) {
+        if (key is String) {
+          rawSampleMap[key] = value;
+        } else {
+          log("found discrepancy: raw sample had non string key: $key, with type: ${key.runtimeType}");
+          !isValid;
+        }
+      });
+    } else {
+      log("found discrepancy: raw sample is not a map. Got: ${rawSample.runtimeType}");
+      return !isValid;
+    }
+
     var objSample = obj.samples[i];
 
-    if (DateTime.parse(rawSample["time"]).isAtSameMomentAs(objSample.time)) {
+    if (!DateTime.parse(rawSampleMap["time"]).isAtSameMomentAs(objSample.time)) {
       log(
-        "Found discrepancy: raw sample time: ${rawSample["time"]} - obj sample time: ${objSample.time}",
+        "Found discrepancy: raw sample time: ${rawSampleMap["time"]} - obj sample time: ${objSample.time}",
       );
       return !isValid;
     }
 
-    if (rawSample["beatsPerMinute"] != objSample.beatsPerMinute) {
+    if (rawSampleMap["beatsPerMinute"] != objSample.beatsPerMinute) {
       log(
-        "Found discrepancy: raw beats per minute: ${rawSample["beatsPerMinute"]} - obj beats per minute: ${objSample.beatsPerMinute}",
+        "Found discrepancy: raw beats per minute: ${rawSampleMap["beatsPerMinute"]} - obj beats per minute: ${objSample.beatsPerMinute}",
       );
       return !isValid;
     }
   }
 
-  if (!validateMetaData(rawData["metadata"], obj.metadata)) {
+  Map<String, dynamic> rawMetadata = {};
+  rawData["metadata"].forEach((key, value) {
+    if (key is String) {
+      rawMetadata[key] = value;
+    } else {
+      log("raw metadata had non string key: $key");
+    }
+  });
+
+  if (!validateMetaData(rawMetadata, obj.metadata)) {
     return !isValid;
   }
 
@@ -92,7 +118,7 @@ bool isValidHeartRateConversion(
       return !isValid;
     }
 
-    if (!objSample.time.isAtSameMomentAs(omhObj.effectiveTimeFrame.dateTime!)) {
+    if (!objSample.time.isAtSameMomentAs(omhObj.effectiveTimeFrame.timeInterval!.startDateTime!)) {
       log(
         "Found discrepancy: obj sample time: ${objSample.time.toString()} - open m health effective time frame: ${omhObj.effectiveTimeFrame.dateTime!.toString()}",
       );

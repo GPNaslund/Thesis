@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:wearable_health/extensions/open_m_health/schemas/heart_rate_variability_algorithm.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health/extensions/open_m_health/health_connect/health_connect_heart_rate_variability.dart';
-import 'package:wearable_health_example/hc_metadata_conversion_validation.dart';
+import 'package:wearable_health_example/services/health_connect/hc_metadata_conversion_validation.dart';
 
 bool isValidHeartRateVariabilityConversion(
   Map<String, dynamic> rawData,
@@ -27,11 +27,14 @@ bool isValidHeartRateVariabilityConversion(
     return !isValid;
   }
 
-  if (rawZoneOffsetSeconds != null && rawZoneOffsetSeconds != obj.zoneOffset!) {
-    log(
-      "discrepancy found: raw zone offset seconds: $rawZoneOffsetSeconds - obj zone offset seconds: ${obj.zoneOffset}",
-    );
-    return !isValid;
+
+  if (rawZoneOffsetSeconds != null) {
+    if (rawZoneOffsetSeconds != obj.zoneOffset!) {
+      log(
+        "discrepancy found: raw zone offset seconds: $rawZoneOffsetSeconds - obj zone offset seconds: ${obj.zoneOffset}",
+      );
+      return !isValid;
+    }
   }
 
   if (rawHeartRateVariabilityMillis != obj.heartRateVariabilityMillis) {
@@ -41,7 +44,17 @@ bool isValidHeartRateVariabilityConversion(
     return !isValid;
   }
 
-  if (!validateMetaData(rawData["metadata"], obj.metadata)) {
+
+  Map<String, dynamic> rawMetadata = {};
+  rawData["metadata"].forEach((key, value) {
+    if (key is String) {
+      rawMetadata[key] = value;
+    } else {
+      log("raw metadata had non string key: $key");
+    }
+  });
+
+  if (!validateMetaData(rawMetadata, obj.metadata)) {
     return !isValid;
   }
 

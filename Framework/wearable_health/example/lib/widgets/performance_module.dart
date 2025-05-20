@@ -1,10 +1,12 @@
+
 import 'package:flutter/material.dart';
-import 'package:wearable_health_example/placeholder.dart';
+import 'package:wearable_health_example/models/performance_test_result.dart';
+import 'package:wearable_health_example/widgets/placeholder.dart';
 
 class PerformanceModule extends StatelessWidget {
-  final Map<String, dynamic>? data;
+  final PerformanceTestResult? data;
 
-  const PerformanceModule({super.key, required this.data});
+  const PerformanceModule({super.key, required this.data });
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +23,13 @@ class PerformanceModule extends StatelessWidget {
             const Icon(Icons.speed, size: 64, color: Colors.purple),
             const SizedBox(height: 16),
             Text(
-              'Performance Module\nTotal time: ${data!['totalTimeMs']}ms',
+              'Performance Module\nTotal time: ${data!.dataFetchExecutionInMs + data!.conversionExecutionInMs}ms',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'This is a placeholder for the full Performance Module widget\nthat would be implemented in a separate file.',
+              'Fetching raw data took ${data!.dataFetchExecutionInMs}ms\nConversion to openMHealth took ${data!.conversionExecutionInMs}ms\nConverted ${data!.amountOfElementsConverted} objects',
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               textAlign: TextAlign.center,
             ),
@@ -36,4 +38,11 @@ class PerformanceModule extends StatelessWidget {
       );
     }
   }
+}
+
+class ConversionStats {
+  int conversionTimeInMs;
+  int amountOfElementsConverted;
+
+  ConversionStats(this.conversionTimeInMs, this.amountOfElementsConverted);
 }
