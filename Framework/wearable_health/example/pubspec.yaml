@@ -19,6 +19,7 @@ dependencies:
   intl: ^0.18.1
   pdf: ^3.10.4
   path_provider: ^2.1.5
+  share_plus: ^7.0.0
 
   wearable_health:
     # When depending on this package from a real application you should use:

@@ -8,10 +8,14 @@ class HCRecordCount {
 
     data.forEach((key, value) {
       if (key == HealthConnectHealthMetric.heartRate.definition) {
-        amountOfHR += 1;
+        for (final element in value) {
+          amountOfHR += 1;
+        }
       }
       if (key == HealthConnectHealthMetric.heartRateVariability.definition) {
-        amountOfHRV += 1;
+        for (final element in value) {
+          amountOfHRV += 1;
+        }
       }
     });
 

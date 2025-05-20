@@ -6,41 +6,24 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
 
 import '../models/experimentation_result.dart';
 
 class ResultExporter {
-  // Get the local app documents directory path
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
+  Future<void> createAndShareResults(ExperimentationResult results, BuildContext context) async {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Creating PDF...')),
+    );
 
-  // Create a reference to the PDF file
-  Future<File> _getPdfFile(String fileName) async {
-    final path = await _localPath;
-    return File('$path/$fileName.pdf');
-  }
-
-  // Write PDF bytes to the file
-  Future<File> _writePdfBytes(String fileName, Uint8List pdfBytes) async {
-    final file = await _getPdfFile(fileName);
-    return file.writeAsBytes(pdfBytes);
-  }
-
-  Future<void> createAndSaveResults(ExperimentationResult results, BuildContext context) async {
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Creating PDF...')),
-      );
-
-      // Create PDF document
       final pdf = pw.Document();
 
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
-          build: (pw.Context context) {
+          build: (pw.Context pdfContext) {
             return pw.Center(
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -61,45 +44,48 @@ class ResultExporter {
         ),
       );
 
-      // Save the PDF to bytes
       final Uint8List pdfBytes = await pdf.save();
 
-      // Format filename with date
-      DateTime now = DateTime.now();
-      String formattedDate = DateFormat("yy-MM-dd_HH-mm").format(now);
-      String fileName = "experimentation_results_$formattedDate";
+      final DateTime now = DateTime.now();
+      final String formattedDate = DateFormat("yy-MM-dd_HH-mm").format(now);
+      final String fileName = "experimentation_results_$formattedDate.pdf";
 
-      try {
-        // Save the PDF file to the app's document directory
-        final File savedFile = await _writePdfBytes(fileName, pdfBytes);
+      final Directory tempDir = await getTemporaryDirectory();
+      final File tempFile = File('${tempDir.path}/$fileName');
+      await tempFile.writeAsBytes(pdfBytes);
 
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('PDF saved successfully to: ${savedFile.path}')),
-          );
+      final ShareResult shareResult = await Share.shareXFiles(
+        [XFile(tempFile.path)],
+        text: 'Experiment Results PDF',
+      );
+
+      if (context.mounted) {
+        String message;
+        if (shareResult.status == ShareResultStatus.success) {
+          message = 'PDF shared successfully!';
+        } else if (shareResult.status == ShareResultStatus.dismissed) {
+          message = 'Share dismissed.';
+        } else if (shareResult.status == ShareResultStatus.unavailable) {
+          message = 'Sharing is not available on this device.';
+        } else {
+          message = 'Sharing completed with status: ${shareResult.status}';
         }
-
-        print("File saved to: ${savedFile.path}");
-
-      } catch (e) {
-        print("Error saving file: $e");
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not save PDF: $e')),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
       }
+
+
     } catch (e) {
-      print("Error creating PDF: $e");
+      print("Error during PDF creation or sharing: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error creating PDF: $e')),
+          SnackBar(content: Text('Error: Could not prepare or share PDF. $e')),
         );
       }
     }
   }
 
-  /// Creates the table with all the experiment results
   pw.Widget _createResultsTable(ExperimentationResult results) {
     final hrSuccessRate = results.amountOfHRRecords > 0
         ? (results.amountOfValidatedHR / results.amountOfHRRecords * 100).toStringAsFixed(2)
@@ -122,7 +108,7 @@ class ResultExporter {
           ),
           children: [
             pw.Padding(
-              padding: pw.EdgeInsets.all(5),
+              padding: const pw.EdgeInsets.all(5),
               child: pw.Text(
                 'RECORDS SUMMARY',
                 style: pw.TextStyle(
@@ -139,14 +125,13 @@ class ResultExporter {
         _createDataRow('Heart Rate Records', '${results.amountOfHRRecords}'),
         _createDataRow('Heart Rate Variability Records', '${results.amountOfHRVRecords}'),
 
-        // Conversion Success Section
         pw.TableRow(
           decoration: pw.BoxDecoration(
             color: PdfColors.green700,
           ),
           children: [
             pw.Padding(
-              padding: pw.EdgeInsets.all(5),
+              padding: const pw.EdgeInsets.all(5),
               child: pw.Text(
                 'CONVERSION SUCCESS',
                 style: pw.TextStyle(
@@ -164,14 +149,13 @@ class ResultExporter {
         _createDataRow('Successfully Converted HRV Records', '${results.amountOfValidatedHRV}'),
         _createDataRow('HRV Conversion Success Rate', '$hrvSuccessRate%'),
 
-        // Performance Metrics Section
         pw.TableRow(
           decoration: pw.BoxDecoration(
             color: PdfColors.orange700,
           ),
           children: [
             pw.Padding(
-              padding: pw.EdgeInsets.all(5),
+              padding: const pw.EdgeInsets.all(5),
               child: pw.Text(
                 'PERFORMANCE METRICS (ms)',
                 style: pw.TextStyle(
@@ -191,12 +175,11 @@ class ResultExporter {
     );
   }
 
-  /// Creates a single data row for the table
   pw.TableRow _createDataRow(String label, String value) {
     return pw.TableRow(
       children: [
         pw.Padding(
-          padding: pw.EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 8),
           child: pw.Text(
             label,
             style: pw.TextStyle(
@@ -205,7 +188,7 @@ class ResultExporter {
           ),
         ),
         pw.Padding(
-          padding: pw.EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 8),
           child: pw.Text(
             value,
             textAlign: pw.TextAlign.right,

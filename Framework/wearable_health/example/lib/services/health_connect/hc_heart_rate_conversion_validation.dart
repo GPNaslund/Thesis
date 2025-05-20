@@ -4,7 +4,7 @@ import 'package:wearable_health/extensions/open_m_health/health_connect/health_c
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health_example/services/health_connect/hc_metadata_conversion_validation.dart';
 
-bool isValidHeartRateConversion(
+bool isValidHCHeartRateConversion(
   Map<String, dynamic> rawData,
   HCDataFactory hcDataFactory,
 ) {
@@ -101,7 +101,7 @@ bool isValidHeartRateConversion(
     }
   });
 
-  if (!validateMetaData(rawMetadata, obj.metadata)) {
+  if (!isValidHCMetaData(rawMetadata, obj.metadata)) {
     return !isValid;
   }
 

@@ -1,14 +1,11 @@
-import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart';
-import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
+import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
+import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
+import 'package:wearable_health_example/models/conversion_validity_result.dart';
 
-import '../../models/conversion_validity_result.dart';
-import 'hc_heart_rate_conversion_validation.dart';
-import 'hc_heart_rate_variability_conversion_validation.dart';
+class HKDataConversionValidation {
+  HKDataFactory hkDataFactory;
 
-class HCDataConversionValidation {
-  HCDataFactory hcDataFactory;
-
-  HCDataConversionValidation(this.hcDataFactory);
+  HKDataConversionValidation(this.hkDataFactory);
 
   ConversionValidityResult performConversionValidation(
       final Map<String, dynamic> data) {
@@ -21,9 +18,10 @@ class HCDataConversionValidation {
       if (value is! List<dynamic>) {
         print("value was not a List, got: ${value.runtimeType}");
       }
-      if (key == HealthConnectHealthMetric.heartRate.definition) {
+
+      if (key == HealthKitHealthMetric.heartRate.definition) {
         for (final element in value) {
-          var isValid = isValidHCHeartRateConversion(element, hcDataFactory);
+          var isValid = isValidHKHeartRateConversion(element, hkDataFactory);
           amountHR += 1;
           if (isValid) {
             validConversionHR += 1;
@@ -31,12 +29,9 @@ class HCDataConversionValidation {
         }
       }
 
-      if (key == HealthConnectHealthMetric.heartRateVariability.definition) {
+      if (key == HealthKitHealthMetric.heartRateVariability.definition) {
         for (final element in value) {
-          var isValid = isValidHCHeartRateVariabilityConversion(
-            element,
-            hcDataFactory,
-          );
+          var isValid = isValidHKHeartRateVariabilityConversion(element, hkDataFactory);
           amountHRV += 1;
           if (isValid) {
             validConversionHRV += 1;

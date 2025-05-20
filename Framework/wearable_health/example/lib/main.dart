@@ -47,6 +47,7 @@ class ExperimentPage extends StatefulWidget {
 
 class _ExperimentPageState extends State<ExperimentPage>
     with SingleTickerProviderStateMixin {
+  // General setup
   late TabController _tabController;
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 7));
   DateTime _endDate = DateTime.now();
@@ -54,12 +55,20 @@ class _ExperimentPageState extends State<ExperimentPage>
   bool _isLoading = false;
   Map<String, List<Map<String, dynamic>>>? _data;
   Stopwatch stopWatch = Stopwatch();
+
+  //Result models
   ConversionValidityResult? conversionValidityResult;
   PerformanceTestResult? performanceTestResult;
   RecordCountResult? recordCountResult;
-  late HCDataConversionValidation conversionValidator;
-  late HCPerformanceTest performanceTester;
-  late HCRecordCount recordCounter;
+
+  // Android specific services
+  late HCDataConversionValidation hcConversionValidator;
+  late HCPerformanceTest hcPerformanceTester;
+  late HCRecordCount hcRecordCounter;
+
+  // Ios specific services
+
+  // Result exporter
   late ResultExporter resultExporter;
 
   @override
@@ -68,9 +77,9 @@ class _ExperimentPageState extends State<ExperimentPage>
     _tabController = TabController(length: 3, vsync: this);
     var jsonConverter = JsonConverterImpl();
     HCDataFactory hcDataFactory = HCDataFactoryImpl(jsonConverter);
-    conversionValidator = HCDataConversionValidation(hcDataFactory);
-    performanceTester = HCPerformanceTest(hcDataFactory);
-    recordCounter = HCRecordCount();
+    hcConversionValidator = HCDataConversionValidation(hcDataFactory);
+    hcPerformanceTester = HCPerformanceTest(hcDataFactory);
+    hcRecordCounter = HCRecordCount();
     resultExporter = ResultExporter();
   }
 
@@ -149,9 +158,9 @@ class _ExperimentPageState extends State<ExperimentPage>
 
     setState(() {
       _data = result.data;
-      recordCountResult = recordCounter.calculateRecordCount(_data!);
-      conversionValidityResult = conversionValidator.performConversionValidation(_data!);
-      performanceTestResult = performanceTester.getPerformanceResults(_data!, stopWatch.elapsedMilliseconds, stopWatch);
+      recordCountResult = hcRecordCounter.calculateRecordCount(_data!);
+      conversionValidityResult = hcConversionValidator.performConversionValidation(_data!);
+      performanceTestResult = hcPerformanceTester.getPerformanceResults(_data!, stopWatch.elapsedMilliseconds, stopWatch);
       stopWatch.reset();
     });
   }
@@ -186,7 +195,7 @@ class _ExperimentPageState extends State<ExperimentPage>
           conversionFetchTimeMs: performanceTestResult!.conversionExecutionInMs
       );
 
-      await resultExporter.createAndSaveResults(results, context);
+      await resultExporter.createAndShareResults(results, context);
     } catch (e) {
       print("Error exporting data: $e");
       ScaffoldMessenger.of(context).showSnackBar(

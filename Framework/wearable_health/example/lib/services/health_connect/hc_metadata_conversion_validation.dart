@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:wearable_health/model/health_connect/hc_entities/metadata.dart';
 
-bool validateMetaData(
+bool isValidHCMetaData(
   Map<String, dynamic> rawData,
   HealthConnectMetadata metadata,
 ) {
