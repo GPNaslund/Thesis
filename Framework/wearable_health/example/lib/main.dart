@@ -30,30 +30,6 @@ import 'package:wearable_health_example/widgets/performance_module.dart';
 import 'widgets/data_conversion.dart';
 import 'widgets/data_retrieval.dart';
 
-// Dummy implementation for JsonConverterImpl if not available
-// Replace with your actual implementation
-class JsonConverterImpl implements JsonConverter {
-  @override
-  T fromJson<T, K>(Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJson) {
-    return fromJson(json);
-  }
-
-  @override
-  List<T> fromJsonList<T, K>(List<dynamic> jsonList, T Function(Map<String, dynamic>) fromJson) {
-    return jsonList.map((json) => fromJson(json as Map<String, dynamic>)).toList();
-  }
-
-  @override
-  Map<String, dynamic> toJson<T, K>(T object, Map<String, dynamic> Function(T) toJson) {
-    return toJson(object);
-  }
-
-  @override
-  List<Map<String, dynamic>> toJsonList<T, K>(List<T> list, Map<String, dynamic> Function(T) toJson) {
-    return list.map((item) => toJson(item)).toList();
-  }
-}
-
 
 enum ExperimentMode { historical, realTime }
 
