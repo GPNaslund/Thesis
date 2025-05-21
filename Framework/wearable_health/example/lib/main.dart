@@ -376,7 +376,6 @@ class _ExperimentPageState extends State<ExperimentPage> {
     if (!mounted || !_isRealTimeSessionRunning) return;
 
     final DateTime endTime = DateTime.now();
-    // 👇 Use the defined _realTimeFetchWindow (e.g., 5 minutes)
     final DateTime startTime = endTime.subtract(_realTimeFetchWindow);
 
     if (kDebugMode) {
@@ -423,6 +422,10 @@ class _ExperimentPageState extends State<ExperimentPage> {
 
         // Update availability and metrics
         final bool hasAnyData = _data!.values.any((list) => list.isNotEmpty);
+
+        if (kDebugMode) {
+          print(' L_RT_LOG [STATE_FINAL]: _data keys: ${_data?.keys}, _dataAvailable: $_dataAvailable, recordCount total: ${recordCountResult?.totalAmountOfRecords}');
+        }
 
         if (hasAnyData) {
           _dataAvailable = true;
