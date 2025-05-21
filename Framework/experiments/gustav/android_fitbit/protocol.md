@@ -2,56 +2,49 @@
 
 ## Test Information
 
-| Field | Value |
-|-------|-------|
-| Test ID | `TEST-XXXX` |
-| Date | `YYYY-MM-DD` |
-| Time | `HH:MM` |
-| Tester Name | `` |
-| Testing Location | `` |
+| Field | Value               |
+|-------|---------------------|
+| Test ID | `TEST-GN02`         |
+| Date | `2025-05-21`        |
+| Time | `19:00`             |
+| Tester Name | `Gustav Näslund`    |
+| Testing Location | `Stockholm, Sweden` |
 
 ## Device Configuration
 
-| Field | Value |
-|-------|-------|
-| Phone Model | `` |
-| OS Type | `[ ] Android  [ ] iOS` |
-| OS Version | `` |
-| Flutter Plugin Version | `` |
-| App Build Number | `` |
+| Field | Value                      |
+|-------|----------------------------|
+| Phone Model | `Samsung Galaxy S22 Ultra` |
+| OS Type | `[X] Android  [ ] iOS`     |
+| OS Version | `14`                       |
+| Flutter Plugin Version | `3.29.2`                   |
+| App Build Number | `0.0.1`                    |
 
 ## Wearable Device
 
-| Field | Value |
-|-------|-------|
-| Wearable Type | `[ ] Smartwatch  [ ] Fitness Band  [ ] Other: _______` |
-| Wearable Model | `` |
-| Firmware Version | `` |
-| Connection Method | `[ ] Bluetooth  [ ] WiFi  [ ] Other: _______` |
-| Wearable Battery Level | `_____%` |
+| Field | Value                                                  |
+|-------|--------------------------------------------------------|
+| Wearable Type | `[X] Smartwatch  [ ] Fitness Band  [ ] Other: _______` |
+| Wearable Model | `Fitbit Sense 2`                                       |
+| Firmware Version | `60.20001.194.86`                                      |
+| Connection Method | `[X] Bluetooth  [ ] WiFi  [ ] Other: _______`          |
+| Wearable Battery Level | `96%`                                                  |
 
 ## Test Environment
 
-| Field | Value |
-|-------|-------|
-| Physical Activity Type | `[ ] Resting  [ ] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
-| Duration | `_____ minutes` |
-| Intensity (if applicable) | `[ ] Low  [ ] Medium  [ ] High` |
-| Environmental Conditions | `Temperature: ___°C, Humidity: ___%, Other factors: _______` |
+| Field | Value                                                                    |
+|-------|--------------------------------------------------------------------------|
+| Physical Activity Type | `[X] Resting  [X] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
+| Duration | `90 minutes`                                                             |
+| Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                          |
+| Environmental Conditions | `Temperature: 9°C, Humidity: 28%, Other factors: _______`                |
 
 ## Health Data Parameters Tested
 
 *Check all that apply:*
 
-- [ ] Heart Rate
-- [ ] Steps Count
-- [ ] Calories Burned
-- [ ] Sleep Data
-- [ ] Blood Oxygen Level
-- [ ] Blood Pressure
-- [ ] ECG Data
-- [ ] Respiratory Rate
-- [ ] Body Temperature
+- [X] Heart Rate
+- [X] Heart Rate Variable 
 - [ ] Other: _______
 
 ## Test Procedure
@@ -59,19 +52,22 @@
 1. **Setup**
     - _Description of how the test environment was prepared_
    ```
-   
+   The smartwatch was inspected for any visible damage or hinder of sensors that might affect the ability to provide data. The FitBit
+   was charged in beforehand and attached to the left wrist. 
    ```
 
 2. **Data Collection Process**
     - _Steps taken to collect the health data_
    ```
-   
+      Preparatory step of ensuring connectivity with the mobile phone and clearing of any present data in health connect was performed.
+      The FitBit app was installed with the purpose of establishing connection between the mobile phone and the FitBit device.
+      Synchronization between the FitBit and Health Connect was initialized to ensure data storage in Health Connect.
    ```
 
 3. **Observations During Testing**
     - _Any notable observations during the testing process_
    ```
-   
+      
    ```
 
 ## Results

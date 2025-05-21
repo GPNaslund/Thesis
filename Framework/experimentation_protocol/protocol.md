@@ -2,13 +2,13 @@
 
 ## Test Information
 
-| Field | Value |
-|-------|-------|
-| Test ID | `TEST-XXXX` |
+| Field | Value        |
+|-------|--------------|
+| Test ID | `TEST-XXXX`  |
 | Date | `YYYY-MM-DD` |
-| Time | `HH:MM` |
-| Tester Name | `` |
-| Testing Location | `` |
+| Time | `HH:MM`      |
+| Tester Name | ``           |
+| Testing Location | ``      |
 
 ## Device Configuration
 
@@ -44,14 +44,7 @@
 *Check all that apply:*
 
 - [ ] Heart Rate
-- [ ] Steps Count
-- [ ] Calories Burned
-- [ ] Sleep Data
-- [ ] Blood Oxygen Level
-- [ ] Blood Pressure
-- [ ] ECG Data
-- [ ] Respiratory Rate
-- [ ] Body Temperature
+- [ ] Heart rate variability
 - [ ] Other: _______
 
 ## Test Procedure
