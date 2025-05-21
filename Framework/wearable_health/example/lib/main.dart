@@ -132,7 +132,7 @@ class _ExperimentPageState extends State<ExperimentPage>
       _isLoading = true;
     });
 
-    try {
+    // try {
       if (Platform.isAndroid) {
         await _fetchDataAndroid();
       } else {
@@ -143,7 +143,7 @@ class _ExperimentPageState extends State<ExperimentPage>
         _dataAvailable = true;
         _isLoading = false;
       });
-    } catch (e) {
+    /* } catch (e) {
       setState(() {
         _isLoading = false;
       });
@@ -151,7 +151,7 @@ class _ExperimentPageState extends State<ExperimentPage>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error running experiment: ${e.toString()}')),
       );
-    }
+    } */
   }
 
   _fetchDataAndroid() async {

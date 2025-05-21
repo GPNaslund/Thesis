@@ -1,29 +1,19 @@
 import 'dart:developer';
 
-import 'package:wearable_health/extensions/open_m_health/health_kit/health_kit_data.dart';
-import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
-import 'package:wearable_health/model/health_kit/health_kit_data.dart';
-import 'package:wearable_health/model/health_kit/hk_entities/hk_quantity_sample.dart';
+
+import 'package:wearable_health/extensions/open_m_health/health_kit/health_kit_heart_rate_variability.dart';
 import 'package:wearable_health/model/health_kit/hk_heart_rate.dart';
+import 'package:wearable_health/model/health_kit/hk_heart_rate_variability.dart';
 import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
 
-bool isValidHKQuantitySample(
+bool isValidHeartRateVariabilitySample(
  Map<String, dynamic> rawData,
-HKDataFactory hkDataFactory,
-    HealthKitHealthMetric metric,
+HKDataFactory hkDataFactory
 ) {
 
   var isValid = true;
-  dynamic obj;
-  dynamic openMHealth;
-
-  if (metric == HealthKitHealthMetric.heartRate) {
-    obj = hkDataFactory.createHeartRate(rawData);
-    openMHealth = obj.toOpenMHealthHeartRate();
-  } else {
-    obj = hkDataFactory.createHeartRateVariability(rawData);
-    openMHealth = obj.toOpenMHealthHeartRateVariability();
-  }
+  var obj = hkDataFactory.createHeartRateVariability(rawData);
+  var openMHealth = obj.toOpenMHealthHeartRateVariability();
 
   // Raw values
   // Required
@@ -125,7 +115,7 @@ HKDataFactory hkDataFactory,
   return isValid;
 }
 
-bool _validateQuantity(dynamic rawQuantity, HKHeartRate obj) {
+bool _validateQuantity(dynamic rawQuantity, HkHeartRateVariability obj) {
   var isValid = true;
   if (rawQuantity is Map<Object?, Object?>) {
     if (rawQuantity["value"] != null) {
@@ -153,7 +143,7 @@ bool _validateQuantity(dynamic rawQuantity, HKHeartRate obj) {
   return isValid;
 }
 
-bool _validateDevice(dynamic rawDevice, HKHeartRate obj) {
+bool _validateDevice(dynamic rawDevice, HkHeartRateVariability obj) {
   var isValid = true;
   if (rawDevice != null) {
     if (rawDevice is Map<Object?, Object?>) {
