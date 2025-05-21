@@ -126,21 +126,55 @@ class _ExperimentPageState extends State<ExperimentPage> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime initialDateTime = isStartDate ? _startDate : _endDate;
+
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: isStartDate ? _startDate : _endDate,
+      initialDate: initialDateTime,
       firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-    if (picked != null && mounted) {
-      setState(() {
-        if (isStartDate) {
-          _startDate = picked;
+
+    if (pickedDate == null || !mounted) return;
+
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initialDateTime),
+    );
+
+    if (pickedTime == null || !mounted) return;
+
+    final DateTime finalDateTime = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+
+    setState(() {
+      if (isStartDate) {
+        if (finalDateTime.isAfter(_endDate)) {
+          _startDate = finalDateTime;
+          _endDate = finalDateTime.add(const Duration(hours: 1));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Start date was after end date. End date adjusted accordingly.')),
+          );
         } else {
-          _endDate = picked;
+          _startDate = finalDateTime;
         }
-      });
-    }
+      } else {
+        if (finalDateTime.isBefore(_startDate)) {
+          _endDate = finalDateTime;
+          _startDate = finalDateTime.subtract(const Duration(hours: 1));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('End date was before start date. Start date adjusted accordingly.')),
+          );
+        } else {
+          _endDate = finalDateTime;
+        }
+      }
+    });
   }
 
   void _handlePrimaryButtonAction() {
@@ -732,67 +766,69 @@ class _ExperimentPageState extends State<ExperimentPage> {
   }
 
   Widget _buildDateSelector(
-    BuildContext context,
-    String label,
-    DateTime date,
-    VoidCallback onTap,
-  ) {
-    final formattedDate = DateFormat(
-      'MMM dd, yyyy',
-    ).format(date);
+      BuildContext context,
+      String label,
+      DateTime date,
+      VoidCallback onTap,
+      ) {
+    // Using a slightly more compact default format, adjust as needed
+    final formattedDate = DateFormat('MMM dd, yy  HH:mm').format(date);
+    // Example alternative: final formattedDate = DateFormat.yMd().add_Hm().format(date); // e.g., 5/21/25, 7:37 PM
 
     bool dateSelectorEnabled =
         _currentMode == ExperimentMode.historical &&
-        !_isRealTimeSessionRunning &&
-        !_isLoading;
+            !_isRealTimeSessionRunning &&
+            !_isLoading;
 
     return InkWell(
       onTap: dateSelectorEnabled ? onTap : null,
       child: Opacity(
         opacity: dateSelectorEnabled ? 1.0 : 0.5,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Adjusted padding
           decoration: BoxDecoration(
-            color:
-                Theme.of(
-                  context,
-                ).cardColor,
-            border: Border.all(color: Colors.grey.shade400),
+            color: Theme.of(context).cardColor,
+            border: Border.all(color: Colors.grey.shade300), // Slightly lighter border
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.05), // Softer shadow
                 spreadRadius: 1,
-                blurRadius: 2,
+                blurRadius: 3,
                 offset: const Offset(0, 1),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min, // Important for Column in a constrained space
             children: [
               Text(
                 label,
                 style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 4), // Consistent spacing
               Row(
                 children: [
                   Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color:
-                        dateSelectorEnabled
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey,
+                    Icons.calendar_month_outlined, // Using outlined icon
+                    size: 18, // Slightly larger icon
+                    color: dateSelectorEnabled
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    formattedDate,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: dateSelectorEnabled ? null : Colors.grey,
+                  const SizedBox(width: 6), // Adjusted spacing
+                  Expanded( // Wrap the Text widget with Expanded
+                    child: Text(
+                      formattedDate,
+                      style: TextStyle(
+                        fontSize: 13, // Adjusted font size for better fit
+                        fontWeight: FontWeight.w500,
+                        color: dateSelectorEnabled ? Theme.of(context).textTheme.bodyLarge?.color : Colors.grey,
+                      ),
+                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                      maxLines: 1,                     // Ensure it stays on one line
+                      softWrap: false,                   // Prevent wrapping that might cause vertical overflow
                     ),
                   ),
                 ],

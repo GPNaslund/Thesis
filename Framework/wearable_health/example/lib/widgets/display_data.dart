@@ -10,6 +10,7 @@ import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
+import 'package:wearable_health_example/widgets/paginated_json_list.dart';
 import 'package:wearable_health_example/widgets/placeholder.dart';
 
 import '../models/displayable_record.dart';
@@ -314,6 +315,41 @@ class _DataDisplayModuleState extends State<DataDisplayModule> {
       titleColor = Colors.tealAccent[100] ?? currentTheme.colorScheme.secondary;
     }
 
+    Widget contentWidget;
+
+    if (isList && jsonData is List) {
+      contentWidget = PaginatedJsonList(
+        jsonDataList: jsonData,
+        itemTitlePrefix: "OMH Item",
+        expansionTileKey: expansionTileKey,
+      );
+    } else if (jsonData != null) {
+      contentWidget = ExpansionTile(
+        key: expansionTileKey,
+        backgroundColor: currentTheme.colorScheme.surface.withOpacity(0.5),
+        collapsedBackgroundColor: currentTheme.colorScheme.surfaceVariant.withOpacity(0.2),
+        iconColor: titleColor,
+        collapsedIconColor: titleColor.withOpacity(0.7),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+        childrenPadding: EdgeInsets.zero,
+        title: Text(
+          "View JSON",
+          style: TextStyle(fontSize: 13, color: titleColor.withOpacity(0.9)),
+        ),
+        children: <Widget>[JsonViewerWidget(jsonData: jsonData)],
+      );
+    } else {
+      contentWidget = ExpansionTile(
+        key: expansionTileKey,
+        backgroundColor: currentTheme.colorScheme.surface.withOpacity(0.5),
+        collapsedBackgroundColor: currentTheme.colorScheme.surfaceVariant.withOpacity(0.2),
+        iconColor: titleColor,
+        collapsedIconColor: titleColor.withOpacity(0.7),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+        title: Text("View JSON", style: TextStyle(fontSize: 13, color: titleColor.withOpacity(0.9))),
+        children: const [Padding(padding: EdgeInsets.all(8.0), child: Text("No data"))],
+      );
+    }
 
     return Container(
       width: 300,
@@ -335,35 +371,10 @@ class _DataDisplayModuleState extends State<DataDisplayModule> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: titleColor),
             ),
           ),
-          ExpansionTile(
-            key: expansionTileKey,
-            backgroundColor: currentTheme.colorScheme.surface.withOpacity(0.5),
-            collapsedBackgroundColor: currentTheme.colorScheme.surfaceVariant.withOpacity(0.2),
-            iconColor: titleColor,
-            collapsedIconColor: titleColor.withOpacity(0.7),
-            tilePadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
-            childrenPadding: EdgeInsets.zero,
-            title: Text(
-              isList && jsonData is List ? "View ${jsonData.length} items" : "View JSON",
-              style: TextStyle(fontSize: 13, color: titleColor.withOpacity(0.9)),
-            ),
-            children: <Widget>[
-              if (isList && jsonData is List)
-                ...jsonData.asMap().entries.map((entry) => JsonViewerWidget(
-                  jsonData: entry.value,
-                  title: "Item ${entry.key + 1}",
-                ))
-              else if (jsonData != null)
-                JsonViewerWidget(jsonData: jsonData)
-              else
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("No data"),
-                ),
-            ],
-          ),
+          contentWidget,
         ],
       ),
     );
   }
 }
+
