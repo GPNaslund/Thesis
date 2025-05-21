@@ -6,7 +6,7 @@ import 'package:wearable_health/model/health_kit/hk_heart_rate.dart';
 import 'package:wearable_health/model/health_kit/hk_heart_rate_variability.dart';
 import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
 
-bool isValidHeartRateVariabilitySample(
+bool isValidHKHeartRateVariability(
  Map<String, dynamic> rawData,
 HKDataFactory hkDataFactory
 ) {
@@ -102,14 +102,18 @@ HKDataFactory hkDataFactory
 
   // Open MHealth
   var omhObj = openMHealth[0];
-  if (omhObj.heartRate.value != obj.data.quantity.doubleValue) {
-    log("found discrepancy: obj quantity ${obj.data.quantity.doubleValue} - omh value ${omhObj.heartRate.value}");
+  if (omhObj.heartRateVariability.value != obj.data.quantity.doubleValue) {
+    log("found discrepancy: obj heart rate variability: ${obj.data.quantity.doubleValue} - omh value: ${omhObj.heartRateVariability.value}" );
     return !isValid;
   }
 
-  if (!omhObj.effectiveTimeFrame.dateTime!.isAtSameMomentAs(obj.data.startDate)) {
-    log("found discrepancy: obj startTime ${obj.data.startDate!.toString()} - omh start date: ${omhObj.effectiveTimeFrame.dateTime!.toString()}");
+  if (omhObj.heartRateVariability.unit != obj.data.quantity.unit) {
+    log("found discrepancy: obj heart rate variability unit ${obj.data.quantity.unit} - omh unit: ${omhObj.heartRateVariability.unit}");
     return !isValid;
+  }
+
+  if (omhObj.effectiveTimeFrame.dateTime!.isAtSameMomentAs(obj.data.startDate)) {
+    log("found discrepancy: obj heart rate date: ${obj.data.startDate.toString()} - omh unit: ${omhObj.effectiveTimeFrame.dateTime.toString()}");
   }
 
   return isValid;

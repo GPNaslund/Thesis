@@ -2,7 +2,9 @@
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
 import 'package:wearable_health_example/models/conversion_validity_result.dart';
-import 'package:wearable_health_example/services/health_kit/hk_quantity_sample_validation.dart';
+
+import 'hk_heart_rate_validation.dart';
+import 'hk_heart_rate_variability_validation.dart';
 
 class HKDataConversionValidation {
   HKDataFactory hkDataFactory;
@@ -20,10 +22,9 @@ class HKDataConversionValidation {
     data.forEach((key, value) {
       if (key == HealthKitHealthMetric.heartRate.definition) {
         for (final element in value) {
-              var isValid = isValidHKQuantitySample(
+              var isValid = isValidHKHeartRate(
               element,
-              hkDataFactory,
-              HealthKitHealthMetric.heartRate,
+              hkDataFactory
             );
             amountHR += 1;
             if (isValid) {
@@ -34,10 +35,9 @@ class HKDataConversionValidation {
 
       if (key == HealthKitHealthMetric.heartRateVariability.definition) {
         for (final element in value) {
-            var isValid = isValidHKQuantitySample(
+            var isValid = isValidHKHeartRateVariability(
               element,
               hkDataFactory,
-              HealthKitHealthMetric.heartRateVariability,
             );
             amountHRV += 1;
             if (isValid) {

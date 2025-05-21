@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:wearable_health/extensions/open_m_health/health_kit/health-kit_heart_rate.dart';
 import 'package:wearable_health/extensions/open_m_health/health_kit/health_kit_data.dart';
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health/model/health_kit/health_kit_data.dart';
@@ -7,23 +8,15 @@ import 'package:wearable_health/model/health_kit/hk_entities/hk_quantity_sample.
 import 'package:wearable_health/model/health_kit/hk_heart_rate.dart';
 import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
 
-bool isValidHKQuantitySample(
+bool isValidHKHeartRate(
  Map<String, dynamic> rawData,
 HKDataFactory hkDataFactory,
-    HealthKitHealthMetric metric,
 ) {
 
   var isValid = true;
-  dynamic obj;
-  dynamic openMHealth;
+  var obj = hkDataFactory.createHeartRate(rawData);
+  var openMHealth = obj.toOpenMHealthHeartRate();
 
-  if (metric == HealthKitHealthMetric.heartRate) {
-    obj = hkDataFactory.createHeartRate(rawData);
-    openMHealth = obj.toOpenMHealthHeartRate();
-  } else {
-    obj = hkDataFactory.createHeartRateVariability(rawData);
-    openMHealth = obj.toOpenMHealthHeartRateVariability();
-  }
 
   // Raw values
   // Required
