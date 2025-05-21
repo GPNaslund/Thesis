@@ -50,7 +50,7 @@ class HKDataFactoryImpl implements HKDataFactory {
     Map<String, dynamic> data,
     String errMsg,
   ) {
-    var quantity = _createQuantity(data, errMsg);
+    var quantity = _createQuantity(data["quantity"], errMsg);
     var count =
         data["count"] != null
             ? jsonConverter.extractIntValue(data["count"], errMsg)

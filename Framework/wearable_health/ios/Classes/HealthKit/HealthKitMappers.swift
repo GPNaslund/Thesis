@@ -89,21 +89,25 @@ func mapHKSampleToDictionary(_ sample: HKSample) -> [String: Any?]? {
 }
 
 
-/// Adds quantity-specific data to a sample dictionary
+/// Adds quantity-specific data to a sample dictionary, nesting value and unit under a "quantity" key.
 /// - Parameters:
 ///   - quantitySample: The HKQuantitySample containing quantity data
 ///   - map: The dictionary to populate with quantity data (passed as inout)
 private func addQuantitySampleData(_ quantitySample: HKQuantitySample, to map: inout [String: Any?]) {
     let quantityType = quantitySample.quantityType
 
-    if let standardUnit = quantityType.getStandardUnit() {
-        map["value"] = quantitySample.quantity.doubleValue(for: standardUnit)
-        map["unit"] = standardUnit.unitString
+    var quantityDetails: [String: Any?] = [:]
+
+    if let standardUnit = quantityType.getStandardUnit() { // Assuming getStandardUnit() is an extension on HKQuantityType
+        quantityDetails["value"] = quantitySample.quantity.doubleValue(for: standardUnit)
+        quantityDetails["unit"] = standardUnit.unitString
     } else {
-        print("[addQuantitySampleData]: No standard unit for \(quantityType.identifier). 'value' and 'unit' fields might be nil. UUID: \(quantitySample.uuid)")
-        map["value"] = nil
-        map["unit"] = nil
+        print("[addQuantitySampleData]: No standard unit for \(quantityType.identifier). 'value' and 'unit' fields for quantity might be nil. UUID: \(quantitySample.uuid)")
+        quantityDetails["value"] = nil
+        quantityDetails["unit"] = nil
     }
+
+    map["quantity"] = quantityDetails
 
     let nonCountBasedTypes: Set<String> = [
         HKQuantityTypeIdentifier.heartRateVariabilitySDNN.rawValue,

@@ -8,6 +8,8 @@ import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health/service/converters/json/json_converter.dart';
 import 'package:wearable_health/service/health_connect/data_factory.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
+import 'package:wearable_health/service/health_kit/data_factory.dart';
+import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
 import 'package:wearable_health_example/models/conversion_validity_result.dart';
 import 'package:wearable_health_example/models/experimentation_result.dart';
 import 'package:wearable_health_example/models/performance_test_result.dart';
@@ -16,6 +18,9 @@ import 'package:wearable_health_example/services/data_export.dart';
 import 'package:wearable_health_example/services/health_connect/hc_data_conversion_validation.dart';
 import 'package:wearable_health_example/services/health_connect/hc_performance_test.dart';
 import 'package:wearable_health_example/services/health_connect/hc_record_count.dart';
+import 'package:wearable_health_example/services/health_kit/hk_data_conversion_validation.dart';
+import 'package:wearable_health_example/services/health_kit/hk_performance_test.dart';
+import 'package:wearable_health_example/services/health_kit/hk_record_count.dart';
 import 'package:wearable_health_example/widgets/performance_module.dart';
 
 import 'widgets/data_conversion.dart';
@@ -67,6 +72,9 @@ class _ExperimentPageState extends State<ExperimentPage>
   late HCRecordCount hcRecordCounter;
 
   // Ios specific services
+  late HKDataConversionValidation hkConversionValidator;
+  late HKPerformanceTest hkPerformanceTester;
+  late HKRecordCount hkRecordCounter;
 
   // Result exporter
   late ResultExporter resultExporter;
@@ -77,10 +85,14 @@ class _ExperimentPageState extends State<ExperimentPage>
     _tabController = TabController(length: 3, vsync: this);
     var jsonConverter = JsonConverterImpl();
     HCDataFactory hcDataFactory = HCDataFactoryImpl(jsonConverter);
+    HKDataFactory hkDataFactory = HKDataFactoryImpl(jsonConverter);
     hcConversionValidator = HCDataConversionValidation(hcDataFactory);
     hcPerformanceTester = HCPerformanceTest(hcDataFactory);
     hcRecordCounter = HCRecordCount();
     resultExporter = ResultExporter();
+    hkConversionValidator = HKDataConversionValidation(hkDataFactory);
+    hkPerformanceTester = HKPerformanceTest(hkDataFactory);
+    hkRecordCounter = HKRecordCount();
   }
 
   @override
@@ -172,13 +184,18 @@ class _ExperimentPageState extends State<ExperimentPage>
     ];
     var sut = WearableHealth().getAppleHealthKit();
     await sut.requestPermissions(dataTypes);
+    stopWatch.start();
     var result = await sut.getRawData(
       dataTypes,
       DateTimeRange(start: _startDate, end: _endDate),
     );
+    stopWatch.stop();
 
     setState(() {
       _data = result.data;
+      recordCountResult = hkRecordCounter.calculateRecordCount(_data!);
+      conversionValidityResult = hkConversionValidator.performConversionValidation(_data!);
+      performanceTestResult = hkPerformanceTester.getPerformanceResults(_data!, stopWatch.elapsedMilliseconds, stopWatch);
     });
   }
 

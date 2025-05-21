@@ -28,7 +28,7 @@ class HKQuantitySample extends HKSample {
     super.sourceRevision,
     required this.quantity,
     required super.sampleType,
-    required this.count,
+    this.count,
   });
 
   /// Returns a string representation of this quantity sample.
