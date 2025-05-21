@@ -373,67 +373,109 @@ class _ExperimentPageState extends State<ExperimentPage> {
   }
 
   Future<void> _fetchAndProcessRealTimeData() async {
-    if (!mounted || !_isRealTimeSessionRunning) return;
+    // Log 1: Confirms timer invocation and approximate window
+    if (kDebugMode) {
+      final DateTime _nowForLog = DateTime.now();
+      final DateTime _startForLog = _nowForLog.subtract(_realTimeFetchWindow);
+      print('L_RT_LOG [1]: Timer Invoked. Attempting fetch for approx window: $_startForLog TO $_nowForLog');
+    }
+
+    if (!mounted || !_isRealTimeSessionRunning) {
+      if (kDebugMode) print('L_RT_LOG [1.1]: Skip: Not mounted or session not running.');
+      return;
+    }
 
     final DateTime endTime = DateTime.now();
     final DateTime startTime = endTime.subtract(_realTimeFetchWindow);
 
-    if (kDebugMode) {
-      final DateTime _nowForLog = DateTime.now();
-      final DateTime _startForLog = _nowForLog.subtract(_realTimeFetchWindow);
-      print(' L-- TIMER FIRED: Attempting real-time fetch for window: $_startForLog TO $_nowForLog');
-    }
+    // Log 2: Confirms actual fetch parameters
+    if (kDebugMode) print('L_RT_LOG [2]: Actual Fetch Window: $startTime TO $endTime for types: $_activeDataTypes');
 
+    // 👇 CORRECTED THIS LINE
     final newlyFetchedChunk = await _fetchDataForRange(
-      _activeDataTypes,
-      DateTimeRange(start: startTime, end: endTime),
+      _activeDataTypes, // First argument: the list of data types
+      DateTimeRange(start: startTime, end: endTime), // Second argument: the date range
     );
 
-    if (mounted && newlyFetchedChunk != null) {
-      bool newUniqueDataWasAddedThisPoll = false;
+    // Log 3: CRITICAL - What did _fetchDataForRange return?
+    //          Does it have data? Does it have 'uuid'?
+    if (kDebugMode) {
+      if (newlyFetchedChunk == null) {
+        print('L_RT_LOG [3]: newlyFetchedChunk is NULL.');
+      } else if (newlyFetchedChunk.isEmpty) {
+        print('L_RT_LOG [3]: newlyFetchedChunk is EMPTY map (no data type keys).');
+      } else {
+        print('L_RT_LOG [3]: newlyFetchedChunk has keys: ${newlyFetchedChunk.keys.join(', ')}');
+        newlyFetchedChunk.forEach((key, list) {
+          print('L_RT_LOG [3.1]: For key "$key", fetched ${list.length} samples from native.');
+          if (list.isNotEmpty) {
+            // CRITICAL: Check structure and 'uuid' key. Ensure your native code adds this.
+            print('L_RT_LOG [3.2]: First sample for "$key" (from native): ${list.first}');
+          }
+        });
+      }
+    }
 
-      setState(() {
-        _data ??= {}; // Ensure _data is initialized
+    // Only proceed if data was fetched and is not empty
+    if (mounted && newlyFetchedChunk != null && newlyFetchedChunk.isNotEmpty) {
+      bool newUniqueDataWasAddedThisPollOverall = false;
+
+      setState(() { // All UI-relevant state changes happen here
+        _data ??= {};
 
         newlyFetchedChunk.forEach((dataTypeKey, incomingSampleList) {
-          // Initialize list for this data type in _data if it doesn't exist
           _data![dataTypeKey] ??= [];
 
-          // Get UUIDs of samples already present for this data type
-          // IMPORTANT: Assumes your sample Maps have a 'uuid' field. Adjust if necessary.
+          // CRITICAL: Assumes your sample Map has a 'uuid' field from native code.
+          // If Health Connect uses a different ID key, you MUST adapt this.
           final Set<String> existingUUIDs = _data![dataTypeKey]!
               .map((sample) => sample['uuid'] as String? ?? '')
               .where((uuid) => uuid.isNotEmpty)
               .toSet();
 
-          int preAddCount = _data![dataTypeKey]!.length;
+          if (kDebugMode) {
+            print('L_RT_LOG [4]: For "$dataTypeKey" - Existing UUIDs in _data: ${existingUUIDs.length}. Incoming this poll: ${incomingSampleList.length}');
+          }
 
-          // Filter and add only unique new samples
+          int preAddCount = _data![dataTypeKey]!.length; // Count before adding new items for this key
+          int addedThisKeyCount = 0;
+
           for (final newSample in incomingSampleList) {
+            // CRITICAL: Adjust 'uuid' if your key is different (especially for Android/Health Connect).
             final newSampleUUID = newSample['uuid'] as String? ?? '';
-            if (newSampleUUID.isNotEmpty && !existingUUIDs.contains(newSampleUUID)) {
+            bool isNewAndValid = newSampleUUID.isNotEmpty && !existingUUIDs.contains(newSampleUUID);
+
+            if (kDebugMode) {
+              print('L_RT_LOG [5]: Checking sample for "$dataTypeKey" - UUID: "$newSampleUUID". Is new & valid for _data? $isNewAndValid.');
+            }
+
+            if (isNewAndValid) {
               _data![dataTypeKey]!.add(newSample);
+              addedThisKeyCount++;
             }
           }
-          if (_data![dataTypeKey]!.length > preAddCount) {
-            newUniqueDataWasAddedThisPoll = true;
+
+          if (addedThisKeyCount > 0) {
+            newUniqueDataWasAddedThisPollOverall = true; // Set if any key got new data
+            if (kDebugMode) {
+              print('L_RT_LOG [5.1]: Added $addedThisKeyCount unique samples for "$dataTypeKey". New _data total for this key: ${_data![dataTypeKey]!.length}');
+            }
           }
         });
 
-        // Update availability and metrics
-        final bool hasAnyData = _data!.values.any((list) => list.isNotEmpty);
-
         if (kDebugMode) {
-          print(' L_RT_LOG [STATE_FINAL]: _data keys: ${_data?.keys}, _dataAvailable: $_dataAvailable, recordCount total: ${recordCountResult?.totalAmountOfRecords}');
+          print('L_RT_LOG [6]: Overall, new unique data added to _data this poll: $newUniqueDataWasAddedThisPollOverall');
         }
 
-        if (hasAnyData) {
+        final bool hasAnyDataNow = _data!.values.any((list) => list.isNotEmpty);
+
+        if (hasAnyDataNow) {
           _dataAvailable = true;
-          // Only recalculate metrics if new data was actually added or if it's the first time data is populated
-          if (newUniqueDataWasAddedThisPoll || recordCountResult == null) {
-            if (kDebugMode && newUniqueDataWasAddedThisPoll) {
-              print("New unique data added. Recalculating metrics.");
+          if (newUniqueDataWasAddedThisPollOverall || recordCountResult == null) {
+            if (kDebugMode) {
+              print("L_RT_LOG [7]: Recalculating metrics. (newUniqueData: $newUniqueDataWasAddedThisPollOverall, recordCountResultIsNull: ${recordCountResult == null})");
             }
+
             if (Platform.isAndroid) {
               recordCountResult = hcRecordCounter.calculateRecordCount(_data!);
               conversionValidityResult = hcConversionValidator.performConversionValidation(_data!);
@@ -441,18 +483,42 @@ class _ExperimentPageState extends State<ExperimentPage> {
               recordCountResult = hkRecordCounter.calculateRecordCount(_data!);
               conversionValidityResult = hkConversionValidator.performConversionValidation(_data!);
             }
+
+            if (kDebugMode && recordCountResult != null) {
+              print('L_RT_LOG [7.1 METRICS_RESULT]: TotalRecs: ${recordCountResult!.totalAmountOfRecords}, HR: ${recordCountResult!.amountOfHRRecords}');
+            } else if (kDebugMode) {
+              print('L_RT_LOG [7.1 METRICS_RESULT]: recordCountResult is null after calculation attempt, or still null.');
+            }
+          } else if (kDebugMode) {
+            print("L_RT_LOG [7.X]: Metrics NOT recalculated. (newUniqueData: $newUniqueDataWasAddedThisPollOverall, recordCountResult was already non-null and no new data was added overall)");
           }
         } else {
           _dataAvailable = false;
-          // If no data, clear results
           recordCountResult = null;
           conversionValidityResult = null;
+          if (kDebugMode) {
+            print("L_RT_LOG [7.Y]: No data in _data. _dataAvailable set to false, metrics nulled.");
+          }
         }
-        // PerformanceTestResult is generally not calculated per real-time tick,
-        // but rather for the whole session or specific operations.
-        // It's kept null here as per original logic for real-time.
         performanceTestResult = null;
+
+        if (kDebugMode) {
+          int currentTotalInData = 0;
+          _data?.values.forEach((list) => currentTotalInData += list.length);
+          print('L_RT_LOG [8 END_OF_SETSTATE]: _data total unique items: $currentTotalInData, _dataAvailable: $_dataAvailable, recordCountResult total: ${recordCountResult?.totalAmountOfRecords}');
+        }
       });
+    } else if (kDebugMode) {
+      print('L_RT_LOG [X]: newlyFetchedChunk was null or had no data type keys. No processing or setState for data accumulation this poll.');
+      bool isDataCurrentlyEmpty = _data == null || _data!.values.every((list) => list.isEmpty);
+      if (isDataCurrentlyEmpty && (_dataAvailable || recordCountResult != null)) {
+        setState((){
+          _dataAvailable = false;
+          recordCountResult = null;
+          conversionValidityResult = null;
+          if (kDebugMode) print('L_RT_LOG [X.1]: Cleared metrics as newlyFetchedChunk was empty AND _data is also confirmed empty.');
+        });
+      }
     }
   }
 
