@@ -50,7 +50,6 @@ class HKDataFactoryImpl implements HKDataFactory {
     Map<String, dynamic> data,
     String errMsg,
   ) {
-    print("hk factory got ${data.runtimeType}");
 
   Map<String, dynamic> formattedQuantity = Map<String, dynamic>.from(data["quantity"]);
     var quantity = _createQuantity(formattedQuantity, errMsg);
