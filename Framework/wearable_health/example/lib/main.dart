@@ -380,7 +380,9 @@ class _ExperimentPageState extends State<ExperimentPage> {
     final DateTime startTime = endTime.subtract(_realTimeFetchWindow);
 
     if (kDebugMode) {
-      print("Real-time fetch (${_realTimeFetchWindow.inMinutes} min window): $startTime to $endTime for types: $_activeDataTypes");
+      final DateTime _nowForLog = DateTime.now();
+      final DateTime _startForLog = _nowForLog.subtract(_realTimeFetchWindow);
+      print(' L-- TIMER FIRED: Attempting real-time fetch for window: $_startForLog TO $_nowForLog');
     }
 
     final newlyFetchedChunk = await _fetchDataForRange(
