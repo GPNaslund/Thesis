@@ -24,7 +24,7 @@ void main() {
           count: 0,
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(72.0, doubleValue: 72.0, unit: ""),
+          quantity: HKQuantity(value: 72.0, unit: ""),
         ),
       );
 
@@ -41,8 +41,7 @@ void main() {
           startDate: startTime,
           endDate: endTime,
           quantity: HKQuantity(
-            heartRateValue,
-            doubleValue: heartRateValue,
+            value: heartRateValue,
             unit: "",
           ),
           uuid: '',
@@ -62,7 +61,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(72.0, doubleValue: 72.0, unit: ""),
+          quantity: HKQuantity(value: 72.0, unit: ""),
           uuid: '',
           sampleType: HKSampleType(identifier: ""),
           count: null,
@@ -86,7 +85,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(72.0, doubleValue: 72.0, unit: ""),
+          quantity: HKQuantity(value: 72.0, unit: ""),
           uuid: '',
           sampleType: HKSampleType(identifier: ""),
           count: null,
@@ -106,7 +105,7 @@ void main() {
           HKQuantitySample(
             startDate: startTime,
             endDate: endTime,
-            quantity: HKQuantity(value, doubleValue: value, unit: ""),
+            quantity: HKQuantity(value: value, unit: ""),
             uuid: '',
             sampleType: HKSampleType(identifier: ""),
             count: null,
@@ -124,7 +123,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(72.0, doubleValue: 72.0, unit: ""),
+          quantity: HKQuantity(value: 72.0, unit: ""),
           uuid: '',
           sampleType: HKSampleType(identifier: ""),
           count: null,
@@ -149,8 +148,7 @@ void main() {
           startDate: startTime,
           endDate: endTime,
           quantity: HKQuantity(
-            heartRateValue,
-            doubleValue: heartRateValue,
+            value: heartRateValue,
             unit: "",
           ),
           uuid: '',

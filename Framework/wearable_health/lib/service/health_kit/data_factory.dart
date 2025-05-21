@@ -94,7 +94,7 @@ class HKDataFactoryImpl implements HKDataFactory {
   HKQuantity _createQuantity(Map<String, dynamic> data, String errMsg) {
     var value = jsonConverter.extractDoubleValue(data["value"], errMsg);
     var unit = jsonConverter.extractStringValue(data["unit"], errMsg);
-    return HKQuantity(value, doubleValue: value, unit: unit);
+    return HKQuantity(value: value, unit: unit);
   }
 
   /// Helper method to create an HKDevice from JSON map data.

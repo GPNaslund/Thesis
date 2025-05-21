@@ -17,4 +17,18 @@ class HealthConnectHeartRateVariabilityRmssd implements HealthConnectData {
 
   @override
   HealthConnectHealthMetric get metric => throw UnimplementedError();
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> result = {
+      "time": time.toIso8601String(),
+      "heartRateVariabilityMillis": heartRateVariabilityMillis,
+      "metadata": metadata.toJson()
+    };
+
+    if (zoneOffset != null) {
+      result["zoneOffset"] = zoneOffset;
+    }
+
+    return result;
+  }
 }

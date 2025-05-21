@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import 'hk_device.dart';
 import 'hk_quantity.dart';
 import 'hk_sample.dart';
@@ -37,5 +39,30 @@ class HKQuantitySample extends HKSample {
   @override
   String toString() {
     return 'HKQuantitySample(uuid: $uuid, quantity: $quantity, startDate: $startDate)';
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> result = {
+      "uuid": uuid,
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate.toIso8601String(),
+      "quantity": quantity.toJson(),
+      "sampleType": sampleType.toString(),
+    };
+
+    if (metadata != null) {
+      result["metadata"] = metadata;
+    }
+    if (device != null) {
+      result["device"] = device!.toJson();
+    }
+    if (sourceRevision != null) {
+      result["sourceRevision"] = sourceRevision;
+    }
+    if (count != null) {
+      result["count"] = count;
+    }
+
+    return result;
   }
 }

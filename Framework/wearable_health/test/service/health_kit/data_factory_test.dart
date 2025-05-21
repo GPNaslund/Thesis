@@ -157,7 +157,7 @@ void main() {
 
         expect(result, isA<HKBodyTemperature>());
         expect(result.data.uuid, equals('test-uuid'));
-        expect(result.data.quantity.doubleValue, equals(37.5));
+        expect(result.data.quantity.value, equals(37.5));
         expect(result.data.quantity.unit, equals('degC'));
       });
 

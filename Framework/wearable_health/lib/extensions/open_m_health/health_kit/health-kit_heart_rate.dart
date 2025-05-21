@@ -15,7 +15,7 @@ extension OpenMHealthHeartRateConverter on HKHeartRate {
   List<OpenMHealthHeartRate> toOpenMHealthHeartRate() {
     List<OpenMHealthHeartRate> result = [];
     var unitValue = UnitValue(
-      value: data.quantity.doubleValue,
+      value: data.quantity.value,
       unit: "beats/min",
     );
 

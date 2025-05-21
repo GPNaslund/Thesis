@@ -36,4 +36,25 @@ class HealthConnectMetadata {
     required this.lastModifiedTime,
     required this.recordingMethod,
   });
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> result = {
+      "dataOrigin": dataOrigin,
+      "id": id,
+      "lastModifiedTime": lastModifiedTime.toIso8601String(),
+      "recordingMethod": recordingMethod
+    };
+
+    if (clientRecordId != null) {
+      result["clientRecordId"] = clientRecordId;
+    }
+    if (clientRecordVersion != null) {
+      result["clientRecordVersion"] = clientRecordVersion;
+    }
+    if (device != null) {
+      result["device"] = device;
+    }
+
+    return result;
+  }
 }

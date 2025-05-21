@@ -102,8 +102,8 @@ HKDataFactory hkDataFactory
 
   // Open MHealth
   var omhObj = openMHealth[0];
-  if (omhObj.heartRateVariability.value != obj.data.quantity.doubleValue) {
-    log("found discrepancy: obj heart rate variability: ${obj.data.quantity.doubleValue} - omh value: ${omhObj.heartRateVariability.value}" );
+  if (omhObj.heartRateVariability.value != obj.data.quantity.value) {
+    log("found discrepancy: obj heart rate variability: ${obj.data.quantity.value} - omh value: ${omhObj.heartRateVariability.value}" );
     return !isValid;
   }
 
@@ -124,8 +124,8 @@ bool _validateQuantity(dynamic rawQuantity, HkHeartRateVariability obj) {
   if (rawQuantity is Map<Object?, Object?>) {
     if (rawQuantity["value"] != null) {
       if (rawQuantity["unit"] != null) {
-        if (rawQuantity["value"] != obj.data.quantity.doubleValue) {
-          log("found discrepancy: raw quantity value: ${rawQuantity["value"]} - obj quantity value: ${obj.data.quantity.doubleValue}");
+        if (rawQuantity["value"] != obj.data.quantity.value) {
+          log("found discrepancy: raw quantity value: ${rawQuantity["value"]} - obj quantity value: ${obj.data.quantity.value}");
           return !isValid;
         }
         if (rawQuantity["unit"] != obj.data.quantity.unit) {

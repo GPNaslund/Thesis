@@ -42,4 +42,30 @@ class HealthConnectHeartRate extends HealthConnectData {
   /// Always returns [HealthConnectHealthMetric.heartRate].
   @override
   HealthConnectHealthMetric get metric => HealthConnectHealthMetric.heartRate;
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> result = {
+      "startTime": startTime.toIso8601String(),
+      "endTime": endTime.toIso8601String(),
+      "samples": _serializeSamples(),
+      "metadata": metadata.toJson(),
+    };
+
+    if (startZoneOffset != null) {
+      result["startZoneOffset"] = startZoneOffset;
+    }
+    if (endZoneOffset != null) {
+      result["endZoneOffset"] = endZoneOffset;
+    }
+
+    return result;
+  }
+
+  List<Map<String, dynamic>> _serializeSamples() {
+    List<Map<String, dynamic>> serialized = [];
+    samples.forEach((element) {
+      serialized.add(element.toJson());
+    });
+    return serialized;
+  }
 }

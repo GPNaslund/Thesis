@@ -29,4 +29,25 @@ class HKDevice {
     this.hardwareVersion,
     this.softwareVersion,
   });
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> result = {};
+    if (name != null) {
+      result["name"] = name;
+    }
+    if (manufacturer != null) {
+      result["manufacturer"] = manufacturer;
+    }
+    if (model != null) {
+      result["model"] = model;
+    }
+    if (hardwareVersion != null) {
+      result["hardwareVersion"] = hardwareVersion;
+    }
+    if (softwareVersion != null) {
+      result["softwareVersion"] = softwareVersion;
+    }
+
+    return result;
+  }
 }

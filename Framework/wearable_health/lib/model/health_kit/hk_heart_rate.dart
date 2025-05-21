@@ -20,4 +20,11 @@ class HKHeartRate extends HealthKitData {
   /// Always returns [HealthKitHealthMetric.heartRate].
   @override
   HealthKitHealthMetric get healthMetric => HealthKitHealthMetric.heartRate;
+
+  Map<String, dynamic> toJson() {
+    return {
+      "quantitySample": data.toJson(),
+      "healthMetric": HealthKitHealthMetric.heartRate.definition,
+    };
+  }
 }

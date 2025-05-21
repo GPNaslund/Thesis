@@ -10,4 +10,11 @@ class HeartRateRecordSample {
 
   /// Creates a new heart rate sample with the specified time and value.
   HeartRateRecordSample(this.time, this.beatsPerMinute);
+
+  Map<String, dynamic> toJson() {
+    return {
+      "time": time.toIso8601String(),
+      "beatsPerMinute": beatsPerMinute
+    };
+  }
 }

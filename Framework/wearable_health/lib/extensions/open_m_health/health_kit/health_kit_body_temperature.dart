@@ -64,7 +64,7 @@ extension OpenMHealthBodyTemperatureConverter on HKBodyTemperature {
 
     var tempUnit = TemperatureUnit.C;
     var unitValue = TemperatureUnitValue(
-      value: data.quantity.doubleValue,
+      value: data.quantity.value,
       unit: tempUnit,
     );
     var timeFrame = TimeFrame(dateTime: data.startDate);

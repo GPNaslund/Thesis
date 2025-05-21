@@ -21,6 +21,7 @@ import 'package:wearable_health_example/services/health_connect/hc_record_count.
 import 'package:wearable_health_example/services/health_kit/hk_data_conversion_validation.dart';
 import 'package:wearable_health_example/services/health_kit/hk_performance_test.dart';
 import 'package:wearable_health_example/services/health_kit/hk_record_count.dart';
+import 'package:wearable_health_example/widgets/display_data.dart';
 import 'package:wearable_health_example/widgets/performance_module.dart';
 
 import 'widgets/data_conversion.dart';
@@ -70,11 +71,13 @@ class _ExperimentPageState extends State<ExperimentPage>
   late HCDataConversionValidation hcConversionValidator;
   late HCPerformanceTest hcPerformanceTester;
   late HCRecordCount hcRecordCounter;
+  late HCDataFactory hcDataFactory;
 
   // Ios specific services
   late HKDataConversionValidation hkConversionValidator;
   late HKPerformanceTest hkPerformanceTester;
   late HKRecordCount hkRecordCounter;
+  late HKDataFactory hkDataFactory;
 
   // Result exporter
   late ResultExporter resultExporter;
@@ -82,10 +85,10 @@ class _ExperimentPageState extends State<ExperimentPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     var jsonConverter = JsonConverterImpl();
-    HCDataFactory hcDataFactory = HCDataFactoryImpl(jsonConverter);
-    HKDataFactory hkDataFactory = HKDataFactoryImpl(jsonConverter);
+    hcDataFactory = HCDataFactoryImpl(jsonConverter);
+    hkDataFactory = HKDataFactoryImpl(jsonConverter);
     hcConversionValidator = HCDataConversionValidation(hcDataFactory);
     hcPerformanceTester = HCPerformanceTest(hcDataFactory);
     hcRecordCounter = HCRecordCount();
@@ -250,6 +253,13 @@ class _ExperimentPageState extends State<ExperimentPage>
               ),
               text: 'Performance',
             ),
+            Tab(
+              icon: Icon(
+                Icons.table_chart_outlined,
+                color: _dataAvailable ? Colors.blue : Colors.grey,
+              ),
+              text: 'Display Data',
+            ),
           ],
         ),
       ),
@@ -263,6 +273,7 @@ class _ExperimentPageState extends State<ExperimentPage>
                 DataRetrievalModule(data: recordCountResult),
                 ConversionModule(stats: conversionValidityResult),
                 PerformanceModule(data: performanceTestResult),
+                DataDisplayModule(data: _data, hcDataFactory: hcDataFactory, hkDataFactory: hkDataFactory),
               ],
             ),
           ),

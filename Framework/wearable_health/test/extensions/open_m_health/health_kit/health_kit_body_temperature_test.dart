@@ -26,7 +26,7 @@ void main() {
           HKQuantitySample(
             startDate: startTime,
             endDate: endTime,
-            quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ""),
+            quantity: HKQuantity(value: 37.0, unit: ""),
             metadata: null,
             uuid: '',
             sampleType: HKSampleType(identifier: ""),
@@ -49,7 +49,7 @@ void main() {
           HKQuantitySample(
             startDate: startTime,
             endDate: endTime,
-            quantity: HKQuantity(tempValue, doubleValue: tempValue, unit: ''),
+            quantity: HKQuantity(value: tempValue, unit: ''),
             metadata: null,
             uuid: '',
             sampleType: HKSampleType(identifier: ""),
@@ -69,7 +69,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ''),
+          quantity: HKQuantity(value: 37.0, unit: ''),
           metadata: null,
           uuid: '',
           sampleType: HKSampleType(identifier: ""),
@@ -89,7 +89,7 @@ void main() {
           HKQuantitySample(
             startDate: startTime,
             endDate: endTime,
-            quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ''),
+            quantity: HKQuantity(value: 37.0, unit: ''),
             metadata: null,
             uuid: '',
             sampleType: HKSampleType(identifier: ""),
@@ -111,7 +111,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ""),
+          quantity: HKQuantity(value: 37.0, unit: ""),
           metadata: null,
           uuid: '',
           sampleType: HKSampleType(identifier: ""),
@@ -148,7 +148,7 @@ void main() {
             HKQuantitySample(
               startDate: startTime,
               endDate: endTime,
-              quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ''),
+              quantity: HKQuantity(value: 37.0, unit: ''),
               metadata: {
                 "HKMetadataKeyBodyTemperatureSensorLocation": location[0],
               },
@@ -174,7 +174,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ''),
+          quantity: HKQuantity(value: 37.0, unit: ''),
           metadata: null,
           uuid: '',
           sampleType: HKSampleType(identifier: ""),
@@ -194,7 +194,7 @@ void main() {
           HKQuantitySample(
             startDate: startTime,
             endDate: endTime,
-            quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ''),
+            quantity: HKQuantity(value: 37.0, unit: ''),
             metadata: {"SomeOtherKey": "SomeValue"},
             uuid: '',
             sampleType: HKSampleType(identifier: ""),
@@ -215,7 +215,7 @@ void main() {
           HKQuantitySample(
             startDate: startTime,
             endDate: endTime,
-            quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ""),
+            quantity: HKQuantity(value: 37.0, unit: ""),
             metadata: {
               "HKMetadataKeyBodyTemperatureSensorLocation": "invalidValue",
             },
@@ -236,7 +236,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ""),
+          quantity: HKQuantity(value: 37.0, unit: ""),
           metadata: {
             "HKMetadataKeyBodyTemperatureSensorLocation": 6, // Oral
           },
@@ -266,7 +266,7 @@ void main() {
         HKQuantitySample(
           startDate: startTime,
           endDate: endTime,
-          quantity: HKQuantity(37.0, doubleValue: 37.0, unit: ""),
+          quantity: HKQuantity(value: 37.0, unit: ""),
           metadata: null,
           uuid: '',
           sampleType: HKSampleType(identifier: ""),
@@ -290,7 +290,7 @@ void main() {
             HKQuantitySample(
               startDate: startTime,
               endDate: endTime,
-              quantity: HKQuantity(value, doubleValue: value, unit: ""),
+              quantity: HKQuantity(value: value, unit: ""),
               metadata: null,
               uuid: '',
               sampleType: HKSampleType(identifier: ""),
