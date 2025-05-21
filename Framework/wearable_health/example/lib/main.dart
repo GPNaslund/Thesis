@@ -8,6 +8,7 @@ import 'package:wearable_health/controller/wearable_health.dart';
 import 'package:wearable_health/model/health_connect/enums/hc_health_metric.dart';
 import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
 import 'package:wearable_health/service/converters/json/json_converter.dart';
+import 'package:wearable_health/service/converters/json/json_converter_interface.dart';
 import 'package:wearable_health/service/health_connect/data_factory.dart';
 import 'package:wearable_health/service/health_connect/data_factory_interface.dart';
 import 'package:wearable_health/service/health_kit/data_factory.dart';
@@ -28,6 +29,31 @@ import 'package:wearable_health_example/widgets/performance_module.dart';
 
 import 'widgets/data_conversion.dart';
 import 'widgets/data_retrieval.dart';
+
+// Dummy implementation for JsonConverterImpl if not available
+// Replace with your actual implementation
+class JsonConverterImpl implements JsonConverter {
+  @override
+  T fromJson<T, K>(Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJson) {
+    return fromJson(json);
+  }
+
+  @override
+  List<T> fromJsonList<T, K>(List<dynamic> jsonList, T Function(Map<String, dynamic>) fromJson) {
+    return jsonList.map((json) => fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Map<String, dynamic> toJson<T, K>(T object, Map<String, dynamic> Function(T) toJson) {
+    return toJson(object);
+  }
+
+  @override
+  List<Map<String, dynamic>> toJsonList<T, K>(List<T> list, Map<String, dynamic> Function(T) toJson) {
+    return list.map((item) => toJson(item)).toList();
+  }
+}
+
 
 enum ExperimentMode { historical, realTime }
 
@@ -85,10 +111,15 @@ class _ExperimentPageState extends State<ExperimentPage> {
   Timer? _realTimeTimer;
   List<dynamic> _activeDataTypes = [];
 
+  // Define the polling interval and fetch window duration
+  static const Duration _realTimePollingInterval = Duration(minutes: 1);
+  static const Duration _realTimeFetchWindow = Duration(minutes: 5);
+
+
   @override
   void initState() {
     super.initState();
-    var jsonConverter = JsonConverterImpl();
+    JsonConverter jsonConverter = JsonConverterImpl();
     hcDataFactory = HCDataFactoryImpl(jsonConverter);
     hkDataFactory = HKDataFactoryImpl(jsonConverter);
     hcConversionValidator = HCDataConversionValidation(hcDataFactory);
@@ -220,12 +251,10 @@ class _ExperimentPageState extends State<ExperimentPage> {
     try {
       if (Platform.isAndroid) {
         final sut = wearableHealthController.getGoogleHealthConnect();
-
         final platformResult = await sut.getRawData(List<HealthConnectHealthMetric>.from(dataTypes), range);
         resultData = platformResult.data;
       } else {
         final sut = wearableHealthController.getAppleHealthKit();
-
         final platformResult = await sut.getRawData(List<HealthKitHealthMetric>.from(dataTypes), range);
         resultData = platformResult.data;
       }
@@ -261,26 +290,24 @@ class _ExperimentPageState extends State<ExperimentPage> {
     setState(() {
       _isLoading = true;
       _dataAvailable = false;
-      _data = null;
+      _data = null; // Clear previous historical data
       recordCountResult = null;
       conversionValidityResult = null;
       performanceTestResult = null;
     });
 
     _activeDataTypes =
-        Platform.isAndroid
-            ? [
-              HealthConnectHealthMetric.heartRate,
-              HealthConnectHealthMetric.heartRateVariability,
-            ]
-            : [
-              HealthKitHealthMetric.heartRate,
-              HealthKitHealthMetric.heartRateVariability,
-            ];
+    Platform.isAndroid
+        ? [
+      HealthConnectHealthMetric.heartRate,
+      HealthConnectHealthMetric.heartRateVariability,
+    ]
+        : [
+      HealthKitHealthMetric.heartRate,
+      HealthKitHealthMetric.heartRateVariability,
+    ];
 
-    bool permissionsGranted = await _requestPlatformPermissions(
-      _activeDataTypes,
-    );
+    bool permissionsGranted = await _requestPlatformPermissions(_activeDataTypes);
     if (!permissionsGranted) {
       if (mounted) setState(() => _isLoading = false);
       return;
@@ -296,11 +323,10 @@ class _ExperimentPageState extends State<ExperimentPage> {
 
     if (mounted) {
       if (fetchedData != null) {
-        _data = fetchedData;
+        _data = fetchedData; // Assign fetched data
         if (Platform.isAndroid) {
           recordCountResult = hcRecordCounter.calculateRecordCount(_data!);
-          conversionValidityResult = hcConversionValidator
-              .performConversionValidation(_data!);
+          conversionValidityResult = hcConversionValidator.performConversionValidation(_data!);
           performanceTestResult = hcPerformanceTester.getPerformanceResults(
             _data!,
             _stopWatch.elapsedMilliseconds,
@@ -308,15 +334,14 @@ class _ExperimentPageState extends State<ExperimentPage> {
           );
         } else {
           recordCountResult = hkRecordCounter.calculateRecordCount(_data!);
-          conversionValidityResult = hkConversionValidator
-              .performConversionValidation(_data!);
+          conversionValidityResult = hkConversionValidator.performConversionValidation(_data!);
           performanceTestResult = hkPerformanceTester.getPerformanceResults(
             _data!,
             _stopWatch.elapsedMilliseconds,
             _stopWatch,
           );
         }
-        _dataAvailable = _data!.isNotEmpty;
+        _dataAvailable = _data!.values.any((list) => list.isNotEmpty);
       } else {
         _dataAvailable = false;
       }
@@ -326,23 +351,21 @@ class _ExperimentPageState extends State<ExperimentPage> {
 
   Future<void> _startRealTimeSession() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Show loading indicator briefly
     });
 
     _activeDataTypes =
-        Platform.isAndroid
-            ? [
-              HealthConnectHealthMetric.heartRate,
-              HealthConnectHealthMetric.heartRateVariability,
-            ]
-            : [
-              HealthKitHealthMetric.heartRate,
-              HealthKitHealthMetric.heartRateVariability,
-            ];
+    Platform.isAndroid
+        ? [
+      HealthConnectHealthMetric.heartRate,
+      HealthConnectHealthMetric.heartRateVariability,
+    ]
+        : [
+      HealthKitHealthMetric.heartRate,
+      HealthKitHealthMetric.heartRateVariability,
+    ];
 
-    bool permissionsGranted = await _requestPlatformPermissions(
-      _activeDataTypes,
-    );
+    bool permissionsGranted = await _requestPlatformPermissions(_activeDataTypes);
     if (!permissionsGranted) {
       if (mounted) setState(() => _isLoading = false);
       return;
@@ -350,22 +373,21 @@ class _ExperimentPageState extends State<ExperimentPage> {
 
     if (mounted) {
       setState(() {
-        _data = {};
+        _data = {}; // Initialize as empty for accumulation
         recordCountResult = null;
         conversionValidityResult = null;
-        performanceTestResult =
-            null;
+        performanceTestResult = null; // Not applicable for ongoing real-time session start
         _dataAvailable = false;
         _isRealTimeSessionRunning = true;
-        _isLoading = false;
+        _isLoading = false; // Hide loading indicator
       });
     }
 
+    // Perform an initial fetch to populate some data immediately
     await _fetchAndProcessRealTimeData();
 
-    _realTimeTimer?.cancel();
-    _realTimeTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-
+    _realTimeTimer?.cancel(); // Cancel any existing timer
+    _realTimeTimer = Timer.periodic(_realTimePollingInterval, (timer) {
       if (!_isRealTimeSessionRunning || !mounted) {
         timer.cancel();
         return;
@@ -378,10 +400,11 @@ class _ExperimentPageState extends State<ExperimentPage> {
     if (!mounted || !_isRealTimeSessionRunning) return;
 
     final DateTime endTime = DateTime.now();
-    final DateTime startTime = endTime.subtract(const Duration(minutes: 1));
+    // 👇 Use the defined _realTimeFetchWindow (e.g., 5 minutes)
+    final DateTime startTime = endTime.subtract(_realTimeFetchWindow);
 
     if (kDebugMode) {
-      print("Real-time fetch: $startTime to $endTime");
+      print("Real-time fetch (${_realTimeFetchWindow.inMinutes} min window): $startTime to $endTime for types: $_activeDataTypes");
     }
 
     final newlyFetchedChunk = await _fetchDataForRange(
@@ -390,30 +413,64 @@ class _ExperimentPageState extends State<ExperimentPage> {
     );
 
     if (mounted && newlyFetchedChunk != null) {
-      setState(() {
-        _data ??= {};
-        newlyFetchedChunk.forEach((key, newList) {
-          final existingList = _data![key] ?? [];
+      bool newUniqueDataWasAddedThisPoll = false;
 
-          _data![key] = existingList..addAll(newList);
+      setState(() {
+        _data ??= {}; // Ensure _data is initialized
+
+        newlyFetchedChunk.forEach((dataTypeKey, incomingSampleList) {
+          // Initialize list for this data type in _data if it doesn't exist
+          _data![dataTypeKey] ??= [];
+
+          // Get UUIDs of samples already present for this data type
+          // IMPORTANT: Assumes your sample Maps have a 'uuid' field. Adjust if necessary.
+          final Set<String> existingUUIDs = _data![dataTypeKey]!
+              .map((sample) => sample['uuid'] as String? ?? '')
+              .where((uuid) => uuid.isNotEmpty)
+              .toSet();
+
+          int preAddCount = _data![dataTypeKey]!.length;
+
+          // Filter and add only unique new samples
+          for (final newSample in incomingSampleList) {
+            final newSampleUUID = newSample['uuid'] as String? ?? '';
+            if (newSampleUUID.isNotEmpty && !existingUUIDs.contains(newSampleUUID)) {
+              _data![dataTypeKey]!.add(newSample);
+            }
+          }
+          if (_data![dataTypeKey]!.length > preAddCount) {
+            newUniqueDataWasAddedThisPoll = true;
+          }
         });
 
-        if (_data!.values.any((list) => list.isNotEmpty)) {
+        // Update availability and metrics
+        final bool hasAnyData = _data!.values.any((list) => list.isNotEmpty);
+
+        if (hasAnyData) {
           _dataAvailable = true;
-          if (Platform.isAndroid) {
-            recordCountResult = hcRecordCounter.calculateRecordCount(
-              _data!,
-            );
-            conversionValidityResult = hcConversionValidator
-                .performConversionValidation(_data!);
-          } else {
-            recordCountResult = hkRecordCounter.calculateRecordCount(_data!);
-            conversionValidityResult = hkConversionValidator
-                .performConversionValidation(_data!);
+          // Only recalculate metrics if new data was actually added or if it's the first time data is populated
+          if (newUniqueDataWasAddedThisPoll || recordCountResult == null) {
+            if (kDebugMode && newUniqueDataWasAddedThisPoll) {
+              print("New unique data added. Recalculating metrics.");
+            }
+            if (Platform.isAndroid) {
+              recordCountResult = hcRecordCounter.calculateRecordCount(_data!);
+              conversionValidityResult = hcConversionValidator.performConversionValidation(_data!);
+            } else {
+              recordCountResult = hkRecordCounter.calculateRecordCount(_data!);
+              conversionValidityResult = hkConversionValidator.performConversionValidation(_data!);
+            }
           }
-          performanceTestResult =
-              null;
+        } else {
+          _dataAvailable = false;
+          // If no data, clear results
+          recordCountResult = null;
+          conversionValidityResult = null;
         }
+        // PerformanceTestResult is generally not calculated per real-time tick,
+        // but rather for the whole session or specific operations.
+        // It's kept null here as per original logic for real-time.
+        performanceTestResult = null;
       });
     }
   }
@@ -424,7 +481,9 @@ class _ExperimentPageState extends State<ExperimentPage> {
     if (mounted) {
       setState(() {
         _isRealTimeSessionRunning = false;
-
+        // Optionally, you might want to finalize any real-time session metrics here
+        // For example, if you were tracking overall performance of the real-time session.
+        // The existing `_data` will be preserved until the mode is switched or a new session starts.
       });
     }
   }
@@ -432,51 +491,45 @@ class _ExperimentPageState extends State<ExperimentPage> {
   Future<void> _exportDataToFile() async {
     bool canExportHistorical =
         _currentMode == ExperimentMode.historical &&
-        recordCountResult != null &&
-        conversionValidityResult != null &&
-        performanceTestResult != null;
+            recordCountResult != null &&
+            conversionValidityResult != null &&
+            performanceTestResult != null;
     bool canExportRealTime =
         _currentMode == ExperimentMode.realTime &&
-        _dataAvailable &&
-        recordCountResult != null &&
-        conversionValidityResult != null;
+            _dataAvailable && // Check if there's any data accumulated
+            recordCountResult != null &&
+            conversionValidityResult != null;
 
     if (!canExportHistorical && !canExportRealTime) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'No complete data set available to export for the current mode.',
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No complete data set available to export for the current mode.'),
           ),
-        ),
-      );
+        );
+      }
       return;
     }
 
     String exportMessage = "Exporting results...";
-    if (_currentMode == ExperimentMode.realTime &&
-        performanceTestResult == null &&
-        canExportRealTime) {
-      exportMessage =
-          'Exporting accumulated real-time data (session performance metrics not applicable).';
+    if (_currentMode == ExperimentMode.realTime && performanceTestResult == null && canExportRealTime) {
+      exportMessage = 'Exporting accumulated real-time data (session performance metrics not applicable).';
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(exportMessage)));
+    if(mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(exportMessage)));
+    }
+
 
     try {
       var results = ExperimentationResult(
         amountOfRecords: recordCountResult!.totalAmountOfRecords,
         amountOfHRRecords: recordCountResult!.amountOfHRRecords,
-        amountOfValidatedHR:
-            conversionValidityResult!.correctlyConvertedHeartRateObjects,
+        amountOfValidatedHR: conversionValidityResult!.correctlyConvertedHeartRateObjects,
         amountOfHRVRecords: recordCountResult!.amountOfHRVRecords,
-        amountOfValidatedHRV:
-            conversionValidityResult!
-                .correctlyConvertedHeartRateVariabilityObjects,
-        totalFetchTimeMs: performanceTestResult?.totalExecutionTimeMs ?? 0,
-        rawDataFetchTimeMs: performanceTestResult?.dataFetchExecutionInMs ?? 0,
-        conversionFetchTimeMs:
-            performanceTestResult?.conversionExecutionInMs ?? 0,
+        amountOfValidatedHRV: conversionValidityResult!.correctlyConvertedHeartRateVariabilityObjects,
+        totalFetchTimeMs: performanceTestResult?.totalExecutionTimeMs ?? 0, // Will be 0 for real-time export
+        rawDataFetchTimeMs: performanceTestResult?.dataFetchExecutionInMs ?? 0, // Will be 0 for real-time
+        conversionFetchTimeMs: performanceTestResult?.conversionExecutionInMs ?? 0, // Will be 0 for real-time
       );
       await resultExporter.createAndShareResults(results, context);
     } catch (e) {
@@ -484,17 +537,15 @@ class _ExperimentPageState extends State<ExperimentPage> {
         print("Error exporting data: $e");
       }
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error exporting results: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error exporting results: $e')));
       }
     }
   }
 
   Future<void> _exportDataToFileWithFeedback() async {
-
     await _exportDataToFile();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -528,33 +579,29 @@ class _ExperimentPageState extends State<ExperimentPage> {
                 leading: Icon(
                   pageDestinations[i]['icon'] as IconData,
                   color:
-                      _selectedPageIndex == i
-                          ? Theme.of(context).colorScheme.primary
-                          : (_dataAvailable
-                              ? Theme.of(
-                                context,
-                              ).textTheme.bodyLarge?.color?.withOpacity(0.8)
-                              : Colors.grey[600]),
+                  _selectedPageIndex == i
+                      ? Theme.of(context).colorScheme.primary
+                      : (_dataAvailable
+                      ? Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.8)
+                      : Colors.grey[600]),
                 ),
                 title: Text(
                   pageDestinations[i]['title'] as String,
                   style: TextStyle(
                     fontWeight:
-                        _selectedPageIndex == i
-                            ? FontWeight.bold
-                            : FontWeight.normal,
+                    _selectedPageIndex == i
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                     color:
-                        _selectedPageIndex == i
-                            ? Theme.of(context).colorScheme.primary
-                            : (_dataAvailable
-                                ? Theme.of(context).textTheme.bodyLarge?.color
-                                : Colors.grey[700]),
+                    _selectedPageIndex == i
+                        ? Theme.of(context).colorScheme.primary
+                        : (_dataAvailable
+                        ? Theme.of(context).textTheme.bodyLarge?.color
+                        : Colors.grey[700]),
                   ),
                 ),
                 selected: _selectedPageIndex == i,
-                selectedTileColor: Theme.of(
-                  context,
-                ).colorScheme.primary.withOpacity(0.1),
+                selectedTileColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                 onTap: () {
                   if (mounted) {
                     setState(() {
@@ -572,9 +619,7 @@ class _ExperimentPageState extends State<ExperimentPage> {
           Expanded(child: _buildCurrentPageWidget()),
           Material(
             elevation: 4.0,
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(
-              0.05,
-            ), // Light background for the whole bar
+            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.05),
             child: ExpansionTile(
               title: Text(
                 'Experiment Setup & Controls',
@@ -584,22 +629,10 @@ class _ExperimentPageState extends State<ExperimentPage> {
                 ),
               ),
               initiallyExpanded: true,
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.surfaceVariant.withOpacity(0.3),
-              collapsedBackgroundColor: Theme.of(
-                context,
-              ).colorScheme.surfaceVariant.withOpacity(0.1),
-              childrenPadding: const EdgeInsets.fromLTRB(
-                16.0,
-                0,
-                16.0,
-                16.0,
-              ),
-              tilePadding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 4.0,
-              ),
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              collapsedBackgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
+              childrenPadding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0,),
+              tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0,),
               children: [
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -625,11 +658,10 @@ class _ExperimentPageState extends State<ExperimentPage> {
                           if (mounted) {
                             setState(() {
                               _currentMode = newSelection.first;
-                              if (_currentMode == ExperimentMode.historical &&
-                                  _isRealTimeSessionRunning) {
+                              if (_currentMode == ExperimentMode.historical && _isRealTimeSessionRunning) {
                                 _stopRealTimeSession();
                               }
-
+                              // Reset data and results when mode changes
                               _data = null;
                               _dataAvailable = false;
                               recordCountResult = null;
@@ -640,23 +672,16 @@ class _ExperimentPageState extends State<ExperimentPage> {
                           }
                         },
                         style: SegmentedButton.styleFrom(
-                          selectedBackgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary.withOpacity(0.2),
-                          selectedForegroundColor:
-                              Theme.of(context).colorScheme.primary,
+                          selectedBackgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                          selectedForegroundColor: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
                     Visibility(
                       visible: _currentMode == ExperimentMode.historical,
-                      maintainState:
-                          true,
+                      maintainState: true, // Keep state for smooth transitions
                       child: Opacity(
-                        opacity:
-                            _currentMode == ExperimentMode.historical
-                                ? 1.0
-                                : 0.0,
+                        opacity: _currentMode == ExperimentMode.historical ? 1.0 : 0.0,
                         child: IgnorePointer(
                           ignoring: _currentMode != ExperimentMode.historical,
                           child: Column(
@@ -669,7 +694,7 @@ class _ExperimentPageState extends State<ExperimentPage> {
                                       context,
                                       'Start Date',
                                       _startDate,
-                                      () => _selectDate(context, true),
+                                          () => _selectDate(context, true),
                                     ),
                                   ),
                                   const SizedBox(width: 16),
@@ -678,7 +703,7 @@ class _ExperimentPageState extends State<ExperimentPage> {
                                       context,
                                       'End Date',
                                       _endDate,
-                                      () => _selectDate(context, false),
+                                          () => _selectDate(context, false),
                                     ),
                                   ),
                                 ],
@@ -696,20 +721,17 @@ class _ExperimentPageState extends State<ExperimentPage> {
                         icon: Icon(
                           _isLoading
                               ? Icons.hourglass_empty_rounded
-                              :
-                              _currentMode == ExperimentMode.historical
+                              : _currentMode == ExperimentMode.historical
                               ? Icons.play_arrow_rounded
                               : _isRealTimeSessionRunning
                               ? Icons.stop_rounded
                               : Icons.play_circle_filled_rounded,
                         ),
-                        onPressed:
-                            _isLoading ? null : _handlePrimaryButtonAction,
+                        onPressed: _isLoading ? null : _handlePrimaryButtonAction,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _isRealTimeSessionRunning
-                                  ? Colors.redAccent.shade200
-                                  : Theme.of(context).colorScheme.primary,
+                          backgroundColor: _isRealTimeSessionRunning && _currentMode == ExperimentMode.realTime
+                              ? Colors.redAccent.shade200
+                              : Theme.of(context).colorScheme.primary,
                           foregroundColor: Colors.white,
                           textStyle: const TextStyle(
                             fontSize: 16,
@@ -732,25 +754,18 @@ class _ExperimentPageState extends State<ExperimentPage> {
                       width: double.infinity,
                       height: 40,
                       child: OutlinedButton.icon(
-                        onPressed:
-                            (_dataAvailable &&
-                                    (recordCountResult != null &&
-                                        conversionValidityResult != null))
-                                ? _exportDataToFileWithFeedback
-                                : null,
+                        onPressed: (_dataAvailable && recordCountResult != null && conversionValidityResult != null)
+                            ? _exportDataToFileWithFeedback
+                            : null,
                         icon: const Icon(Icons.file_download_outlined),
                         label: const Text('Export Results'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor:
-                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.primary,
                           disabledForegroundColor: Colors.grey.shade400,
                           side: BorderSide(
-                            color:
-                                (_dataAvailable &&
-                                        (recordCountResult != null &&
-                                            conversionValidityResult != null))
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.grey.shade300,
+                            color: (_dataAvailable && recordCountResult != null && conversionValidityResult != null)
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey.shade300,
                           ),
                         ),
                       ),
@@ -771,28 +786,23 @@ class _ExperimentPageState extends State<ExperimentPage> {
       DateTime date,
       VoidCallback onTap,
       ) {
-    // Using a slightly more compact default format, adjust as needed
-    final formattedDate = DateFormat('MMM dd, yy  HH:mm').format(date);
-    // Example alternative: final formattedDate = DateFormat.yMd().add_Hm().format(date); // e.g., 5/21/25, 7:37 PM
-
+    final formattedDate = DateFormat('MMM dd, yy HH:mm').format(date);
     bool dateSelectorEnabled =
-        _currentMode == ExperimentMode.historical &&
-            !_isRealTimeSessionRunning &&
-            !_isLoading;
+        _currentMode == ExperimentMode.historical && !_isRealTimeSessionRunning && !_isLoading;
 
     return InkWell(
       onTap: dateSelectorEnabled ? onTap : null,
       child: Opacity(
         opacity: dateSelectorEnabled ? 1.0 : 0.5,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Adjusted padding
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            border: Border.all(color: Colors.grey.shade300), // Slightly lighter border
+            border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05), // Softer shadow
+                color: Colors.black.withOpacity(0.05),
                 spreadRadius: 1,
                 blurRadius: 3,
                 offset: const Offset(0, 1),
@@ -801,34 +811,32 @@ class _ExperimentPageState extends State<ExperimentPage> {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, // Important for Column in a constrained space
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 label,
                 style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
               ),
-              const SizedBox(height: 4), // Consistent spacing
+              const SizedBox(height: 4),
               Row(
                 children: [
                   Icon(
-                    Icons.calendar_month_outlined, // Using outlined icon
-                    size: 18, // Slightly larger icon
-                    color: dateSelectorEnabled
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey,
+                    Icons.calendar_month_outlined,
+                    size: 18,
+                    color: dateSelectorEnabled ? Theme.of(context).colorScheme.primary : Colors.grey,
                   ),
-                  const SizedBox(width: 6), // Adjusted spacing
-                  Expanded( // Wrap the Text widget with Expanded
+                  const SizedBox(width: 6),
+                  Expanded(
                     child: Text(
                       formattedDate,
                       style: TextStyle(
-                        fontSize: 13, // Adjusted font size for better fit
+                        fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: dateSelectorEnabled ? Theme.of(context).textTheme.bodyLarge?.color : Colors.grey,
                       ),
-                      overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
-                      maxLines: 1,                     // Ensure it stays on one line
-                      softWrap: false,                   // Prevent wrapping that might cause vertical overflow
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      softWrap: false,
                     ),
                   ),
                 ],
