@@ -105,7 +105,6 @@ bool isValidHCHeartRateConversion(
     return !isValid;
   }
 
-  // Validate open mhealth conversion
 
   for (var i = 0; i < obj.samples.length; i++) {
     var objSample = obj.samples[i];

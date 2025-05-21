@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:wearable_health/extensions/open_m_health/health_connect/health_connect_heart_rate.dart';
 import 'package:wearable_health/extensions/open_m_health/health_connect/health_connect_heart_rate_variability.dart';
 import 'package:wearable_health/extensions/open_m_health/health_kit/health-kit_heart_rate.dart';
@@ -33,112 +33,153 @@ class DataDisplayModule extends StatefulWidget {
 }
 
 class _DataDisplayModuleState extends State<DataDisplayModule> {
-  Map<String, List<DisplayableRecord>>? _categorizedData;
-  bool _isLoading = true;
-  String? _processingError;
+  String? _selectedMetricKey;
+  List<String> _availableMetricKeys = [];
+
+  List<DisplayableRecord> _displayedPageRecords = [];
+  int _currentPage = 1;
+  int _totalPages = 0;
+  final int _recordsPerPage = 15;
+
+  bool _isLoadingPage = false;
 
   @override
   void initState() {
     super.initState();
-    _initiateDataProcessing();
+    _initializeModule();
   }
 
   @override
-  void didUpdateWidget(covariant DataDisplayModule oldWidget) {
+  void didUpdateWidget(DataDisplayModule oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.data != oldWidget.data) {
-      _initiateDataProcessing();
+      _initializeModule();
     }
   }
 
-  void _initiateDataProcessing() {
-    if (widget.data == null || widget.data!.isEmpty) {
+  void _initializeModule() {
+    if (widget.data != null && widget.data!.isNotEmpty) {
+      _availableMetricKeys = widget.data!.keys.toList()..sort();
+      if (_selectedMetricKey == null || !widget.data!.containsKey(_selectedMetricKey)) {
+        _selectedMetricKey = _availableMetricKeys.isNotEmpty ? _availableMetricKeys.first : null;
+      }
+    } else {
+      _availableMetricKeys = [];
+      _selectedMetricKey = null;
+    }
+    _currentPage = 1;
+    _loadPageDataForSelectedMetric();
+  }
+
+  void _onMetricSelected(String? newMetricKey) {
+    if (newMetricKey != null && newMetricKey != _selectedMetricKey) {
       setState(() {
-        _isLoading = false;
-        _categorizedData = null;
-        _processingError = null;
+        _selectedMetricKey = newMetricKey;
+        _currentPage = 1;
+        _loadPageDataForSelectedMetric();
       });
+    }
+  }
+
+  Future<void> _loadPageDataForSelectedMetric() async {
+    if (_selectedMetricKey == null || widget.data == null || widget.data![_selectedMetricKey] == null) {
+      if (mounted) {
+        setState(() {
+          _displayedPageRecords = [];
+          _totalPages = 0;
+          _isLoadingPage = false;
+        });
+      }
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _categorizedData = null;
-      _processingError = null;
-    });
-    _processDataAsync();
-  }
-
-  Future<void> _processDataAsync() async {
-    await Future.delayed(Duration.zero);
-
-    try {
-      final Map<String, List<DisplayableRecord>> processedResult = {};
-      int tempGlobalRecordIndex = 0;
-
-      widget.data!.forEach((metricKey, records) {
-        final List<DisplayableRecord> displayRecords = [];
-        for (int i = 0; i < records.length; i++) {
-          final rawRecord = records[i];
-          Map<String, dynamic> convertedJson = {};
-          List<Map<String, dynamic>> omhJsonList = [];
-
-          if (Platform.isAndroid) {
-            if (metricKey == HealthConnectHealthMetric.heartRate.definition) {
-              var hcHr = widget.hcDataFactory.createHeartRate(rawRecord);
-              convertedJson = hcHr.toJson();
-              omhJsonList = hcHr.toOpenMHealthHeartRate().map((e) => e.toJson()).toList();
-            } else if (metricKey == HealthConnectHealthMetric.heartRateVariability.definition) {
-              var hcHrv = widget.hcDataFactory.createHeartRateVariability(rawRecord);
-              convertedJson = hcHrv.toJson();
-              omhJsonList = hcHrv.toOpenMHealthHeartRateVariabilityRmssd().map((e) => e.toJson()).toList();
-            }
-          } else { // iOS
-            if (metricKey == HealthKitHealthMetric.heartRate.definition) {
-              var hkHr = widget.hkDataFactory.createHeartRate(rawRecord);
-              convertedJson = hkHr.toJson();
-              omhJsonList = hkHr.toOpenMHealthHeartRate().map((e) => e.toJson()).toList();
-            } else if (metricKey == HealthKitHealthMetric.heartRateVariability.definition) {
-              var hkHrv = widget.hkDataFactory.createHeartRateVariability(rawRecord);
-              convertedJson = hkHrv.toJson();
-              omhJsonList = hkHrv.toOpenMHealthHeartRateVariability().map((e) => e.toJson()).toList();
-            }
-          }
-
-          displayRecords.add(DisplayableRecord(
-            rawData: rawRecord,
-            convertedData: convertedJson,
-            omhDataList: omhJsonList,
-            recordIndex: i + 1,
-          ));
-          tempGlobalRecordIndex++;
-        }
-        if (displayRecords.isNotEmpty) {
-          processedResult[metricKey] = displayRecords;
-        }
+    if (mounted) {
+      setState(() {
+        _isLoadingPage = true;
       });
+    }
+    await Future.delayed(const Duration(milliseconds: 50));
 
-      if (mounted) {
-        setState(() {
-          _categorizedData = processedResult;
-          _isLoading = false;
-          _processingError = null;
-        });
+
+    final allRawRecordsForSelectedMetric = widget.data![_selectedMetricKey]!;
+    _totalPages = (allRawRecordsForSelectedMetric.length / _recordsPerPage).ceil();
+    if (_totalPages == 0 && allRawRecordsForSelectedMetric.isNotEmpty) _totalPages = 1;
+    if (allRawRecordsForSelectedMetric.isEmpty) _totalPages = 0;
+
+
+    final startIndex = (_currentPage - 1) * _recordsPerPage;
+    final endIndex = (startIndex + _recordsPerPage > allRawRecordsForSelectedMetric.length)
+        ? allRawRecordsForSelectedMetric.length
+        : startIndex + _recordsPerPage;
+
+    final List<Map<String, dynamic>> rawRecordsForPage;
+    if (startIndex < allRawRecordsForSelectedMetric.length) {
+      rawRecordsForPage = allRawRecordsForSelectedMetric.sublist(startIndex, endIndex);
+    } else {
+      rawRecordsForPage = [];
+    }
+
+
+    final List<DisplayableRecord> pageDisplayRecords = [];
+    for (int i = 0; i < rawRecordsForPage.length; i++) {
+      final rawRecord = rawRecordsForPage[i];
+      final originalRecordIndexInMetric = startIndex + i + 1;
+
+      Map<String, dynamic> convertedJson = {};
+      List<Map<String, dynamic>> omhJsonList = [];
+
+      try {
+
+        if (Platform.isAndroid) {
+          if (_selectedMetricKey == HealthConnectHealthMetric.heartRate.definition) {
+            var hcHr = widget.hcDataFactory.createHeartRate(rawRecord);
+            convertedJson = hcHr.toJson();
+            omhJsonList = hcHr.toOpenMHealthHeartRate().map((e) => e.toJson()).toList();
+          } else if (_selectedMetricKey == HealthConnectHealthMetric.heartRateVariability.definition) {
+            var hcHrv = widget.hcDataFactory.createHeartRateVariability(rawRecord);
+            convertedJson = hcHrv.toJson();
+            omhJsonList = hcHrv.toOpenMHealthHeartRateVariabilityRmssd().map((e) => e.toJson()).toList();
+          }
+        } else {
+          if (_selectedMetricKey == HealthKitHealthMetric.heartRate.definition) {
+            var hkHr = widget.hkDataFactory.createHeartRate(rawRecord);
+            convertedJson = hkHr.toJson();
+            omhJsonList = hkHr.toOpenMHealthHeartRate().map((e) => e.toJson()).toList();
+          } else if (_selectedMetricKey == HealthKitHealthMetric.heartRateVariability.definition) {
+            var hkHrv = widget.hkDataFactory.createHeartRateVariability(rawRecord);
+            convertedJson = hkHrv.toJson();
+            omhJsonList = hkHrv.toOpenMHealthHeartRateVariability().map((e) => e.toJson()).toList();
+          }
+        }
+      } catch (e) {
+        debugPrint("Error processing record for $_selectedMetricKey (Index: $originalRecordIndexInMetric): $e");
+        convertedJson = {'error': 'Failed to process: ${e.toString()}'};
+        omhJsonList = [{'error': 'Failed to process: ${e.toString()}'}];
       }
-    } catch (e, stackTrace) {
-      if (kDebugMode) {
-        print("Error processing data for display: $e");
-        print(stackTrace);
-      }
-      if (mounted) {
-        setState(() {
-          _processingError = "An error occurred while preparing data: $e";
-          _isLoading = false;
-        });
-      }
+      pageDisplayRecords.add(DisplayableRecord(
+        rawData: rawRecord,
+        convertedData: convertedJson,
+        omhDataList: omhJsonList,
+        recordIndex: originalRecordIndexInMetric,
+      ));
+    }
+
+    if (mounted) {
+      setState(() {
+        _displayedPageRecords = pageDisplayRecords;
+        _isLoadingPage = false;
+      });
     }
   }
 
+  void _goToPage(int pageNumber) {
+    if (pageNumber >= 1 && pageNumber <= _totalPages && pageNumber != _currentPage) {
+      setState(() {
+        _currentPage = pageNumber;
+        _loadPageDataForSelectedMetric();
+      });
+    }
+  }
 
   String _getMetricDisplayName(String metricKey) {
     if (metricKey.isEmpty) return '';
@@ -150,152 +191,129 @@ class _DataDisplayModuleState extends State<DataDisplayModule> {
     }).join(' ');
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text("Processing data, please wait..."),
-          ],
-        ),
-      );
-    }
-
-    if (_processingError != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 48),
-              const SizedBox(height: 16),
-              Text(
-                "Could not display data:",
-                style: Theme.of(context).textTheme.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _processingError!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.redAccent),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (_categorizedData == null || _categorizedData!.isEmpty) {
+    if (widget.data == null || widget.data!.isEmpty) {
       return const PlaceholderModule(
-        message: 'No data available or processed.',
-        icon: Icons.info_outline,
+        message: 'No data available to run experiment.',
+        icon: Icons.science_outlined,
       );
     }
 
-    int recordGlobalIndex = 0;
-    return ListView.builder(
-      padding: const EdgeInsets.all(8.0),
-      itemCount: _categorizedData!.keys.length,
-      itemBuilder: (context, index) {
-        final metricKey = _categorizedData!.keys.elementAt(index);
-        final recordsForMetric = _categorizedData![metricKey]!;
-        final String metricDisplayName = _getMetricDisplayName(metricKey);
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                child: Text(
-                  metricDisplayName,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: recordsForMetric.length,
-                itemBuilder: (context, recordIdx) {
-                  final record = recordsForMetric[recordIdx];
-                  recordGlobalIndex++;
-
-                  return Card(
-                    elevation: 2.0,
-                    margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                              child: Text(
-                                record.recordIndex.toString(),
-                                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
-                              ),
-                            ),
-                            title: Text(
-                              '$metricDisplayName - Record #${record.recordIndex}',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
-                            ),
-                            dense: true,
-                          ),
-                          const SizedBox(height: 8.0),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: IntrinsicHeight(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildDataColumn(
-                                    context,
-                                    "Raw Data",
-                                    record.rawData,
-                                    PageStorageKey('raw_$metricKey\_${record.recordIndex}_$recordGlobalIndex'),
-                                  ),
-                                  _buildDataColumn(
-                                    context,
-                                    "Converted Plugin Object",
-                                    record.convertedData,
-                                    PageStorageKey('converted_$metricKey\_${record.recordIndex}_$recordGlobalIndex'),
-                                  ),
-                                  _buildDataColumn(
-                                    context,
-                                    "Open mHealth Format",
-                                    record.omhDataList.isEmpty ? {"info": "No OMH data generated"} : (record.omhDataList.length == 1 ? record.omhDataList.first : record.omhDataList),
-                                    PageStorageKey('omh_$metricKey\_${record.recordIndex}_$recordGlobalIndex'),
-                                    isList: record.omhDataList.length > 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Data Type',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            ),
+            value: _selectedMetricKey,
+            isExpanded: true,
+            items: _availableMetricKeys.map((key) {
+              return DropdownMenuItem<String>(
+                value: key,
+                child: Text(_getMetricDisplayName(key), overflow: TextOverflow.ellipsis),
+              );
+            }).toList(),
+            onChanged: _onMetricSelected,
+            hint: const Text('Select a data type'),
           ),
-        );
-      },
+        ),
+
+        Expanded(
+          child: _selectedMetricKey == null
+              ? const PlaceholderModule(message: "Please select a data type above.", icon: Icons.category)
+              : _isLoadingPage
+              ? const Center(child: CircularProgressIndicator())
+              : _displayedPageRecords.isEmpty
+              ? PlaceholderModule(
+              message: "No records found for '${_getMetricDisplayName(_selectedMetricKey!)}'\nfor the selected period or category.",
+              icon: Icons.hourglass_empty)
+              : ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            itemCount: _displayedPageRecords.length,
+            itemBuilder: (context, index) {
+              final record = _displayedPageRecords[index];
+              final String pageStorageKeyBase = '${_selectedMetricKey}_${record.recordIndex}';
+              return Card(
+                elevation: 2.0,
+                margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          child: Text(
+                            record.recordIndex.toString(),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer, fontSize: 12),
+                          ),
+                        ),
+                        title: Text(
+                          '${_getMetricDisplayName(_selectedMetricKey!)} - Record #${record.recordIndex}',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
+                        ),
+                        dense: true,
+                      ),
+                      const SizedBox(height: 8.0),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDataColumn(context, "Raw Data", record.rawData, PageStorageKey('raw_$pageStorageKeyBase')),
+                              _buildDataColumn(context, "Converted Object", record.convertedData, PageStorageKey('converted_$pageStorageKeyBase')),
+                              _buildDataColumn(context, "Open mHealth", record.omhDataList.isEmpty ? {"info": "No OMH data"} : (record.omhDataList.length == 1 ? record.omhDataList.first : record.omhDataList), PageStorageKey('omh_$pageStorageKeyBase'), isList: record.omhDataList.length > 1),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        if (_selectedMetricKey != null && _totalPages > 0 && !_isLoadingPage)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios),
+                  onPressed: _currentPage > 1 ? () => _goToPage(_currentPage - 1) : null,
+                  tooltip: "Previous Page",
+                ),
+                Text('Page $_currentPage of $_totalPages'),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  onPressed: _currentPage < _totalPages ? () => _goToPage(_currentPage + 1) : null,
+                  tooltip: "Next Page",
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 
+
   Widget _buildDataColumn(BuildContext context, String title, dynamic jsonData, Key expansionTileKey, {bool isList = false}) {
     ThemeData currentTheme = Theme.of(context);
-    Color titleColor = currentTheme.brightness == Brightness.dark ? Colors.tealAccent[100]! : currentTheme.primaryColorDark;
+    Color titleColor = currentTheme.primaryColorDark ?? currentTheme.primaryColor;
+    if (currentTheme.brightness == Brightness.dark) {
+      titleColor = Colors.tealAccent[100] ?? currentTheme.colorScheme.secondary;
+    }
+
 
     return Container(
       width: 300,
@@ -349,4 +367,3 @@ class _DataDisplayModuleState extends State<DataDisplayModule> {
     );
   }
 }
-

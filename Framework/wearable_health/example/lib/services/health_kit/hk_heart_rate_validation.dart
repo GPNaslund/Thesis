@@ -1,10 +1,6 @@
 import 'dart:developer';
 
 import 'package:wearable_health/extensions/open_m_health/health_kit/health-kit_heart_rate.dart';
-import 'package:wearable_health/extensions/open_m_health/health_kit/health_kit_data.dart';
-import 'package:wearable_health/model/health_kit/enums/hk_health_metric.dart';
-import 'package:wearable_health/model/health_kit/health_kit_data.dart';
-import 'package:wearable_health/model/health_kit/hk_entities/hk_quantity_sample.dart';
 import 'package:wearable_health/model/health_kit/hk_heart_rate.dart';
 import 'package:wearable_health/service/health_kit/data_factory_interface.dart';
 
