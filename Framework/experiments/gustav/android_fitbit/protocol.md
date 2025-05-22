@@ -74,14 +74,14 @@
 
 ### Data Extraction Performance
 
-| Metric | Result | Notes |
-|--------|--------|-------|
-| Connection Success | `[ ] Success  [ ] Partial  [ ] Failed` | |
-| Data Retrieval Completeness | `[ ] Complete  [ ] Partial  [ ] Failed` | |
-| Extraction Speed | `_____ seconds` | |
-| Battery Impact (device) | `_____% drain` | |
-| Battery Impact (wearable) | `_____% drain` | |
-| App Stability | `[ ] Stable  [ ] Minor Issues  [ ] Crashed` | |
+| Metric | Result                                      | Notes |
+|--------|---------------------------------------------|-------|
+| Connection Success | `[X] Success  [ ] Partial  [ ] Failed`      | |
+| Data Retrieval Completeness | `[X] Complete  [ ] Partial  [ ] Failed`     | |
+| Extraction Speed | `_____ seconds`                             | |
+| Battery Impact (device) | `4% drain`                                  | |
+| Battery Impact (wearable) | `0-1% drain`                                | |
+| App Stability | `[X] Stable  [ ] Minor Issues  [ ] Crashed` | |
 
 ### Data Validation
 

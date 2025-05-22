@@ -37,7 +37,7 @@ During the design and development phase, we followed the artifact creation proce
 
 To evaluate the developed solution, we will use experimentation as the primary method of validating functionality. According to Basili et al. @experimentation-in-software-engineering, experimentation is an iterative process of hypothesizing and testing. In our case, this involves defining (or redefining) software requirements, implementing them (the hypothesis), and verifying wether those requirements are fulfilled (the test).
 
-Additionally, we will perform validation to ensure tha the plugin's software requirements align with the original stakeholder expectation @the-role-of-software-verification. As an alternative to experimentation, we considered survey-based research to gather stakeholder opinions on desired functionality. However, we ultimately decided against this due to our limited timeframe. We also believed that the iterative loop supported by experimentation would be hindered by the time required to create, distribute and analyze a survey. In our context, experimentation offers more immediate feedback and supports rapid iteration, which we viewed as essential for effective development.
+Additionally, we will perform validation to ensure that the plugin's software requirements align with the original stakeholder expectation @the-role-of-software-verification. As an alternative to experimentation, we considered survey-based research to gather stakeholder opinions on desired functionality. However, we ultimately decided against this due to our limited timeframe. We also believed that the iterative loop supported by experimentation would be hindered by the time required to create, distribute and analyze a survey. In our context, experimentation offers more immediate feedback and supports rapid iteration, which we viewed as essential for effective development.
 
 == 2.3 Data for migraine prediction using machine learning
 
@@ -68,7 +68,7 @@ We decided that the framework should target the native health data stores due to
   [], [*Sleep time*], [Measurement the amount of hours slept], [@machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable],
 )
 
-We have decided to include heart rate and skin temperature in our data processing. The selection is based on a combination on what data is available from regular wearables and what health metrics have been shown in previous studies to be of high value.
+We have decided to include heart rate and skin temperature [ÄNDRA] in our data processing. The selection is based on a combination on what data is available from regular wearables and what health metrics have been shown in previous studies to be of high value.
 
 == 2.5 Reliability and validity
 === Validity
