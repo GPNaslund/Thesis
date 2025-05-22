@@ -2,31 +2,31 @@
 
 ## Test Information
 
-| Field | Value               |
-|-------|---------------------|
-| Test ID | `TEST-GN02`         |
-| Date | `2025-05-21`        |
-| Time | `19:00`             |
-| Tester Name | `Gustav Näslund`    |
-| Testing Location | `Stockholm, Sweden` |
+| Field | Value           |
+|-------|-----------------|
+| Test ID | `TEST-DP01`     |
+| Date | `2025-05-22`    |
+| Time | `01:51`         |
+| Tester Name | `Duc Anh Pham`  |
+| Testing Location | `Vaxjo, Sweden` |
 
 ## Device Configuration
 
-| Field | Value                      |
-|-------|----------------------------|
-| Phone Model | `Samsung Galaxy S22 Ultra` |
-| OS Type | `[X] Android  [ ] iOS`     |
-| OS Version | `14`                       |
-| Flutter Plugin Version | `3.29.2`                   |
-| App Build Number | `0.0.1`                    |
+| Field | Value                 |
+|-------|-----------------------|
+| Phone Model | `Iphone 13 Pro`       |
+| OS Type | `[] Android  [X] iOS` |
+| OS Version | `18.4.1`              |
+| Flutter Plugin Version | `3.29.2`              |
+| App Build Number | `0.0.1`               |
 
 ## Wearable Device
 
 | Field | Value                                                  |
 |-------|--------------------------------------------------------|
 | Wearable Type | `[X] Smartwatch  [ ] Fitness Band  [ ] Other: _______` |
-| Wearable Model | `Fitbit Sense 2`                                       |
-| Firmware Version | `60.20001.194.86`                                      |
+| Wearable Model | `Apple Watch Series 9`                                 |
+| Firmware Version | `WatchOS 11.4`                                         |
 | Connection Method | `[X] Bluetooth  [ ] WiFi  [ ] Other: _______`          |
 | Wearable Battery Level | `96%`                                                  |
 
@@ -35,16 +35,16 @@
 | Field | Value                                                                    |
 |-------|--------------------------------------------------------------------------|
 | Physical Activity Type | `[X] Resting  [X] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
-| Duration | `24 hours`                                                               |
+| Duration | `90 minutes`                                                             |
 | Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                          |
-| Environmental Conditions | `Temperature: 9°C, Humidity: 28%, Other factors: _______`                |
+| Environmental Conditions | `Temperature: -, Humidity: -, Other factors: _______`                    |
 
 ## Health Data Parameters Tested
 
 *Check all that apply:*
 
 - [X] Heart Rate
-- [X] Heart Rate Variable 
+- [X] Heart Rate Variability
 - [ ] Other: _______
 
 ## Test Procedure
@@ -52,17 +52,17 @@
 1. **Setup**
     - _Description of how the test environment was prepared_
    ```
-   The smartwatch was inspected for any visible damage or hinder of sensors that might affect the ability to provide data. The FitBit
-   was charged in beforehand and attached to the left wrist. 
+      The test environment was prepared through charging of devices and preparation of additional software needed for 
+      the ability to synchronize data between apple watch series 9 and health kit on IOS. The smartwatch was also
+      inspected for any visible damage or hinder of sensors that might affect the ability to provide data.
    ```
 
 2. **Data Collection Process**
     - _Steps taken to collect the health data_
    ```
-      The plugin experiment app was installed on my Samsung Galaxy S22 aswell as Health Sync, which is a third party app
-      needed for data synchronization between the Garmin Venu 2 and Health Connect. Then i synchronized gathered data via
-      Health Sync from the smartwatch to the device. After synchronization of the registered data, i initialized the experiment
-      within the experiment app for extraction of the data.
+   The Apple Watch Series 9 was worn on the left wrist throughout the day to collect heart rate and heart rate variability data during resting and walking activities.
+   The test application, built using the Flutter plugin, was installed on the iPhone 13 Pro. The plugin accessed Apple HealthKit to retrieve the health data collected by the Apple Watch.
+   Once permissions was verified for the given metrics, the test app initiated a data request and successfully fetched available records for the selected metrics.
    ```
 
 3. **Observations During Testing**
@@ -79,19 +79,20 @@
 |--------|---------------------------------------------|-------|
 | Connection Success | `[X] Success  [ ] Partial  [ ] Failed`      | |
 | Data Retrieval Completeness | `[X] Complete  [ ] Partial  [ ] Failed`     | |
-| Extraction Speed | `_____ seconds`                             | |
-| Battery Impact (device) | `4% drain`                                  | |
-| Battery Impact (wearable) | `0-1% drain`                                | |
+| Extraction Speed | `239 milliseconds`                          | |
+| Battery Impact (device) | `0% drain (test was ran during charge)`     | |
+| Battery Impact (wearable) | `0% drain`                                  | |
 | App Stability | `[X] Stable  [ ] Minor Issues  [ ] Crashed` | |
 
 ### Data Validation
 
-| Data Type | Expected Value | Actual Value | Matches? | Notes |
-|-----------|---------------|--------------|----------|-------|
-| | | | `[ ] Yes [ ] No` | |
-| | | | `[ ] Yes [ ] No` | |
-| | | | `[ ] Yes [ ] No` | |
-| | | | `[ ] Yes [ ] No` | |
+| Data Type              | Expected Value | Actual Value  | Matches?         | Notes |
+|------------------------|----------------|---------------|------------------|-------|
+| Heart rate             | 132 beats/min  | 132 beats/min | `[X] Yes [ ] No` |       |
+| Heart rate             | 110 beats/min  | 110 beats/min | `[X] Yes [ ] No` |       |
+| Heart rate variability | 25 ms          | 25 ms         | `[X] Yes [ ] No` |       |
+| Heart rate variability | 28 ms          | 28 ms         | `[X] Yes [ ] No` |       |
+
 
 ### Results Report
 
@@ -116,7 +117,7 @@ Alternative link to report: [Report Link](url_or_path)
 
 ## Conclusion
 
-**Test Result:** `[ ] Pass  [ ] Pass with Issues  [ ] Fail`
+**Test Result:** `[X] Pass  [ ] Pass with Issues  [ ] Fail`
 
 **Recommendations for Improvement:**
 ```

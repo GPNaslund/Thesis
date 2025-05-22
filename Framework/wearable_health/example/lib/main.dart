@@ -63,6 +63,7 @@ class _ExperimentPageState extends State<ExperimentPage> {
   DateTime _endDate = DateTime.now();
   bool _dataAvailable = false;
   bool _isLoading = false;
+  bool _showExperimentControls = false;
   Map<String, List<Map<String, dynamic>>>? _data;
   final Stopwatch _stopWatch = Stopwatch();
 
@@ -603,8 +604,20 @@ class _ExperimentPageState extends State<ExperimentPage> {
       {'title': 'Inspect Data', 'icon': Icons.table_chart_outlined},
     ];
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Health Plugin Experiment')),
+    return Scaffold(appBar: AppBar(
+      title: const Text('Health Plugin Experiment'),
+      actions: [
+        IconButton(
+          icon: Icon(_showExperimentControls ? Icons.expand_less : Icons.expand_more),
+          tooltip: _showExperimentControls ? 'Hide Setup' : 'Show Setup',
+          onPressed: () {
+            setState(() {
+              _showExperimentControls = !_showExperimentControls;
+            });
+          },
+        ),
+      ],
+    ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -664,163 +677,136 @@ class _ExperimentPageState extends State<ExperimentPage> {
       body: Column(
         children: [
           Expanded(child: _buildCurrentPageWidget()),
-          Material(
-            elevation: 4.0,
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.05),
-            child: ExpansionTile(
-              title: Text(
-                'Experiment Setup & Controls',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color,
-                ),
-              ),
-              initiallyExpanded: true,
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-              collapsedBackgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
-              childrenPadding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0,),
-              tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0,),
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: SegmentedButton<ExperimentMode>(
-                        segments: const <ButtonSegment<ExperimentMode>>[
-                          ButtonSegment<ExperimentMode>(
-                            value: ExperimentMode.historical,
-                            label: Text('Historical'),
-                            icon: Icon(Icons.history),
-                          ),
-                          ButtonSegment<ExperimentMode>(
-                            value: ExperimentMode.realTime,
-                            label: Text('Real-time'),
-                            icon: Icon(Icons.timer_sharp),
-                          ),
-                        ],
-                        selected: <ExperimentMode>{_currentMode},
-                        onSelectionChanged: (Set<ExperimentMode> newSelection) {
-                          if (mounted) {
-                            setState(() {
-                              _currentMode = newSelection.first;
-                              if (_currentMode == ExperimentMode.historical && _isRealTimeSessionRunning) {
-                                _stopRealTimeSession();
-                              }
-                              // Reset data and results when mode changes
-                              _data = null;
-                              _dataAvailable = false;
-                              recordCountResult = null;
-                              conversionValidityResult = null;
-                              performanceTestResult = null;
-                              _isLoading = false;
-                            });
+          AnimatedCrossFade(
+            crossFadeState: _showExperimentControls ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 300),
+            firstChild: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: SegmentedButton<ExperimentMode>(
+                      segments: const <ButtonSegment<ExperimentMode>>[
+                        ButtonSegment<ExperimentMode>(
+                          value: ExperimentMode.historical,
+                          label: Text('Historical'),
+                          icon: Icon(Icons.history),
+                        ),
+                        ButtonSegment<ExperimentMode>(
+                          value: ExperimentMode.realTime,
+                          label: Text('Real-time'),
+                          icon: Icon(Icons.timer_sharp),
+                        ),
+                      ],
+                      selected: <ExperimentMode>{_currentMode},
+                      onSelectionChanged: (Set<ExperimentMode> newSelection) {
+                        setState(() {
+                          _currentMode = newSelection.first;
+                          if (_currentMode == ExperimentMode.historical && _isRealTimeSessionRunning) {
+                            _stopRealTimeSession();
                           }
-                        },
-                        style: SegmentedButton.styleFrom(
-                          selectedBackgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                          selectedForegroundColor: Theme.of(context).colorScheme.primary,
-                        ),
+                          _data = null;
+                          _dataAvailable = false;
+                          recordCountResult = null;
+                          conversionValidityResult = null;
+                          performanceTestResult = null;
+                          _isLoading = false;
+                        });
+                      },
+                      style: SegmentedButton.styleFrom(
+                        selectedBackgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        selectedForegroundColor: Theme.of(context).colorScheme.primary,
                       ),
                     ),
-                    Visibility(
-                      visible: _currentMode == ExperimentMode.historical,
-                      maintainState: true, // Keep state for smooth transitions
-                      child: Opacity(
-                        opacity: _currentMode == ExperimentMode.historical ? 1.0 : 0.0,
-                        child: IgnorePointer(
-                          ignoring: _currentMode != ExperimentMode.historical,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildDateSelector(
-                                      context,
-                                      'Start Date',
-                                      _startDate,
-                                          () => _selectDate(context, true),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: _buildDateSelector(
-                                      context,
-                                      'End Date',
-                                      _endDate,
-                                          () => _selectDate(context, false),
-                                    ),
-                                  ),
-                                ],
+                  ),
+                  if (_currentMode == ExperimentMode.historical)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildDateSelector(
+                                context,
+                                'Start Date',
+                                _startDate,
+                                    () => _selectDate(context, true),
                               ),
-                              const SizedBox(height: 16.0),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildDateSelector(
+                                context,
+                                'End Date',
+                                _endDate,
+                                    () => _selectDate(context, false),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16.0),
+                      ],
+                    ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      icon: Icon(
+                        _isLoading
+                            ? Icons.hourglass_empty_rounded
+                            : _currentMode == ExperimentMode.historical
+                            ? Icons.play_arrow_rounded
+                            : _isRealTimeSessionRunning
+                            ? Icons.stop_rounded
+                            : Icons.play_circle_filled_rounded,
+                      ),
+                      onPressed: _isLoading ? null : _handlePrimaryButtonAction,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _isRealTimeSessionRunning && _currentMode == ExperimentMode.realTime
+                            ? Colors.redAccent.shade200
+                            : Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      label: Text(
+                        _isLoading
+                            ? 'Processing...'
+                            : _currentMode == ExperimentMode.historical
+                            ? 'Fetch Historical Data'
+                            : _isRealTimeSessionRunning
+                            ? 'Stop Real-time Session'
+                            : 'Start Real-time Session',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 40,
+                    child: OutlinedButton.icon(
+                      onPressed: (_dataAvailable && recordCountResult != null && conversionValidityResult != null)
+                          ? _exportDataToFileWithFeedback
+                          : null,
+                      icon: const Icon(Icons.file_download_outlined),
+                      label: const Text('Export Results'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.primary,
+                        disabledForegroundColor: Colors.grey.shade400,
+                        side: BorderSide(
+                          color: (_dataAvailable && recordCountResult != null && conversionValidityResult != null)
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.grey.shade300,
                         ),
                       ),
                     ),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        icon: Icon(
-                          _isLoading
-                              ? Icons.hourglass_empty_rounded
-                              : _currentMode == ExperimentMode.historical
-                              ? Icons.play_arrow_rounded
-                              : _isRealTimeSessionRunning
-                              ? Icons.stop_rounded
-                              : Icons.play_circle_filled_rounded,
-                        ),
-                        onPressed: _isLoading ? null : _handlePrimaryButtonAction,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _isRealTimeSessionRunning && _currentMode == ExperimentMode.realTime
-                              ? Colors.redAccent.shade200
-                              : Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        label: Text(
-                          _isLoading
-                              ? 'Processing...'
-                              : _currentMode == ExperimentMode.historical
-                              ? 'Fetch Historical Data'
-                              : _isRealTimeSessionRunning
-                              ? 'Stop Real-time Session'
-                              : 'Start Real-time Session',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: OutlinedButton.icon(
-                        onPressed: (_dataAvailable && recordCountResult != null && conversionValidityResult != null)
-                            ? _exportDataToFileWithFeedback
-                            : null,
-                        icon: const Icon(Icons.file_download_outlined),
-                        label: const Text('Export Results'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Theme.of(context).colorScheme.primary,
-                          disabledForegroundColor: Colors.grey.shade400,
-                          side: BorderSide(
-                            color: (_dataAvailable && recordCountResult != null && conversionValidityResult != null)
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
+            secondChild: const SizedBox.shrink(),
           ),
         ],
       ),
