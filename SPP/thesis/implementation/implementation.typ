@@ -20,7 +20,7 @@ This framework targets heart rate and skin temperature data. On Android, it extr
 
 == 4.2 Implementation concerns
 
-To ensure interoperability, the plugin normalizes all extraced data into Open mHealth format regardless of the source platform or underlying API. Metadata not defined within the Open mHealth schema, such as device name or specific hardware information, is discarded to maintain consistency and reduce variability across platforms.
+To ensure interoperability, the plugin normalizes all extracted data into Open mHealth format regardless of the source platform or underlying API. Metadata not defined within the Open mHealth schema, such as device name or specific hardware information, is discarded to maintain consistency and reduce variability across platforms.
 
 The plugin ensures that permission handling is performed correctly and that permission states are regularly verified, as users may revoke permissions at any time. Both HealthKit and Health Connect offer similar permission models, which posed minimal challenges during implementation.
 
@@ -28,7 +28,7 @@ Data granularity and sampling resolution is determined by the user via an input 
 
 To account for situations where a health data store is not available (e.g the data store is not installed), the plugin includes logic to direct users to the respective app store to download the required app. Additionally, if a user attempts to use the plugin on an unsupported OS version, they are informed of the compatibility issue through user-facing feedback.
 
-The plugin is designed with extensibility in mind. Its architecture allows for straightforward integration of additional data types, data providers (e.g Fitbit, Garmin) and health metrics in fututre iterations.
+The plugin is designed with extensibility in mind. Its architecture allows for straightforward integration of additional data types, data providers (e.g Fitbit, Garmin) and health metrics in future iterations.
 
 == 4.3 Demonstration
 
@@ -36,6 +36,6 @@ The plugin will be demonstrated through a dedicated test application built in Fl
 
 The test application will be evaluated using real devices including Apple Watch, Fitbit and Garmin Venu to simulate real-world usage and ensure compatibility across a range of wearables. The demonstration will showcase both real-time and historical data extraction, within the constraints of each data stores retention policy and access limitations.
 
-The plugin will be considered succesful if it consistently provides accurate and correctly formatted Open mHealth data on both iOS and Android platforms, across a diverse set of wearable devices.
+The plugin will be considered successful if it consistently provides accurate and correctly formatted Open mHealth data on both iOS and Android platforms, across a diverse set of wearable devices.
 
 #bibliography("refs.yml")
