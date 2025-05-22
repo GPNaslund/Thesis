@@ -44,7 +44,7 @@
 *Check all that apply:*
 
 - [X] Heart Rate
-- [X] Heart Rate Variable 
+- [X] Heart Rate Variability
 - [ ] Other: _______
 
 ## Test Procedure
@@ -86,11 +86,13 @@
 
 ### Data Validation
 
-| Data Type  | Expected Value | Actual Value  | Matches?         | Notes |
-|------------|----------------|---------------|------------------|-------|
-| Heart rate | 132 beats/min  | 132 beats/min | `[X] Yes [ ] No` |       |
-| Heart rate | 110 beats/min  | 110 beats/min | `[X] Yes [ ] No` |       |
-| Heart rate | 109 beats/min  | 109 beats/min | `[X] Yes [ ] No` |       |
+| Data Type              | Expected Value | Actual Value  | Matches?         | Notes |
+|------------------------|----------------|---------------|------------------|-------|
+| Heart rate             | 132 beats/min  | 132 beats/min | `[X] Yes [ ] No` |       |
+| Heart rate             | 110 beats/min  | 110 beats/min | `[X] Yes [ ] No` |       |
+| Heart rate variability | 25 ms          | 25 ms         | `[X] Yes [ ] No` |       |
+| Heart rate variability | 28 ms          | 28 ms         | `[X] Yes [ ] No` |       |
+
 
 ### Results Report
 
