@@ -35,7 +35,7 @@
 | Field | Value                                                                    |
 |-------|--------------------------------------------------------------------------|
 | Physical Activity Type | `[X] Resting  [X] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
-| Duration | `90 minutes`                                                             |
+| Duration | `24 hours`                                                               |
 | Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                          |
 | Environmental Conditions | `Temperature: 9°C, Humidity: 28%, Other factors: _______`                |
 
@@ -59,9 +59,10 @@
 2. **Data Collection Process**
     - _Steps taken to collect the health data_
    ```
-      Preparatory step of ensuring connectivity with the mobile phone and clearing of any present data in health connect was performed.
-      The FitBit app was installed with the purpose of establishing connection between the mobile phone and the FitBit device.
-      Synchronization between the FitBit and Health Connect was initialized to ensure data storage in Health Connect.
+      The plugin experiment app was installed on my Samsung Galaxy S22 aswell as Health Sync, which is a third party app
+      needed for data synchronization between the Garmin Venu 2 and Health Connect. Then i synchronized gathered data via
+      Health Sync from the smartwatch to the device. After synchronization of the registered data, i initialized the experiment
+      within the experiment app for extraction of the data.
    ```
 
 3. **Observations During Testing**
