@@ -28,16 +28,15 @@
 | Wearable Model | `Apple Watch Series 9`                                 |
 | Firmware Version | `WatchOS 11.4`                                         |
 | Connection Method | `[X] Bluetooth  [ ] WiFi  [ ] Other: _______`          |
-| Wearable Battery Level | `96%`                                                  |
+| Wearable Battery Level | `100%`                                                  |
 
 ## Test Environment
 
 | Field | Value                                                                    |
 |-------|--------------------------------------------------------------------------|
 | Physical Activity Type | `[X] Resting  [X] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
-| Duration | `90 minutes`                                                             |
+| Duration | `24 hours`                                                             |
 | Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                          |
-| Environmental Conditions | `Temperature: -, Humidity: -, Other factors: _______`                    |
 
 ## Health Data Parameters Tested
 
@@ -52,23 +51,23 @@
 1. **Setup**
     - _Description of how the test environment was prepared_
    ```
-      The test environment was prepared through charging of devices and preparation of additional software needed for 
-      the ability to synchronize data between apple watch series 9 and health kit on IOS. The smartwatch was also
-      inspected for any visible damage or hinder of sensors that might affect the ability to provide data.
-   ```
+      The test environment was prepared through charging the devices and preparing the necessary software to synchronize data between Apple Watch Series 9 and Apple HealthKit on IOS. The smartwatch was also
+      inspected for any visible damage or hinder of sensors that might affect the ability to provide data. The Apple Watch Series 9 was then connected to the iPhone 13, which was linked to a Mac laptop to establish a synchronized development environment.
 
 2. **Data Collection Process**
     - _Steps taken to collect the health data_
    ```
    The Apple Watch Series 9 was worn on the left wrist throughout the day to collect heart rate and heart rate variability data during resting and walking activities.
    The test application, built using the Flutter plugin, was installed on the iPhone 13 Pro. The plugin accessed Apple HealthKit to retrieve the health data collected by the Apple Watch.
-   Once permissions was verified for the given metrics, the test app initiated a data request and successfully fetched available records for the selected metrics.
+   Once the necessary permissions were verified, the test app initiated a data request and successfully retrieved the available records for the selected health metrics.
    ```
 
 3. **Observations During Testing**
     - _Any notable observations during the testing process_
    ```
+      The application, plugin and all hardware components worked smoothly throughout the entire process.
       
+      A mismatch was observed between the timestamp fields in the fetched records and those in Apple HealthKit. This was accounted for due to timezone differences. Apple HealthKit stores timestamps in local time, whereas the plugin records them in UTC. The observed mismatches are due to this systematic timezone offset.
    ```
 
 ## Results
@@ -80,39 +79,36 @@
 | Connection Success | `[X] Success  [ ] Partial  [ ] Failed`      | |
 | Data Retrieval Completeness | `[X] Complete  [ ] Partial  [ ] Failed`     | |
 | Extraction Speed | `239 milliseconds`                          | |
-| Battery Impact (device) | `0% drain (test was ran during charge)`     | |
+| Battery Impact (device) | `0% drain (test ran during charge)`     | |
 | Battery Impact (wearable) | `0% drain`                                  | |
 | App Stability | `[X] Stable  [ ] Minor Issues  [ ] Crashed` | |
 
 ### Data Validation
 
-| Data Type              | Expected Value | Actual Value  | Matches?         | Notes |
-|------------------------|----------------|---------------|------------------|-------|
-| Heart rate             | 132 beats/min  | 132 beats/min | `[X] Yes [ ] No` |       |
-| Heart rate             | 110 beats/min  | 110 beats/min | `[X] Yes [ ] No` |       |
-| Heart rate variability | 25 ms          | 25 ms         | `[X] Yes [ ] No` |       |
-| Heart rate variability | 28 ms          | 28 ms         | `[X] Yes [ ] No` |       |
+| Data Type              | Expected Value | Actual Value  | Matches?         | Expected Timestamp | Actual Timestamp   | Matches?         | Notes                                | Image reference in app    | Image reference in HealthKit                |
+|------------------------|----------------|---------------|------------------|--------------------|--------------------|------------------|--------------------------------------|---------------------------|---------------------------------------------|
+| Heart rate             | 132 beats/min  | 132 beats/min | `[X] Yes [ ] No` | 21-05-25 15:26     | 21-05-25 13:26     | `[ ] Yes [X] No` | Did not match due to timezone offset |![HR Data 1](images/hr_data_1.png)|![HR - HK Data 1](images/1.4_hr_data_health_kit.png)|
+| Heart rate             | 110 beats/min  | 110 beats/min | `[X] Yes [ ] No` | 21-05-25 15:29     | 21-05-25 13:29     | `[ ] Yes [X] No` | Did not match due to timezone offset |![HR Data 2](images/hr_data_2.png)|![HR - HK Data 2](images/2.4_hr_data_health_kit.png)|
+| Heart rate variability | 25 ms          | 25 ms         | `[X] Yes [ ] No` | 21-05-25 16:31     | 21-05-25 14:31     | `[ ] Yes [X] No` | Did not match due to timezone offset |![HRV Data 1](images/hrv_data_1.png)|![HRV - HK Data 1](images/3.4_hrv_data_health_kit.png)|
+| Heart rate variability | 46 ms          | 46 ms         | `[X] Yes [ ] No` | 22-05-25 01:29     | 21-05-25 23:29     | `[ ] Yes [X] No` | Did not match due to timezone offset |![HRV Data 2](images/hrv_data_2.png)|![HRV - HK Data 2](images/4.4_hrv_data_health_kit.png)|
 
 
 ### Results Report
 
 *Attach screenshot or link to the formal results report generated by the test software*
 
-![Results Report](path/to/screenshot.png)
-
-Alternative link to report: [Report Link](url_or_path)
+![Results Report](images/experimentation_results_IOS_apple_watch.png)
 
 ## Issues Encountered
 
 | Issue | Severity | Description | Reproducible? |
 |-------|----------|-------------|--------------|
-| | `[ ] Low [ ] Medium [ ] High [ ] Critical` | | `[ ] Yes [ ] No [ ] Sometimes` |
-| | `[ ] Low [ ] Medium [ ] High [ ] Critical` | | `[ ] Yes [ ] No [ ] Sometimes` |
+| None observed | `[ ] Low [ ] Medium [ ] High [ ] Critical` | No issues occurred during testing. | `[ ] Yes [X] No [ ] Sometimes` |
 
 ## Additional Notes
 
 ```
-
+   The test was repeated multiple times to ensure validity and consistency for the data records.
 ```
 
 ## Conclusion
@@ -121,6 +117,7 @@ Alternative link to report: [Report Link](url_or_path)
 
 **Recommendations for Improvement:**
 ```
+Although the timestamp mismatches were expected and accounted for, consider aligning the plugin's timestamps with HealthKit’s local time format to improve clarity and reduce potential confusion.
 
 ```
 
@@ -130,8 +127,7 @@ Alternative link to report: [Report Link](url_or_path)
 
 | Action Item | Assigned To | Due Date | Status |
 |-------------|-------------|----------|--------|
-| | | | `[ ] Open [ ] In Progress [ ] Completed` |
-| | | | `[ ] Open [ ] In Progress [ ] Completed` |
+| None required| - |  - | `[ ] Open [ ] In Progress [ ] Completed [X] None` |
 
 ---
 

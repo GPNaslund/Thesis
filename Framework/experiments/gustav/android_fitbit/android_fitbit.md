@@ -4,9 +4,9 @@
 
 | Field | Value               |
 |-------|---------------------|
-| Test ID | `TEST-GN01`         |
-| Date | `2025-05-20`        |
-| Time | `00:00`             |
+| Test ID | `TEST-GN02`         |
+| Date | `2025-05-21`        |
+| Time | `19:00`             |
 | Tester Name | `Gustav Näslund`    |
 | Testing Location | `Stockholm, Sweden` |
 
@@ -25,26 +25,25 @@
 | Field | Value                                                  |
 |-------|--------------------------------------------------------|
 | Wearable Type | `[X] Smartwatch  [ ] Fitness Band  [ ] Other: _______` |
-| Wearable Model | `Garmin Venu 2`                                        |
-| Firmware Version | `19.05`                                                |
+| Wearable Model | `Fitbit Sense 2`                                       |
+| Firmware Version | `60.20001.194.86`                                      |
 | Connection Method | `[X] Bluetooth  [ ] WiFi  [ ] Other: _______`          |
 | Wearable Battery Level | `96%`                                                  |
 
 ## Test Environment
 
-| Field | Value                                                                 |
-|-------|-----------------------------------------------------------------------|
-| Physical Activity Type | `[X] Resting  [X] Walking  [ ] Running  [ ] Cycling  [ ] Other: ____` |
-| Duration | `24 hrs`                                                              |
-| Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                       |
-| Environmental Conditions | `Temperature: - °C, Humidity: - %, Other factors: _______`            |
+| Field | Value                                                                    |
+|-------|--------------------------------------------------------------------------|
+| Physical Activity Type | `[X] Resting  [X] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
+| Duration | `24 hours`                                                               |
+| Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                          |
 
 ## Health Data Parameters Tested
 
 *Check all that apply:*
 
 - [X] Heart Rate
-- [ ] Heart rate variability
+- [X] Heart Rate Variable 
 - [ ] Other: _______
 
 ## Test Procedure
@@ -52,9 +51,8 @@
 1. **Setup**
     - _Description of how the test environment was prepared_
    ```
-      The test environment was prepared through charging of devices and preparation of additional software needed for 
-      the ability to synchronize data between garmin venu 2 and google health connect on android. The smartwatch was also
-      inspected for any visible damage or hinder of sensors that might affect the ability to provide data.
+   The smartwatch was inspected for any visible damage or hinder of sensors that might affect the ability to provide data. The FitBit
+   was charged in beforehand and attached to the left wrist. 
    ```
 
 2. **Data Collection Process**
@@ -69,11 +67,7 @@
 3. **Observations During Testing**
     - _Any notable observations during the testing process_
    ```
-      The need for a third party software solution for synchronization of data between Garmin Venu 2 and Health Connect
-      provides insight in the probable need for additional vendors within the plugin for more seamless integration and
-      data extraction, even though the native abstraction also have value. The ability to extract heart rate variability values from 
-      Garmin Venu 2 to Health Connect is limited by the third party software, even though the capbility to store and record
-      heart rate variability data is present at both the recording device and the data store.
+      
    ```
 
 ## Results
@@ -84,19 +78,19 @@
 |--------|---------------------------------------------|-------|
 | Connection Success | `[X] Success  [ ] Partial  [ ] Failed`      | |
 | Data Retrieval Completeness | `[X] Complete  [ ] Partial  [ ] Failed`     | |
-| Extraction Speed | `256 milliseconds`                          | |
-| Battery Impact (device) | `5% drain`                                  | |
+| Extraction Speed | `_____ seconds`                             | |
+| Battery Impact (device) | `4% drain`                                  | |
 | Battery Impact (wearable) | `0-1% drain`                                | |
 | App Stability | `[X] Stable  [ ] Minor Issues  [ ] Crashed` | |
 
 ### Data Validation
 
-| Data Type  | Expected Value | Actual Value | Matches?         | Notes         |
-|------------|----------------|--------------|------------------|---------------|
-| Heart rate | 63bpm          | 63bpm        | `[X] Yes [ ] No` | 00:00 - 00:02 |
-| Heart rate | 70 bpm         | 70bpm        | `[X] Yes [ ] No` | 00:02 - 00:03 |
-| Heart rate | 79 bpm         | 79bpm        | `[X] Yes [ ] No` | 00:03 - 00:05 |
-| Heart rate | 72 bpm         | 72bpm        | `[X] Yes [ ] No` | 00:05 - 00:06 |
+| Data Type | Expected Value | Actual Value | Matches? | Notes |
+|-----------|---------------|--------------|----------|-------|
+| | | | `[ ] Yes [ ] No` | |
+| | | | `[ ] Yes [ ] No` | |
+| | | | `[ ] Yes [ ] No` | |
+| | | | `[ ] Yes [ ] No` | |
 
 ### Results Report
 
@@ -121,7 +115,7 @@ Alternative link to report: [Report Link](url_or_path)
 
 ## Conclusion
 
-**Test Result:** `[X] Pass  [ ] Pass with Issues  [ ] Fail`
+**Test Result:** `[ ] Pass  [ ] Pass with Issues  [ ] Fail`
 
 **Recommendations for Improvement:**
 ```

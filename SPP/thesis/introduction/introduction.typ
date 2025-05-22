@@ -2,7 +2,7 @@
 
 This thesis is a 15 HEC Master's thesis in Software Engineering. It explores the domain of mobile application development, wearable health technology, and data normalization. As healthcare becomes increasingly more digital, wearable devices like smartwatches and fitness trackers are gaining traction as tools for collecting physiological and behavioral data.
 
-The widespread adoption and acceptance of such devices offers insightful possibilities for health monitoring, especially for conditions like migraine that could benefit from health monitoring. However, as of today that landscape is flawed due to data formats and APIs being differently interpreted depending on the different providers, making it difficult to integrate health data across platforms or use it effectively in research and machine learning. @impact-wearable-technologies
+The widespread adoption and acceptance of such devices offers insightful possibilities for health monitoring, especially for conditions like migraine. However, as of today that landscape is flawed due to data formats and APIs being differently interpreted depending on the different providers, making it difficult to integrate health data across platforms or use it effectively in research and machine learning. @impact-wearable-technologies
 
 This thesis aims to investigate this challenge and contributes by exploring how a mobile software framework solution might help unify and normalize health data from various sources. The aim is to simplify data handling for researchers and developers while also hopefully enabling more effective use of health data in fields such as machine learning. 
 
@@ -22,7 +22,7 @@ In recent years, as the market for wearable devices has grown, so has the amount
 
 Along similar research and works there is also Tasrif @tasrif. Tasrif is a Python based preprocessing framework for wearable data. It is designed to effectively handle and process data from widely used platforms such as Apple Health. More than just targeting bigger platforms, it also directly supports integration with machine learning libraries and focuses on offline data processing. Tasrif is a promising solution for data preprocessing purposes but just like WearMerge, it is not designed for mobile integration. 
 
-In addition to web and data processing frameworks, there are also several libraries for extracting data from wearable devices which is closely related to the work in this thesis. The solutions that exist are platform specific and are designed to work for their respective platforms. Some examples for these solutions for this are the health package, @health-package, React Native Health @react-native-health and React Native Health Connect @react-native-health-connect. More than these libraries being designed to work with specific platforms, they also lack the ability to normalize and standardize the data.
+In addition to web and data processing frameworks, there are also several libraries for extracting data from wearable devices which is closely related to the work in this thesis. The solutions that exist are platform specific and are designed to work for their respective platforms. Some examples for these solutions are the health package, @health-package, React Native Health @react-native-health and React Native Health Connect @react-native-health-connect. More than these libraries being designed to work with specific platforms, they also lack the ability to normalize and standardize the data.
 
 == 1.3 Problem formulation
 
