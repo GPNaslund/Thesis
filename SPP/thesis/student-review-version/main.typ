@@ -75,19 +75,19 @@ The company Neurawave @neurawave presented a need for collecting health metrics 
 We began our research project by conducting open-ended interviews with the founders of neurawave @neurawave. This approach helps us build a deeper understanding of both stakeholder needs and the problem domain. One of the key requirements was that the data collection mechanism had to be integrated into their existing cross-platform mobile application. The main reason for this requirement is the ability for the existing application to act upon realtime health data. Additionally, we conducted literature review to gather insights regarding the state of the art available solutions, and which health data is commonly used in migraine prediction.
 
 === Phase 2 - Objective formulation
-Based on the analysis of identified requirements gather in open-ended interviews and resarch gap found in the literature review, we have defined the projects objectives.
+Based on the analysis of identified requirements gathered through open-ended interviews and the research gap identified in the literature review, we defined the project's objectives. This involved a systematic consolidation of findings and stakeholder discussions to establish clear, actionable goals that would guide the subsequent design and development of the software artifact.
 
 === Phase 3 - Design and implementation
-Based on the formulated objectives, the software artifact which is the data collection framework for mobile platforms was developed and refined iteratively.
+Guided by the formulated objectives, the software artifact, a data collection framework for mobile platforms, was designed and developed. The development process was iterative, characterized by cycles of design, prototyping, implementation, and stakeholder feedback. This approach allowed for progressive refinement of the framework's functionality and architecture, ensuring alignment with the project goals and evolving insights.
 
 === Phase 4 - Demonstrating efficacy
-Once the artifact has been developed, we will demonstrate its capabilities in addressing the defined problem through system testing. This will be followed by rigarous testing of how well the artifact meets the objectives, likely by comparing the implemented functionality with the stakeholder-defined goals.
+Upon completion of the data collection framework, its implemented functionality was subjected to a series of tests to demonstrate its capability in addressing the defined problem. These evaluations included functional, integration, and system testing to verify the core features and overall system performance. Subsequently, a collaborative assessment was conducted with the stakeholders. In this phase, the framework's achieved functionality and performance were compared against their initially defined goals and requirements to determine how well the objectives were met.
 
 === Phase 5 - Critical evaluation and feedback integration
-The quantitative assessments using controlled experiment is applied to measure the accuracy and reliability of the data collection framework in different scenarios or use-cases.
+The critical evaluation of the data collection framework was conducted through quantitative assessments using experiments. These experiments were designed to meticulously measure the framework's accuracy and reliability across various scenarios and use-cases. Specifically, the evaluations focused on the system's capability to effectively fetch and convert data, alongside its performance concerning execution time. To ensure a comprehensive assessment, these metrics were tested under different operational conditions, including scenarios for historical data retrieval and real-time data processing. The findings from this evaluation phase were then analyzed to identify potential areas for refinement.
 
 === Phase 6 - Dissemination and community engagement
-Our findings and its implications are articulated in this thesis work for dissemination among AI researchers and developers.
+This thesis serves as the primary vehicle for disseminating our research findings and their implications, aiming to engage with and contribute to the knowledge base of AI researchers and developers.
 
 == 2.2 Research methods
 We began our research project by conducting open-ended interviews with the founders of Neurawave @neurawave. Open-ended interviewing allows for a flexible, free-flowing conversation and is considered a qualitative method of data collection @interviewing-as-a-data-collection-method. This method was chosen because the stakeholders possessed significantly more domain knowledge than us, making them essential in framing the problem accurately. As described by Alshenqeeti @interviewing-as-a-data-collection-method, the purpose of open-ended interviews is to "broaden the scope of understanding of investigated phenomena". We believed this approach would help us build a deeper understanding of both stakeholder needs and the problem domain.
@@ -153,10 +153,10 @@ A number of general risks may impact both the reliability and validity of the pr
 
 - Lack of access to wearable data may hinder testing or validation of the component under real world conditions. To address this, we prioritize using devices with public or open APIs and ensure local caching of test data were possible.
 - Complexity of data normalization and integration may result in inconsistent behavior across devices. This will be mitigated by adopting standardized data formats and implementing preprocessing checks.
-- Data quality issues, especially from low-cost or experimental devices may reduce the effectiveness of the component. We will include a validation layers to detect and handle poor input.
+- Variability in data completeness, or encountering unexpected data structures from providers (especially low-cost or experimental devices), could impact the reliability of data retrieval or the accuracy of data normalization processes. To address this, the framework implements robust error handling for data parsing and transformation, focusing on structural correctness during format conversion (e.g., to Open mHealth) and transparently reporting any encountered issues.
 - Time management and scope creep pose risks to project completion. A well defined timeline and iterative planning approach are used to ensure focus and manage scope.
 - Limited expertise in wearable APIs and data pipelines may slow progress. To mitigate this, we will rely on documentation and existing libraries where possible.
-- Difficulty demonstrating machine learning readiness of the collected data may arise due to insufficient volume or inconsistency. We will evaluate and report data quality with descriptive statistics and document its limitations for future machine learning integration.
+- Framework data outputs, though correctly formatted, generally require further user-side processing and feature engineering for optimal machine learning application. To address this, the framework's defined scope in data retrieval and format normalization, alongside its documented output data structures, enables users to effectively plan this subsequent data preparation.
 - API rate limits and access restrictions may impact data collection throughput. Mitigation strategies include caching responses, adhering to API usage guidelines and contacting vendors if necessary.
 
 By identifying these threats and planning accordingly, this project strives to maintain both reliability and validity, despite the challenges inherent in working with third-party hardware and health data.
@@ -166,7 +166,7 @@ While this project doest not involve direct interaction with human participants 
 
 
 === Confidentiality
-The component is designed to collect health metrics that are sensitive by nature, such as heart rate, heart rate variability and skin temperature. Even though no personally identifiable information is intended to be handled, care must be taken to ensure that the processing of data is in accordance with privacy regulations such as GDPR.
+The component is designed to collect health metrics that are sensitive by nature, such as heart rate and heart rate variability. Even though no personally identifiable information is intended to be handled, care must be taken to ensure that the processing of data is in accordance with privacy regulations such as GDPR.
 
 To address this, all test data used during development and experimentation will be anonymized. No user names, contact information, or device IDs linked to individuals will be stored or processed in any way that could allow for re-identification. No data will be stored within the component, only processing of the data. No data will be shared externally or stored in the cloud.
 
@@ -182,9 +182,9 @@ This project poses minimal risk of harm. as it does not involve any physical or 
 
 = 3. Theoretical background
 
-The current landscape of health data has seen a significant transformation due to the prliferation of wearable devices. Devices such as smartwatches, smart rings and fitness trackers have advanced rapidly in recent years, now offering high-quality, clinically certified data collection capabilities @impact-wearable-technologies. This longitudinal and increasingly accurate health monitoring opens up new possibilities in health research, disease detection and personalized treatment strategies @wearable-devices-healthcare. The global wearable device market continues to grow at a substantial rate, with an estimated compound annual growth rate of 14.6% between 2023 and 2030 [@wearable-sales-statistics]. Leading industry actors include Alphabet Inc./Google, Apple Inc., Garmin Ltd., and Samsung Electronics Co., Ltd. [@wearable-sales-statistics].
+The current landscape of health data has seen a significant transformation due to the proliferation of wearable devices. Devices such as smartwatches, smart rings and fitness trackers have advanced rapidly in recent years, now offering high-quality, clinically certified data collection capabilities @impact-wearable-technologies. This longitudinal and increasingly accurate health monitoring opens up new possibilities in health research, disease detection and personalized treatment strategies @wearable-devices-healthcare. The global wearable device market continues to grow at a substantial rate, with an estimated compound annual growth rate of 14.6% between 2023 and 2030 @wearable-sales-statistics. Leading industry actors include Alphabet Inc./Google, Apple Inc., Garmin Ltd., and Samsung Electronics Co., Ltd. @wearable-sales-statistics.
 
-While the growth of wearable technologies presents valuable opportunities, it also introduces significant technical and interoperability challenges. Each provider typically offers its own platforms for accessing and modifying health data, with unique APIs, data models and permission systems. This fragmentation complicates efforts to aggregate data from multiple providers. For instance, Apple's HealthKit provides a generalized abstraction for measurements via types such as HKQuantityType @apple-healthkit-hkquantitytype, representing quantities like step conts. In contrast, Google Health structures similar metrics as domain-specific records such as StepRecord @google-health-step-record, including associated metadata like start and end times. These inconsistensies in data modeling extend beyond simple metrics such as step counts to more complex physiological measurements such as heart rate variability, sleep stages and stress levels. The absence of standardized approaches for normalizing and integrating such heterogenous health data represents a significant obstacle for developers and researchers building cross platform applications, particulary for those leveraging machine learning techniques.
+While the growth of wearable technologies presents valuable opportunities, it also introduces significant technical and interoperability challenges. Each provider typically offers its own platforms for accessing and modifying health data, with unique APIs, data models and permission systems. This fragmentation complicates efforts to aggregate data from multiple providers. For instance, Apple's HealthKit provides a generalized abstraction for measurements via types such as HKQuantityType @apple-healthkit-hkquantitytype, representing quantities like step counts. In contrast, Google Health structures similar metrics as domain-specific records such as StepRecord @google-health-step-record, including associated metadata like start and end times. These inconsistensies in data modeling extend beyond simple metrics such as step counts to more complex physiological measurements such as heart rate variability, sleep stages and stress levels. The absence of standardized approaches for normalizing and integrating such heterogenous health data represents a significant obstacle for developers and researchers building cross platform applications, particulary for those leveraging machine learning techniques.
 
 == Existing frameworks for collecting health data
 
@@ -213,7 +213,7 @@ The existing frameworks for collecting health data are outlined below:
   - Does not support Open mHealth.],
 )
 
-While each of these frameworks fulfills part of the requirements for multi-provider health data integration, none currently provide a complete, mobile-native, cross-platform solution that supports standardized output such as Open mHealth format.
+While each of these frameworks fulfills part of the requirements for a multi-provider health data integration, none currently provide a complete, mobile-native, cross-platform solution that supports standardized output such as Open mHealth format.
 
 == Health data standards
 
@@ -246,7 +246,7 @@ Google Health Connect uses specific record classes, such as Steps @health-connec
 
 == Selected software
 
-One requirement for this framework is that it must be cross-platform and mobile-native. Several development frameworks support this, including React Native @react-native, Flutter @flutter, LynxJS @lynx-js and Kotlin Multiplatofmr @kotlin-multi-platform.
+One requirement for this framework is that it must be cross-platform and mobile-native. Several development frameworks support this, including React Native @react-native, Flutter @flutter, LynxJS @lynx-js and Kotlin Multiplatform @kotlin-multi-platform.
 
 Flutter was selected for this project due to existing infrastructure and developer experience within the organization (Neurawave). Flutter uses the Dart programming language, with native platform functionality implemented in Swift (iOS) and Kotlin (Android). Platform-specific functionality is accessed via MethodChannels, which allow Flutter code to call native APIs directly.
 
@@ -267,25 +267,25 @@ We designed a Flutter plugin using the Dart programming language, with platform-
 The high level data flow is illustrated below:
 
 #figure(
-  image("flow-chart.jpeg", width: 80%),
+  image("flow-chart.png", width: 96%),
   caption: [Data flow of requesting permissions and extracting health data],
 )
 
-Several standardization models exist for structuring health data, including Open mHealth, FHIR and IEEE P1752. We chose Open mHealth due to its lightweight nature, JSON-compatibility and its specific focus on mobile health data. While FHIR is a powerful and widely adopted clinical standard, it introduces significant overhead for mobile use cases, requiring modeling of patients, medications and other elements irrelevant to this project. Additionally, Open mHealth has begun incorporating elements from IEEE P1752, further reinforcing its suitability for mobile-focused applications.
+Several standardization models exist for structuring health data, including Open mHealth, FHIR and IEEE P1752. We chose Open mHealth due to its lightweight nature, JSON-compatibility and its specific focus on mobile health data. While FHIR is a powerful and widely adopted clinical standard, it introduces significant overhead for mobile use cases, requiring modeling of patients, medications and other elements irrelevant to this project @fhir. Additionally, Open mHealth has begun incorporating elements from IEEE P1752, further reinforcing its suitability for mobile-focused applications.
 
-This framework targets heart rate and skin temperature data. On Android, it extracts HeartRate @health-connect-heart-rate-type and SkinTemperature @health-connect-skin-temperature-type records from Google Health Connect. On iOS, it extracts HKQuantitySample objects with type heartRate @health-kit-heart-rate-type and bodyTemperature @health-kit-body-temperature-type, filtering for locations associated with skin contant measurements (e.g armpit, body, finger, toe, forehead). The extracted data is transformed into the Open mHealth Heart Rate schema @openmhealth-heart-rate-schema and a custom Skin Temperature schema modeled after the Open mHealth Body Temperature schema @openmhealth-body-temperature-schema.
+This framework targets heart rate and heart rate variability data. On Android, it extracts HeartRate @health-connect-heart-rate-type and HeartRateVariabilityRmssd @health-connect-hrv-type records from Google Health Connect. On iOS, it extracts HKQuantitySample objects with type heartRate @health-kit-heart-rate-type and heartRateVariabilitySDNN @health-kit-hrv-type. The extracted data is transformed into the Open mHealth Heart Rate schema @openmhealth-heart-rate-schema and a custom heart rate variability schema modeled in accordance with the Open mHealth schema design principles @openmhealth-schema-principles and template guidelines @openmhealth-template-guidelines.
 
 == 4.2 Implementation concerns
 
-To ensure interoperability, the plugin normalizes all extraced data into Open mHealth format regardless of the source platform or underlying API. Metadata not defined within the Open mHealth schema, such as device name or specific hardware information, is discarded to maintain consistency and reduce variability across platforms.
+A primary objective of the plugin is to enhance interoperability across mobile health platforms. To achieve this, it provides functionality to normalize all extracted data into the Open mHealth format, regardless of the source platform or its underlying API. Metadata not explicitly defined within the Open mHealth schema, such as device-specific identifiers or detailed hardware information, is intentionally omitted during this process. This approach ensures data consistency and reduces variability when aggregating data from diverse sources.
 
-The plugin ensures that permission handling is performed correctly and that permission states are regularly verified, as users may revoke permissions at any time. Both HealthKit and Health Connect offer similar permission models, which posed minimal challenges during implementation.
+Ensuring correct and user-transparent permission handling was a central, yet challenging, aspect of the implementation. While the plugin offers a unified API for requesting and managing data permissions, the native mechanisms provided by Apple's HealthKit and Google's Health Connect differ substantially. These differences presented considerable implementation hurdles. A significant divergence is HealthKit's privacy-centric design, which, unlike Health Connect, does not allow an application to programmatically determine the current status of read permissions for specific data types once a user has interacted with the initial permission prompt. Furthermore, to address operating system limitations that restrict applications from repeatedly requesting permissions, and to empower users with direct control, the plugin incorporates functionality to guide users to the relevant system settings page where they can manually adjust health data permissions for the application.
 
-Data granularity and sampling resolution is determined by the user via an input time window. The plugin adheres to the data limits and resolution supported by the respective health data store, returning data only within the requested time frame.
+Data granularity and sampling resolution are determined by the user through a specified time window for each data query. The plugin respects the data resolution and any rate limits imposed by the underlying native health data store (HealthKit or Health Connect), retrieving data strictly within the user-defined timeframe.
 
-To account for situations where a health data store is not available (e.g the data store is not installed), the plugin includes logic to direct users to the respective app store to download the required app. Additionally, if a user attempts to use the plugin on an unsupported OS version, they are informed of the compatibility issue through user-facing feedback.
+The plugin also addresses scenarios where necessary platform components might be missing or prerequisites are not met. If a user attempts to utilize the plugin on an unsupported operating system version, they are provided with clear, user-facing feedback regarding the compatibility issue. Similarly, if a required health data store (like Health Connect) is not installed or accessible, the plugin detects this and informs the user of the situation, guiding them on the necessary prerequisites rather than attempting automated redirections.
 
-The plugin is designed with extensibility in mind. Its architecture allows for straightforward integration of additional data types, data providers (e.g Fitbit, Garmin) and health metrics in fututre iterations.
+Finally, the plugin is designed with extensibility as a core principle. Its modular architecture facilitates the straightforward integration of additional health data types, new data providers (e.g., specific third-party wearable APIs beyond native platform stores), and expanded health metric support in future development iterations.
 
 == 4.3 Demonstration
 
@@ -296,7 +296,54 @@ The test application will be evaluated using real devices including Apple Watch,
 The plugin will be considered succesful if it consistently provides accurate and correctly formatted Open mHealth data on both iOS and Android platforms, across a diverse set of wearable devices.
 
 = 5 Results
-No results have been obtained since the thesis project is not completed yet.
+
+== 5.1 Resulting artifact
+This section presents the 'wearable_health' Flutter plugin, the software artifact resulting from the design choices and implementation techniques detailed in Section 4.1. The developed plugin offers a Dart API designed to abstract the complexities of native platform interactions for managing health data permissions, extracting data from Apple HealthKit and Google Health Connect, and subsequently normalizing this data into the Open mHealth format.
+
+Interaction with the plugin typically involves first obtaining a platform-specific interface object. For instance, methods on the main plugin instance allow developers to retrieve either an AppleHealthKit interface or a GoogleHealthConnect interface. These platform-specific interface objects then expose a largely consistent set of methods for data operations. The core functionalities available through these interfaces are detailed in Table 5.1.
+
+#table(
+  columns: (1fr, auto, auto, auto),
+  inset: 5pt,
+  align: horizon,
+  table.header(
+    [], [*API*], [*Description*], [*Platform(s)*],
+  ),
+  /* CHECK PERMISSIONS */
+  [], [*checkPermissions*], [Retrieves a list of the health metrics that the user has given permissions to be read. Not implemented on HealthKit due to Apple's privacy policy.], [HealthConnect],
+  /* REQUEST PERMISSIONS */
+  [], [*requestPermissions*], [Requests read permissions of provided data types.], [HealthConnect & HealthKit],
+  /* DATA STORE AVAILABILITY */
+  [], [*checkDataStoreAvailability*], [Checks the availability of underlying data store.], [HealthConnect & HealthKit],
+  /* REDIRCT TO SETITNGS */
+  [], [*redirectToPermissionsSettings*], [Provides a stable fallback for the request permissions functionality. Useful when the underlying os blocks requests due to several factors.], [HealthConnect & HealthKit],
+  /* GET RAW DATA */
+  [], [*getRawData*], [Retrieves serialized native data records of specified types and within specified time frame.], [HealthConnect & HealthKit],
+  /* GET DATA */
+  [], [*getData*], [Retrieves data of specified types and within specified timeframe as dart objects that are structurally equivalent to their native counterpart.], [HealthConnect & HealthKit],
+  /* GET PLATFORM VERSION */
+  [], [*getPlatformVersion*], [Retrieves the platform version of the device running the plugin.], [HealthConnect & HealthKit],
+)
+Table 5.1 - Description of the public API.
+
+In addition to the direct data retrieval methods, the plugin includes Dart extension methods that facilitate the conversion of the retrieved Dart objects into the standardized Open mHealth format.
+
+Internally, the plugin's software architecture employs a Model-Controller-Service pattern implemented independently within both the Dart layer and each native platform-specific layer. This modular design separates concerns for API interaction, business logic, and direct data source communication within their respective environments.
+
+== 5.2 Experiment results
+This section presents the empirical data obtained from the experiments conducted to evaluate the 'wearable_health' plugin. The primary aim of these experiments was to assess the plugin's core functionalities, data transformation accuracy, and operational performance. 
+
+All experiments were executed using the dedicated Flutter-based experiment application, as outlined in the demonstration plan in Section 4.3, and followed the evaluation approach described within the Design Science Research methodology.
+
+The tests were performed across a variety of configurations, encompassing different mobile operating systems (iOS and Android), physical wearable devices (as specified in Section 4.3), target health data types (Heart Rate and Heart Rate Variability), for both historical data extraction and real time data extraction. The data presented in the following subsections are key findings derived from experimental logs and automatically generated test reports. These subsections will detail the results pertaining to data retrieval completeness, accuracy of data value conversion through the normalization process, and execution time for data retrieval and transformation.
+
+=== 5.2.1 Data retrieval completeness
+=> Samlad tabell med experimentens resultat
+=== 5.2.2 Conversion accuracy
+=> Samlad tabell med experimentens resultat 
+=== 5.2.3 Execution time
+=> Samlad tabell med experimentens resultat
+
 
 = 6 Analysis
 No analysis has been made since the thesis project is not completed yet.

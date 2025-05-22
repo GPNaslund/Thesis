@@ -468,3 +468,19 @@ openmhealth-heart-rate-schema:
 openmhealth-body-temperature-schema:
   type: web
   url: https://www.openmhealth.org/documentation/#/schema-docs/schema-library/schemas/omh_body-temperature
+
+health-connect-hrv-type:
+  type: web
+  url: https://developer.android.com/reference/kotlin/androidx/health/connect/client/records/HeartRateVariabilityRmssdRecord
+
+health-kit-hrv-type:
+  type: web
+  url: https://developer.apple.com/documentation/healthkit/hkquantitytypeidentifier/2881127-heartratevariabilitysdnn
+
+openmhealth-schema-principles:
+  type: web
+  url: https://www.openmhealth.org/documentation/#/schema-docs/schema-design-principles
+
+openmhealth-template-guidelines:
+  type: web
+  url: https://www.openmhealth.org/documentation/#/schema-docs/write-a-schema
