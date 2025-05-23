@@ -64,7 +64,13 @@
       using the experiment app for extraction of the data.
    ```
 
-3. **Observations During Testing**
+3. **Experiment app steps to collect data**
+    - _In app navigation and steps to extract data
+   ```
+      In the experiment app, the timefields were selected. The startdate selected was 2025-05-21
+   ```
+
+4. **Observations During Testing**
     - _Any notable observations during the testing process_
    ```
       The need for a third party software solution for synchronization of data between Garmin Venu 2 and Health Connect
