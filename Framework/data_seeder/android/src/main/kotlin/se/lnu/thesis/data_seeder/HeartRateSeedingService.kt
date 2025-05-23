@@ -1,9 +1,10 @@
-package se.lnu.thesis.data_seeder_example
+package se.lnu.thesis.data_seeder
 
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.bluetooth.BluetoothClass
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
@@ -12,11 +13,11 @@ import androidx.core.app.NotificationCompat
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
+import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.records.metadata.Metadata // Import Metadata
 import kotlinx.coroutines.*
 import java.time.Instant
 import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 class HeartRateSeedingService : Service() {
@@ -90,14 +91,8 @@ class HeartRateSeedingService : Service() {
                         continue
                     }
 
-                    // MODIFICATION: Construct Metadata to mimic Fitbit
-                    val recordMetadata = Metadata(
-                        dataOrigin = fitbitDataOrigin,
-                        // device = null (by not setting it, it defaults to null or isn't included)
-                        // clientRecordId = null (by not setting it)
-                        // clientRecordVersion = 0 (default if not set, or explicitly if needed, but often not necessary for insert)
-                        recordingMethod = Metadata.RECORDING_METHOD_AUTOMATICALLY_TRACKED // This is '2'
-                    )
+                    val recordMetadata = Metadata.manualEntry();
+
 
                     val heartRateRecord = HeartRateRecord(
                         startTime = sampleStartTime,
@@ -105,14 +100,16 @@ class HeartRateSeedingService : Service() {
                         endTime = sampleEndTime,
                         endZoneOffset = ZoneOffset.systemDefault().rules.getOffset(sampleEndTime),
                         samples = listOf(HeartRateRecord.Sample(time = sampleStartTime, beatsPerMinute = bpm)),
-                        metadata = recordMetadata // Use the modified metadata
+                        metadata = recordMetadata
                     )
 
                     healthConnectClient.insertRecords(listOf(heartRateRecord))
                     Log.i("FitbitMimicHRSeeder", "Seeded HR (as Fitbit): $bpm bpm")
                     lastSampleEndTime = sampleEndTime
 
-                    delay(5000L) // Seed every 5 seconds
+                    val randomDelayMillis = Random.nextLong(15000L, 30001L) // Generates a random Long between 15000 (inclusive) and 30001 (exclusive)
+                    delay(randomDelayMillis)
+                    Log.i("FitbitMimicHRSeeder", "Next seed in ${randomDelayMillis / 1000} seconds.") // Optional: for logging the delay
                 }
             } catch (e: CancellationException) {
                 Log.i("FitbitMimicHRSeeder", "Seeding cancelled.")
@@ -144,7 +141,7 @@ class HeartRateSeedingService : Service() {
     }
 
     private fun createBarebonesNotification(): Notification {
-        val icon = android.R.drawable.ic_popup_sync // System "sync" icon
+        val icon = android.R.drawable.ic_popup_sync
 
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Seeding Heart Rate (Fitbit Mimic)")

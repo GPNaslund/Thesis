@@ -34,7 +34,7 @@
 
 | Field | Value                                                                    |
 |-------|--------------------------------------------------------------------------|
-| Physical Activity Type | `[X] Resting  [X] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
+| Physical Activity Type | `[X] Resting  [] Walking  [ ] Running  [ ] Cycling  [ ] Other: _______` |
 | Duration | `10 hours`                                                               |
 | Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                          |
 | Environmental Conditions | `Temperature: 9°C, Humidity: 28%, Other factors: _______`                |
@@ -44,7 +44,7 @@
 *Check all that apply:*
 
 - [X] Heart Rate
-- [X] Heart Rate Variable 
+- [X] Heart Rate Variability
 - [ ] Other: _______
 
 ## Test Procedure
@@ -52,20 +52,19 @@
 1. **Setup**
     - _Description of how the test environment was prepared_
    ```
-      The Fitbit Sense 2 smartwatch was visually inspected for any physical damage or obstructions to its sensors that could potentially interfere with data collection. The device was confirmed to be adequately charged (96%) prior to the test commencement and was securely attached to the tester's left wrist. The necessary mobile applications, including the Fitbit app, Google Fit (for visual data verification), and the 'plugin experiment app' (v0.0.1), were ensured to be installed and configured on the Samsung Galaxy S22 Ultra.
+   The Fitbit Sense 2 smartwatch was visually inspected for any physical damage or sensor obstructions that could potentially interfere with data collection. The device was confirmed to be adequately charged (96%) prior to test commencement. To ensure a clean dataset for the current test, any cached or locally stored health data within the 'plugin experiment app' (v0.0.1) from previous sessions was cleared. On the Samsung Galaxy S22 Ultra, it was verified that no other Bluetooth devices (especially other smartwatches or fitness trackers) were actively connected that could interfere with wearable data transmission. The necessary mobile applications were ensured to be installed and correctly configured on the Samsung Galaxy S22 Ultra: this included the Fitbit app (logged in, device paired, and recently synced), Google Fit (for visual data verification, configured with Health Connect), and the 'plugin experiment app' (v0.0.1) with all required permissions granted. Finally, the Fitbit Sense 2 was securely attached to the tester's left wrist, ensuring good skin contact.
    ```
 
 2. **Data Collection Process**
     - _Steps taken to collect the health data_
    ```
-      Health data (Heart Rate and Heart Rate Variability) was captured by the Fitbit Sense 2 overnight, between approximately 23:00 and 10:00. Post-recording, the data was synchronized from the smartwatch to the Fitbit mobile application on the Samsung Galaxy S22 Ultra. The Fitbit app was configured to share its data with Google's Health Connect. After allowing time for this synchronization, the 'plugin experiment app' was launched to initiate the extraction of the relevant health data from Health Connect for the defined period.
-
+   Health data (Heart Rate and Heart Rate Variability) was actively captured by the Fitbit Sense 2, worn by the tester overnight, specifically between approximately 23:00 and 10:00 the following day. Post-recording, the collected data was synchronized from the smartwatch to the Fitbit mobile application on the Samsung Galaxy S22 Ultra. It was ensured that the Fitbit app was configured to share its data with Google's Health Connect, and sufficient time was allowed for this secondary synchronization to complete, making the data available in Health Connect.
    ```
 
 3. **Observations During Testing**
     - _Any notable observations during the testing process_
    ```
-      The Fitbit Sense 2 was worn as intended on the left wrist from approximately 23:00 to 10:00 to specifically capture nocturnal Heart Rate (HR) and Heart Rate Variability (HRV), as the latter is primarily recorded by Fitbit devices during sleep. Synchronization of data from the watch to the Fitbit app, and subsequently to Health Connect, proceeded smoothly. Google Fit provided a convenient way to visually confirm that data was populating Health Connect as expected. A manual data sanitization step was performed within Health Connect to remove any entries outside the designated 23:00-10:00 test window, ensuring the dataset's integrity.
+   The Fitbit Sense 2 was worn as intended on the left wrist from approximately 23:00 to 10:00 to specifically capture nocturnal Heart Rate (HR) and Heart Rate Variability (HRV), as HRV is primarily recorded by Fitbit devices during sleep. Synchronization of data from the watch to the Fitbit app, and subsequently to Health Connect (prior to manual sanitization), proceeded smoothly. Google Fit provided a convenient way to visually confirm that data was populating Health Connect as expected before the sanitization and extraction steps. No other significant issues or deviations from the planned procedure were noted during the setup, collection, or extraction phases beyond the necessity for manual data window trimming in Health Connect.
    ```
 
 ## Results

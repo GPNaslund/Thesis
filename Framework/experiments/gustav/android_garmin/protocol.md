@@ -37,7 +37,7 @@
 | Physical Activity Type | `[X] Resting  [] Walking  [ ] Running  [ ] Cycling  [ ] Other: ____` |
 | Duration | `6 hrs`                                                              |
 | Intensity (if applicable) | `[X] Low  [ ] Medium  [ ] High`                                       |
-| Environmental Conditions | `Temperature: - °C, Humidity: - %, Other factors: _______`            |
+| Environmental Conditions | `Temperature: Approx 20°C, Humidity: - %, Other factors: _______`            |
 
 ## Health Data Parameters Tested
 
@@ -52,28 +52,22 @@
 1. **Setup**
     - _Description of how the test environment was prepared_
    ```
-      The test environment was prepared through charging of devices and preparation of additional software needed for 
-      the ability to synchronize data between garmin venu 2 and google health connect on android. The smartwatch was also
-      inspected for any visible damage or hinder of sensors that might affect the ability to provide data.
+   Both the Samsung Galaxy S22 Ultra and the Garmin Venu 2 smartwatch were confirmed to be adequately charged (wearable at 96%). The Garmin Venu 2 was visually inspected for any physical damage or sensor obstructions. The 'plugin experiment app' (v0.0.1) was installed on the Samsung Galaxy S22 Ultra, and any cached data from prior tests within this app was cleared. Crucially, the 'Health Sync' third-party application was installed and configured on the smartphone to bridge data from the Garmin Connect platform to Google Health Connect. This involved ensuring the Garmin Connect app was also installed, logged in, and had recently synced with the Garmin Venu 2. Permissions for Health Sync to read from Garmin Connect and write to Google Health Connect were verified. The Garmin Venu 2 was then securely fitted to the tester's wrist for the duration of the data collection period.
    ```
 
 2. **Data Collection Process**
     - _Steps taken to collect the health data_
    ```
-      The plugin experiment app was installed on my Samsung Galaxy S22 aswell as Health Sync, which is a third party app
-      needed for data synchronization between the Garmin Venu 2 and Health Connect. Then i synchronized gathered data via
-      Health Sync from the smartwatch to the device. After synchronization of the registered data, i initialized the experiment
-      within the experiment app for extraction of the data.
+   The Garmin Venu 2 was worn by the tester for a continuous period of 6 hours (approximately from 00:00 to 06:00, based on test time and data timestamps), during which it passively collected Heart Rate data in a 'Resting' state with 'Low' intensity. Following the 6-hour data collection period, the data synchronization process was initiated. First, data from the Garmin Venu 2 was synced to the Garmin Connect application on the Samsung Galaxy S22 Ultra. Once this was complete, the 'Health Sync' application was opened and a synchronization was manually triggered to transfer the newly acquired Heart Rate data from Garmin Connect into Google Health Connect. Sufficient time was allowed for this transfer to complete.
+
+   After confirming data synchronization to Google Health Connect via 'Health Sync', the 'plugin experiment app' was launched on the Samsung Galaxy S22 Ultra. The app was then used to initiate the extraction of Heart Rate data from Health Connect, specifically targeting the 6-hour window corresponding to the test period. (Optional but recommended: If data outside the precise test window might have been synced to Health Connect by 'Health Sync', a manual review and sanitization of entries in Health Connect, similar to procedures with other platforms, would be advisable before extraction to ensure data integrity, though this step's necessity depends on Health Sync's behavior regarding timeframes.)
+
    ```
 
 3. **Observations During Testing**
     - _Any notable observations during the testing process_
    ```
-      The need for a third party software solution for synchronization of data between Garmin Venu 2 and Health Connect
-      provides insight in the probable need for additional vendors within the plugin for more seamless integration and
-      data extraction, even though the native abstraction also have value. The ability to extract heart rate variability values from 
-      Garmin Venu 2 to Health Connect is limited by the third party software, even though the capbility to store and record
-      heart rate variability data is present at both the recording device and the data store.
+   The primary observation during this test (TEST-GN01) was the critical dependency on the 'Health Sync' third-party application to facilitate data flow from the Garmin Venu 2 ecosystem into Google Health Connect. This introduces an additional layer in the data pathway, which, as noted in the 'Additional Notes', may have implications for data validity and reliability if 'Health Sync' introduces transformations or delays. It was also observed that 'Health Sync', in its current configuration or version, appeared to limit the synchronization of Heart Rate Variability (HRV) data to Health Connect, even though the Garmin Venu 2 records HRV and Health Connect can store it. This highlights a potential limitation for comprehensive data analysis when relying on this specific third-party bridge. The 'plugin experiment app' itself performed stably during extraction from Health Connect.
    ```
 
 ## Results

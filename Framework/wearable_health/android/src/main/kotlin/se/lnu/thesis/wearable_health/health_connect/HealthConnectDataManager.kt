@@ -54,35 +54,56 @@ class HealthConnectDataManager {
                     }
 
                     for (dataType in healthDataTypes) {
-                        val response = healthConnectClient.readRecords(
-                            ReadRecordsRequest(
-                                recordType = dataType,
-                                timeRangeFilter = TimeRangeFilter.between(startInstant, endInstant)
-                            )
-                        )
-                        Log.d(tag,"Read ${response.records.size} records for $dataType")
+                        val allRecordsForType = mutableListOf<Record>()
+                        var pageToken: String? = null
+                        var pageCount = 0
 
-                        for (record in response.records) {
-                            when (record) {
-                                is HeartRateRecord -> {
-                                    val serialized = record.serialize()
-                                    dataMap[HealthPermission.getReadPermission(record::class)]!!.add(serialized)
-                                }
-                                is SkinTemperatureRecord -> {
-                                    val serialized = record.serialize()
-                                    dataMap[HealthPermission.getReadPermission(record::class)]!!.add(serialized)
-                                }
-                                is HeartRateVariabilityRmssdRecord -> {
-                                    val serialized = record.serialize()
-                                    dataMap[HealthPermission.getReadPermission(record::class)]!!.add(serialized)
-                                }
-                                else -> {
-                                    Log.w(
-                                        tag,
-                                        "Unsupported record type encountered: ${record::class.simpleName}"
+                        Log.d(tag, "Starting to read paginated records for ${dataType.simpleName}")
+
+                        try {
+                            do {
+                                pageCount++
+                                Log.d(tag, "Reading page $pageCount for ${dataType.simpleName} with pageToken: $pageToken")
+                                val response = healthConnectClient.readRecords(
+                                    ReadRecordsRequest(
+                                        recordType = dataType,
+                                        timeRangeFilter = TimeRangeFilter.between(startInstant, endInstant),
+                                        pageToken = pageToken
                                     )
+                                )
+
+                                Log.d(tag, "Read ${response.records.size} records in this page for ${dataType.simpleName}")
+                                allRecordsForType.addAll(response.records)
+
+                                pageToken = response.pageToken
+                            } while (pageToken != null)
+
+                            Log.d(tag, "Finished reading for ${dataType.simpleName}. Total records: ${allRecordsForType.size}")
+
+                            for (record in allRecordsForType) {
+                                when (record) {
+                                    is HeartRateRecord -> {
+                                        val serialized = record.serialize()
+                                        dataMap[HealthPermission.getReadPermission(record::class)]?.add(serialized)
+                                    }
+                                    is SkinTemperatureRecord -> {
+                                        val serialized = record.serialize()
+                                        dataMap[HealthPermission.getReadPermission(record::class)]?.add(serialized)
+                                    }
+                                    is HeartRateVariabilityRmssdRecord -> {
+                                        val serialized = record.serialize()
+                                        dataMap[HealthPermission.getReadPermission(record::class)]?.add(serialized)
+                                    }
+                                    else -> {
+                                        Log.w(tag, "Unsupported record type for serialization: ${record::class.simpleName}")
+                                    }
                                 }
                             }
+
+                        } catch (quotaError: IllegalStateException) {
+                            Log.e(tag, "Quota error (IllegalStateException) while reading ${dataType.simpleName}: ${quotaError.message}")
+                        } catch (e: Exception) {
+                            Log.e(tag, "Generic error reading ${dataType.simpleName}: ${e.message}", e)
                         }
                     }
                     dataMap
