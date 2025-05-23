@@ -22,6 +22,8 @@ class _MyAppState extends State<MyApp> {
   final DataSeeder _dataSeederPlugin = DataSeeder();
   String _consoleOutput = '';
   bool _isSeedingData = false;
+  bool _isLiveSeedingActive = false; // New: To track live seeding state
+  bool _isProcessingLiveSeedAction = false; // New: To disable button during async call
 
   @override
   void initState() {
@@ -157,6 +159,78 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<void> _toggleLiveSeeding() async {
+    if (_hasPermissions != true) {
+      _appendToConsole('Cannot start/stop live seeding: Permissions missing.');
+      return;
+    }
+
+    setState(() {
+      _isProcessingLiveSeedAction = true; // Disable button during the call
+    });
+
+    if (_isLiveSeedingActive) {
+      // Try to stop live seeding
+      _appendToConsole('Attempting to stop live data seeding...');
+      try {
+        final bool success = await _dataSeederPlugin.stopSeedDataLive();
+        if (mounted) {
+          if (success) {
+            _appendToConsole('Stop live data seeding command successful.');
+            setState(() {
+              _isLiveSeedingActive = false;
+            });
+          } else {
+            _appendToConsole('Stop live data seeding command failed (plugin returned false).');
+            // Consider if _isLiveSeedingActive should be reverted or reflect assumed state
+          }
+        }
+      } on PlatformException catch (e) {
+        if (mounted) {
+          _appendToConsole(
+            'PlatformException during stop live data seeding: ${e.message}\n${e.details}',
+          );
+        }
+      } catch (e, stacktrace) {
+        if (mounted) {
+          _appendToConsole('Error during stop live data seeding: $e\n$stacktrace');
+        }
+      }
+    } else {
+      // Try to start live seeding
+      _appendToConsole('Attempting to start live data seeding...');
+      try {
+        final bool success = await _dataSeederPlugin.seedDataLive();
+        if (mounted) {
+          if (success) {
+            _appendToConsole('Start live data seeding command successful.');
+            setState(() {
+              _isLiveSeedingActive = true;
+            });
+          } else {
+            _appendToConsole('Start live data seeding command failed (plugin returned false).');
+          }
+        }
+      } on PlatformException catch (e) {
+        if (mounted) {
+          _appendToConsole(
+            'PlatformException during start live data seeding: ${e.message}\n${e.details}',
+          );
+        }
+      } catch (e, stacktrace) {
+        if (mounted) {
+          _appendToConsole('Error during start live data seeding: $e\n$stacktrace');
+        }
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isProcessingLiveSeedAction = false; // Re-enable button
+      });
+    }
+  }
+
   void _appendToConsole(String text) {
     if (mounted) {
       setState(() {
@@ -206,23 +280,45 @@ class _MyAppState extends State<MyApp> {
                     child: const Text('Request permissions'),
                   ),
                   ElevatedButton(
-                    onPressed:
-                        (_hasPermissions == true && !_isSeedingData)
-                            ? _seedDataAction
-                            : null,
-                    child:
-                        _isSeedingData
-                            ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                            : const Text('Seed Data'),
+                    onPressed: (_hasPermissions == true && !_isSeedingData && !_isProcessingLiveSeedAction)
+                        ? _seedDataAction // Existing one-off seed
+                        : null,
+                    child: _isSeedingData
+                        ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white, // Assuming button text is white
+                      ),
+                    )
+                        : const Text('Seed Batch Data'), // Clarified button text
                   ),
                 ],
+              ),
+              const SizedBox(height: 10), // Space before new button
+              Center( // Center the new button
+                child: ElevatedButton(
+                  onPressed: (_hasPermissions == true && !_isProcessingLiveSeedAction)
+                      ? _toggleLiveSeeding
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isLiveSeedingActive ? Colors.redAccent : Colors.green,
+                  ),
+                  child: _isProcessingLiveSeedAction // Show progress indicator if processing
+                      ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                      : Text(
+                    _isLiveSeedingActive ? 'Stop Live Seeding' : 'Start Live Seeding',
+                    style: const TextStyle(color: Colors.white), // Ensure text is visible
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
 
@@ -250,7 +346,11 @@ class _MyAppState extends State<MyApp> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => setState(() => _consoleOutput = ''),
+                  onPressed: () {
+                    if (mounted) { // Good practice to check mounted before setState
+                      setState(() => _consoleOutput = '');
+                    }
+                  },
                   child: const Text('Clear console'),
                 ),
               ),

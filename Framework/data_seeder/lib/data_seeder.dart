@@ -14,17 +14,41 @@ class DataSeeder {
     return success ?? false;
   }
 
+  Future<bool> seedDataLive() async {
+    bool? success = await methodChannel.invokeMethod<bool>("seedLive");
+    return success ?? false;
+  }
+
+  Future<bool> stopSeedDataLive() async {
+    bool? success = await methodChannel.invokeMethod<bool>("stopSeedLive");
+    return success ?? false;
+  }
+
   Future<bool> hasPermissions() async {
     bool? hasPermissions = await methodChannel.invokeMethod<bool>(
-      "hasPermissions",
+      "hasHealthConnectPermissions",
     );
-    return hasPermissions ?? false;
+
+
+    bool? hasSysPermissions = await methodChannel.invokeMethod<bool>(
+      "hasSystemPermissions",
+    );
+
+    return hasPermissions! && hasSysPermissions! ?? false;
   }
 
   Future<bool> requestPermissions() async {
     bool? requestSuccess = await methodChannel.invokeMethod<bool>(
-      "requestPermissions",
+      "requestHealthConnectPermissions",
     );
-    return requestSuccess ?? false;
+
+    bool? requestSystemSuccess = await methodChannel.invokeMethod<bool>(
+      "requestSystemPermissions",
+    );
+
+    if (requestSystemSuccess! && requestSuccess!) {
+      return true;
+    }
+    return false;
   }
 }
