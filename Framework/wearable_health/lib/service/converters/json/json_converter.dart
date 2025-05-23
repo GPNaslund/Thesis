@@ -161,6 +161,6 @@ class JsonConverterImpl implements JsonConverter {
       );
     }
 
-    return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    return DateTime.fromMillisecondsSinceEpoch(value.toInt(), isUtc: true);
   }
 }

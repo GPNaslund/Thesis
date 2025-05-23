@@ -1,6 +1,6 @@
 = 1 Introduction
 
-This thesis is a 15 HEC Master's thesis in Software Engineering. It explores the domain of mobile application development, wearable health technology, and data normalization. As healthcare becomes increasingly more digital, wearable devices like smartwatches and fitness trackers are becoming progressively more established as tools for collecting physiological and behavioral data.
+This thesis is a 15 HEC Bachelor's thesis in Software Engineering. It explores the domain of mobile application development, wearable health technology, and data normalization. As healthcare becomes increasingly more digital, wearable devices like smartwatches and fitness trackers are becoming progressively more established as tools for collecting physiological and behavioral data.
 
 The widespread adoption and acceptance of these devices offers insightful possibilities for health monitoring, particularly for conditions like migraine that stand to gain from such monitoring. However, the current landscape is flawed because data formats and APIs are interpreted differently among various providers. This divergence makes it difficult to integrate health data across platforms or use it effectively in research and machine learning. @impact-wearable-technologies
 
@@ -32,9 +32,9 @@ Existing solutions like WearMerge and Tasrif focus on data aggregation and prepr
 
 To explore this gap, the thesis is structured by the following research questions:
 
-RQ1. How can wearable health data from different platforms be effectively normalized into a unified format suitable for migraine-focused machine learning applications?
+RQ1. How can wearable health data from different platforms be effectively normalized into a unified format, thereby establishing a foundational step towards suitability for broader health applications, including migraine-focused machine learning?
 RQ2. What are the key requirements and challenges in implementing real-time data normalization for migraine-relevant wearable data in a mobile environment?
-RQ3. How effective is the Open mHealth schema as a standardized format for representing migraine-relevant physiological data from diverse wearable devices?
+RQ3. To what extent can the Open mHealth standard, leveraging its schema design principles for extension, effectively support the normalization of specific migraine-relevant physiological data collected from diverse wearable devices via mobile platforms?
 
 == 1.4 Motivation
 
@@ -46,11 +46,15 @@ Furthermore, from an industry standpoint, the proposed framework provides a robu
 
 == 1.5 Results
 
-None obtained
+The primary result of this thesis is the 'wearable_health' Flutter plugin, a software artifact designed to facilitate the collection and normalization of health data (specifically Heart Rate and Heart Rate Variability) from Apple HealthKit and Google Health Connect into the Open mHealth standard. The development and evaluation of this plugin directly address the research questions. Experimental validation demonstrated the plugin's capability for consistent data retrieval and accurate normalization of the targeted health metrics into the Open mHealth format. Performance assessments indicated computationally efficient data conversion processes and practical data extraction times for the tested scenarios. Collectively, these outcomes establish the technical viability of the proposed mobile-based approach for unified health data handling. The process also yielded insights into the requirements and challenges of implementing such a system in a mobile environment, and into the practical effectiveness of the Open mHealth schema (with necessary adaptations) for representing the selected physiological data. Detailed experimental results are presented in Chapter 5, followed by an in-depth analysis in Chapter 6.
 
 == 1.6 Scope/Limitation
 
-Not finished
+This thesis focuses on the design, development, and initial evaluation of a mobile software framework for normalizing wearable health data. To demonstrate the core normalization capabilities of the framework within the defined project scope, this study specifically targets Heart Rate (HR) and Heart Rate Variability (HRV). These metrics were chosen due to their common availability across consumer wearables and their recognized relevance in physiological monitoring, including in contexts such as migraine research, allowing for a focused investigation into the challenges of cross-platform data unification. The aim is to establish the feasibility of such a mobile-based normalization framework, which could then be extended to other data types relevant for specific applications like migraine-focused machine learning. The developed 'wearable_health' plugin supports data extraction from Apple HealthKit on iOS and Google Health Connect on Android, with subsequent transformation of the collected data into the Open mHealth standard. The evaluation of the plugin was conducted using a specific set of wearable devices (Apple Watch, Fitbit, and Garmin Venu) in controlled settings, primarily by the development team.
+
+Several limitations are acknowledged within this research. The generalizability of the findings to other health data types, a broader array of wearable devices not explicitly tested, or diverse real-world user scenarios is constrained by the defined scope of the evaluation. Specifically, while the research questions consider suitability for 'migraine-focused ML applications,' the empirical work is confined to HR and HRV. A comprehensive assessment for migraine applications would necessitate the inclusion and testing of other metrics identified in the literature (e.g., skin temperature, skin conductance, respiratory rate, sleep time), which were beyond the scope of this initial framework demonstration due to project constraints focused on core normalization logic and the availability and standardization maturity of these additional data types within the targeted native data stores and Open mHealth. The plugin's functionality is intrinsically dependent on the stability and consistency of third-party APIs provided by Apple and Google, which are subject to change and could potentially impact long-term compatibility and operational reliability. Additionally, the quality and granularity of data obtainable from wearable devices can vary, which may affect the plugin's output, and the normalized data may require further user-side processing and feature engineering for optimal use in specific machine learning applications.
+
+Finally, it is important to recognize that the 'wearable_health' plugin, as developed within this thesis, is a research prototype. While it successfully demonstrates the core functionalities as designed and validated in Chapter 5 and analyzed in Chapter 6, it has not undergone the extensive, rigorous testing, comprehensive error handling development, or performance hardening typically required for a production-grade software component intended for deployment in critical or large-scale health applications.
 
 == 1.7 Target group
 
@@ -60,8 +64,25 @@ Furthermore, the framework can also be of interest to healthcare-focused researc
 
 == 1.8 Outline
 
-Not finished
+The remainder of this thesis is organized as follows:
 
+Chapter 1, Introduction, provides the context for this research, outlining the background, related work, problem formulation, and motivation. It also presents a summary of the results achieved, the scope and limitations of the work, the target group, and this structural outline.
+
+Chapter 2, Method, describes the Design Science Research (DSR) methodology adopted for this study. This includes detailing the research project phases, the specific research methods employed (such as literature reviews and experimentation), considerations for data relevant to migraine prediction, the targeted wearable devices and data stores, and an assessment of reliability, validity, and ethical considerations pertinent to the research.
+
+Chapter 3, Theoretical Background, reviews existing literature and foundational concepts. This encompasses the current landscape of wearable health technology, challenges in data normalization, an overview of relevant health data standards like Open mHealth, an examination of current data collection frameworks and APIs, the rationale for software choices, and a reiteration of the identified research gap.
+
+Chapter 4, Research Project - Implementation, details the design and development process of the 'wearable_health' Flutter plugin. It covers the architectural choices, platform-specific implementation details for iOS and Android, how key technical concerns such as permission handling and data transformation were addressed, and the planned approach for demonstrating the artifact's capabilities.
+
+Chapter 5, Results, presents the primary outcomes of the research and development effort. This includes a comprehensive description of the developed 'wearable_health' plugin as a software artifact, including its API, and the empirical findings from experiments conducted to assess its data retrieval completeness, normalization accuracy, and operational performance.
+
+Chapter 6, Analysis, critically examines and interprets the experimental results presented in Chapter 5. This chapter connects the findings to the initial research questions, evaluating the plugin's core functionality, its performance characteristics, and the effectiveness of the strategies implemented to address design and operational challenges.
+
+Chapter 7, Discussion, synthesizes the overall findings of the thesis. It relates the results and analysis back to the initial problem statement and research questions, discusses their implications in the context of existing literature and related work in the field, and acknowledges the inherent limitations of the study.
+
+Chapter 8, Conclusion, summarizes the key contributions and main findings of the thesis. It offers reflections on the research project as a whole and suggests potential directions and avenues for future work in the domain of mobile health data integration and normalization.
+
+The thesis concludes with a Bibliography, listing all referenced academic papers, technical documentation, and other source materials.
 
 = 2. Method
 
@@ -97,7 +118,7 @@ Following the interviews, we conducted literature research to expand our context
 
 Alternative approaches, such as expert interviews, could also have been employed to gather real-world insights. As described by Döringer @the-problem-centered-expert-interview, expert interviews are valuable for problem-centered exploration and knowledge gathering. However, owing to time and resource constraints, this method was not feasible within the scope of this thesis. Nonetheless, it represents a promising avenue for future research and validation.
 
-During the design and development phase, we followed the artifact creation process outlined in the Design Science Research methodology. While this is not an empirical method in the classical sense, it is a core research activity in DSR, where existing knowledge and stakeholder input are synthesized into a functional solution. We began by defining application requirements that map directly to stakeholder requirements and then iteratively developed the plugin aimed at fulfilling those needs. No specific structured development framework was followed, as our team had prior experience in collaborative software development.
+During the design and development phase, we followed the artifact creation process outlined in the Design Science Research methodology. While this is not an empirical method in the classical sense, it is a core research activity in DSR, where existing knowledge and stakeholder input are synthesized into a functional solution. We began by defining application requirements that map directly to stakeholder requirements and then iteratively developed the plugin aimed at fulfilling those needs. While no single, formally named agile or iterative framework (e.g., Scrum, Kanban) was strictly adhered to due to the small team size and prior collaborative experience, the development process embraced core DSR principles of iterative artifact construction and evaluation. This involved regular cycles of design, implementation, testing (as detailed in Sec 4.3 and Chapter 5), and refinement based on emerging findings and stakeholder feedback.
 
 To evaluate the developed solution, we will use experimentation as the primary method of validating functionality. According to Basili et al. @experimentation-in-software-engineering, experimentation is an iterative process of hypothesizing and testing. In our case, this involves defining (or redefining) software requirements, implementing them (the hypothesis), and verifying whether those requirements are fulfilled (the test).
 
@@ -106,10 +127,6 @@ Additionally, we will perform validation to ensure that the plugin's software re
 == 2.3 Data for migraine prediction using machine learning
 
 During the literature review of previous studies investigating migraine prediction using machine learning, we found only two studies @machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable. The health metrics used in both studies are outlined below. It is worth noting that several health metrics were included in either study, such as hours of working out @forecasting-migraine-with-ml-based-on-diary-wearable and step count @machine-learning-wearable-technology. We also found studies @migraine-review-general-practice, @triggers-protectors-predictors, @forecasting-migraine that examined different triggers (internal and external factors) such as weather, diet, and hormonal changes that could be valuable in predicting migraine episodes, but none of these were included in the studies that combined migraine prediction with machine learning.
-
-== 2.4 Wearables and datastores
-
-We decided that the framework should target native health data stores because they provide a unified API for extracting health data that is not affected by third-party wearables. Since Android holds 71.9% of the global market share and iOS 27.68% @mobile-os-market, Google Health Connect and Apple HealthKit are the native data stores we primarily target. During the validation of the framework, we will perform experiments using Apple Watch, Google Fitbit, and Garmin smartwatches as providers of health data to the native datastores. The selection of wearables was determined by available resources and the aim for reasonable coverage of common wearables.
 
 #table(
   columns: (1fr, auto, auto, auto),
@@ -132,7 +149,11 @@ We decided that the framework should target native health data stores because th
   [], [*Sleep time*], [Measurement the amount of hours slept], [@machine-learning-wearable-technology, @forecasting-migraine-with-ml-based-on-diary-wearable],
 )
 
-We have decided to include heart rate and heart rate variability in our data processing. The selection is based on a combination of what data is available from regular wearables and which health metrics have been shown in previous studies to be of high value.
+The decision to initially focus the plugin's implementation on Heart Rate and Heart Rate Variability was based on several factors: their fundamental importance and frequent use in wearable health studies, their relatively consistent availability across major wearable platforms and native data stores (Apple HealthKit and Google Health Connect), and the desire to thoroughly address the normalization challenges for these core data types within the project's scope. This allows for a detailed exploration of the normalization process before potentially expanding to other metrics that may have more varied availability or require more extensive custom schema development.
+
+== 2.4 Wearables and datastores
+
+We decided that the framework should target native health data stores because they provide a unified API for extracting health data that is not affected by third-party wearables. Since Android holds 71.9% of the global market share and iOS 27.68% @mobile-os-market, Google Health Connect and Apple HealthKit are the native data stores we primarily target. During the validation of the framework, we will perform experiments using Apple Watch, Google Fitbit, and Garmin smartwatches as providers of health data to the native datastores. The selection of wearables was determined by available resources and the aim for reasonable coverage of common wearables.
 
 == 2.5 Reliability and validity
 === Validity
@@ -300,6 +321,8 @@ This section presents the 'wearable_health' Flutter plugin, the software artifac
 
 Interaction with the plugin typically involves first obtaining a platform-specific interface object. For instance, methods on the main plugin instance allow developers to retrieve either an AppleHealthKit interface or a GoogleHealthConnect interface. These platform-specific interface objects then expose a largely consistent set of methods for data operations. The core functionalities available through these interfaces are detailed in Table 5.1.
 
+
+_Table 5.1 - Description of the public API._
 #table(
   columns: (1fr, auto, auto, auto),
   inset: 5pt,
@@ -322,7 +345,6 @@ Interaction with the plugin typically involves first obtaining a platform-specif
   /* GET PLATFORM VERSION */
   [], [*getPlatformVersion*], [Retrieves the platform version of the device running the plugin.], [HealthConnect & HealthKit],
 )
-Table 5.1 - Description of the public API.
 
 In addition to the direct data retrieval methods, the plugin includes Dart extension methods that facilitate the conversion of the retrieved Dart objects into the standardized Open mHealth format.
 
@@ -335,13 +357,80 @@ All experiments were executed using the dedicated Flutter-based experiment appli
 
 The tests were performed across a variety of configurations, encompassing different mobile operating systems (iOS and Android), physical wearable devices (as specified in Section 4.3), target health data types (Heart Rate and Heart Rate Variability), for both historical data extraction and real-time data extraction. The data presented in the following subsections are key findings derived from experimental logs and automatically generated test reports. These subsections will detail the results pertaining to data retrieval completeness, accuracy of data value conversion through the normalization process, and execution time for data retrieval and transformation.
 
-=== 5.2.1 Data retrieval completeness
-=> Samlad tabell med experimentens resultat
-=== 5.2.2 Conversion accuracy
-=> Samlad tabell med experimentens resultat 
-=== 5.2.3 Execution time
-=> Samlad tabell med experimentens resultat
+=== 5.2.1 Experimental setup overview
+To provide context for the subsequent results, Table 5.2 outlines the specific configurations used for each experiment. These configurations encompass the wearable devices, mobile platforms, operating systems, test durations, and health metrics involved, reflecting the testing parameters described in Section 4.3.
 
+_Table 5.2_
+#table(
+  columns: (1fr, auto, auto, auto, auto, auto),
+  inset: 2pt,
+  align: horizon,
+  table.header(
+    [*Id*], [*Wearable*], [*Mobile device*], [*OS*], [*Duration*], [*Metrics included*]
+  ),
+  [TEST-GN02], [Fitbit Sense 2], [Samsung Galaxy S22], [Android 14], [10h], [HR & HRV],
+  [TEST-GN03], [Fitbit Sense 2], [Samsung Galaxy S22], [Android 14], [20min, real-time], [HR],
+  [TEST-GN04], [Garmin Venu 2], [Samsung Galaxy S22], [Android 14], [6h], [HR],
+  [TEST-DP01], [Apple Watch Series 9], [Iphone 13 Pro], [iOS 18.4.1], [24h], [HR & HRV],
+[TEST-DP02], [Apple Watch Series 9], [Iphone 13 Pro], [iOS 18.4.1], [10min, real-time], [HR],
+)
+_It should be noted that the real-time tests (TEST-GN03, TEST-DP02) focused exclusively on Heart Rate (HR). Heart Rate Variability (HRV) was excluded from these specific continuous tests due to operational characteristics of the consumer wearables used: Fitbit devices typically measure HRV reliably only during sleep to ensure data accuracy, and the Apple Watch tends to record HRV sporadically, making consistent capture for short, ad-hoc real-time tests challenging. Historical data extraction tests (TEST-GN02, TEST-DP01), however, did include HRV where available._
+
+=== 5.2.2 Data retrieval completeness
+This section details the data retrieval completeness of the wearable_health plugin. The completeness was assessed by comparing the number of data points extracted by the plugin against the total number of available data points within the native datastores for the specified test duration.
+
+_Table 5.3_
+#table(
+  columns: (1fr, auto, auto),
+  inset: 10pt,
+  align: horizon,
+  table.header(
+    [*Id*], [*Amount collected/available*], [*Completeness %*],
+  ),
+  [TEST-GN02],  [7206/7206], [100%],
+  [TEST-GN03], [51/51], [100%],
+  [TEST-GN04], [1406/1406], [100%],
+  [TEST-DP01],  [589/589], [100%],
+  [TEST-DP02], [20/20], [100%],
+)
+
+=== 5.2.3 Conversion accuracy
+The accuracy of the data conversion and normalization process is presented in this section. Correctness was ensured by systematically comparing each value in the Open mHealth-formatted data structure to its corresponding pre-conversion native value.
+
+_Table 5.4_
+#table(
+  columns: (1fr, auto, auto),
+  inset: 10pt,
+  align: horizon,
+  table.header(
+    [*Id*], [*Conversions/Successful*], [*Success rate%*],
+  ),
+  [TEST-GN02],  [7206/7206], [100%],
+  [TEST-GN03], [51/51], [100%],
+  [TEST-GN04], [1406/1406], [100%],
+  [TEST-DP01],  [589/589], [100%],
+  [TEST-DP02], [20/20], [100%],
+)
+
+=== 5.2.4 Execution time
+This section outlines the execution time performance of the wearable_health plugin during data extraction and conversion phases. The results, measured using the Dart standard library's built-in timer functionality, are presented in Table 5.5.
+
+_Table 5.5_
+#table(
+  columns: (1fr, auto, auto, auto, auto),
+  inset: 5pt,
+  align: horizon,
+  table.header(
+    [*Id*], [*Amount of data points*], [*Extraction time*], [*Conversion time*], [*Total time*],
+  ),
+  [TEST-GN02],  [7206], [1286ms], [3ms], [1289ms],
+  [TEST-GN03], [51], [N/A], [N/A], [N/A],
+  [TEST-GN04], [1406], [133ms], [\<1\*], [133ms],
+  [TEST-DP01],  [589], [239ms], [\<1\*], [239ms],
+  [TEST-DP02], [20], [N/A], [N/A], [N/A],
+)
+_Execution and conversion times for the real-time data tests (TEST-GN03, TEST-DP02) are marked as 'N/A'. These experiments were designed to assess the plugin's capacity for continuous data querying from the native data stores and handling of incoming data, rather than measuring the specific latency of batch processing or per-record normalization under these conditions. The focus was on the system's stability and responsiveness in a semi-continuous data retrieval scenario. Latency characteristics of the normalization process itself are better represented by the batch conversion times reported for other tests._
+_\*Conversion time for TEST-DP01 registered as 0 ms. This is attributed to the millisecond precision of the Dart timer; the actual conversion time is likely in the microsecond range but below the timer's resolution for this dataset size._
 
 = 6 Analysis
 == 6.1 Analysis introduktion
@@ -361,7 +450,7 @@ In summary, while the experimental results within the tested configurations indi
 == 6.3 Analysis of the artifacts performance characteristics
 This section analyzes the operational performance of the 'wearable_health' plugin, focusing on the execution times for data extraction and subsequent data conversion processes. The analysis is based on the quantitative performance metrics presented in Section 5.2.3 and is particularly important for understanding practical considerations pertinent to RQ2 (requirements and challenges for implementing near real-time data normalization).
 
-The experimental results for data extraction (Section 5.2.3) indicated that for datasets comprising approximately !![1000 to 5000 records]!!, execution times were consistently observed in the vicinity of !![300 milliseconds across the tested platforms and devices]!!. The absence of significant outliers suggests a predictable performance profile within this operational range. While these figures may be considered acceptable for use cases involving single, discrete requests or periodic data synchronization, their implications for applications demanding true real-time continuous monitoring or very frequent polling (relevant to RQ2) warrant careful consideration. Such latency, though modest, could become a cumulative factor in resource consumption (e.g., battery) or perceived application responsiveness if invoked excessively. The predictability of this performance is, however, a positive aspect for developers anticipating system behavior for similar data loads.
+The performance analysis for RQ2 (requirements and challenges for implementing real-time data normalization) draws from two aspects: the batch processing tests and the continuous availability tests. The batch conversion times, consistently minimal (0-3 milliseconds per dataset ), indicate that the normalization algorithms themselves are highly efficient and computationally inexpensive, suggesting they would add negligible overhead in a real-time processing pipeline. The 'real-time' tests (TEST-GN03, TEST-DP02) specifically evaluated the plugin's ability to repeatedly query the data store and process available data in an ongoing manner, simulating a scenario where an application frequently checks for new health records. While these tests confirmed the plugin's capability for such continuous data handling and availability  (as per their 100% completeness and success rates for the data captured during those short, continuous intervals), they were not structured to measure the end-to-end latency of individual data points from capture by the wearable to full normalization by the plugin in a true streaming architecture. Therefore, while the normalization step is demonstrably fast, overall system performance in true real-time applications would also depend on API latencies of the native data stores, data polling frequency, and background processing constraints of the mobile OS, aspects that require further dedicated real-time performance profiling.
 
 Regarding the performance of the data conversion phase (transforming raw serialized data to Open mHealth), the measured execution times were consistently minimal, typically ranging from 0 to 3 milliseconds per dataset. This negligible processing overhead underscores the computational efficiency of the current normalization algorithms. This efficiency is a strong positive indicator for near real-time processing aspirations (RQ2), suggesting the normalization step itself adds minimal latency for the currently implemented transformations. It is acknowledged, however, that this high efficiency pertains to the specific data types and transformation logic of this project; more complex future normalizations could potentially introduce greater overhead.
 
@@ -392,7 +481,7 @@ The overarching purpose of this thesis, as outlined in Section 1.3, was to explo
 
 Regarding RQ1 – How can wearable health data from different platforms be effectively normalized into a unified format suitable for migraine-focused machine learning applications? – the development and subsequent analysis of the 'wearable_health' plugin demonstrated a viable pathway. The study indicated that a Flutter-based plugin, employing platform-specific native modules and a clearly defined data transformation pipeline, can effectively abstract complexities of disparate platform APIs for the purpose of data extraction. Furthermore, the implemented strategies for normalizing this data to the Open mHealth standard, including the judicious use of custom schema extensions where the base standard was found insufficient, proved to be technically sound for the tested data types. This suggests that achieving "effective normalization" for such specialized applications often involves a pragmatic combination of leveraging existing standards while allowing for tailored adaptations to capture necessary data nuances, thereby providing a structured, though not universally applicable without consideration for such extensions, input for potential ML pipelines.
 
-The investigation into RQ2 – What are the key requirements and challenges in implementing real-time data normalization for migraine-relevant wearable data in a mobile environment? – illuminated several critical aspects based on the analyses in Sections 6.3 and 6.4. Key requirements identified through this DSR project include robust mechanisms for managing diverse and restrictive platform-specific permission models, strategies for handling API limitations and potential data inconsistencies from sources, and computationally efficient data processing logic suitable for mobile resource constraints. The primary challenges analyzed encompass the inherent difficulties in creating a truly seamless abstraction layer over fundamentally different native systems, the trade-offs between achieving a high degree of standardization versus retaining rich, platform-specific metadata, and ensuring predictable performance. While the plugin’s data conversion stage was found to be highly efficient, the data extraction times (approximately !![300 milliseconds for 1000-5000 records]!!) suggest that while suitable for many intermittent mobile use cases, careful architectural consideration regarding data polling frequency and volume is essential for applications with stringent near-real-time demands.
+The investigation into RQ2 revealed several key aspects. Requirements for near real-time processing in a mobile environment include efficient normalization algorithms, which the plugin demonstrates with its minimal conversion times (0-3 ms per dataset ). Challenges include managing the inherent latencies of native platform APIs for data extraction (observed in batch tests, e.g., 133ms for 1406 records in TEST-GN04, 1286ms for 7206 records in TEST-GN02 ) and designing appropriate data polling strategies. While our 'real-time' tests confirmed continuous data handling capability, they did not measure per-update normalization latency. Thus, for applications with stringent, low-latency real-time demands, these native API latencies and the chosen polling frequency, rather than the normalization step itself, would likely be the primary performance determinants.
 
 In addressing RQ3 – How effective is the Open mHealth schema as a standardized format for representing migraine-relevant physiological data from diverse wearable devices? – the analysis suggests that the Open mHealth schema, when augmented by necessary, context-specific extensions (such as the custom HRV schema developed in this project), can serve as an effective foundation for representing the targeted physiological data from the evaluated sources. Its application facilitated the creation of a consistent data structure, which is vital for unified datasets. However, the identified need for such an extension for HRV also implies that the base Open mHealth standard, in its current iteration, may not comprehensively cater to all granularities or types of migraine-relevant physiological data without such adaptation. Thus, its "effectiveness" is determined to be context-dependent, often relying on the schema's inherent flexibility to be extended in accordance with its design principles, while users of the plugin retain access to less abstracted data formats if the Open mHealth trade-offs are unsuitable for their specific needs.
 
@@ -419,7 +508,7 @@ Beyond direct artifact development, further research should focus on evaluating 
 Finally, the broader challenges encountered in this project highlight persistent areas for ongoing research in the field of mobile health informatics. This includes developing more adaptive and resilient strategies for managing evolving cross-platform permission models and data access restrictions, creating robust methods for handling highly asynchronous, sparse, or intermittently available data streams from diverse wearables, and contributing to the continued evolution and adoption of interoperable data standards like Open mHealth to better accommodate emerging data types and complex use cases in personalized and preventative health.
 
 = 8 Conclusion
-The primary outcome, the 'wearable_health' plugin, demonstrated a feasible approach to RQ1 (effective normalization). It successfully unified Heart Rate and HRV data from HealthKit and Health Connect into the Open mHealth standard, although this highlighted that achieving optimal data representation often requires context-specific schema adaptations, such as the custom HRV extension developed herein. Regarding RQ2 (requirements and challenges), the project underscored critical needs for managing disparate platform APIs and permission models. While data conversion proved highly efficient (0-3ms), extraction times (approximately !![300 milliseconds for 1000-5000 records]!!) were identified as a factor requiring careful consideration for applications with stringent near-real-time demands in mobile environments. For RQ3 (Open mHealth effectiveness), the schema, when appropriately augmented, was found applicable for the targeted data. However, this analysis also confirmed a trade-off between the consistency afforded by standardization and the richness of platform-specific metadata, a choice the plugin accommodates by offering multiple data output formats.
+The primary outcome, the 'wearable_health' plugin, demonstrated a feasible approach to RQ1 (effective normalization). It successfully unified Heart Rate and HRV data from HealthKit and Health Connect into the Open mHealth standard, although this highlighted that achieving optimal data representation often requires context-specific schema adaptations, such as the custom HRV extension developed herein. Regarding RQ2 (requirements and challenges), the project underscored critical needs for managing disparate platform APIs and permission models. While data conversion proved highly efficient (0-3ms), extraction times (ranging from approximately 130ms to over 1200ms for the datasets tested) were identified as a factor requiring careful consideration for applications with stringent near-real-time demands in mobile environments. For RQ3 (Open mHealth effectiveness), the schema, when appropriately augmented, was found applicable for the targeted data. However, this analysis also confirmed a trade-off between the consistency afforded by standardization and the richness of platform-specific metadata, a choice the plugin accommodates by offering multiple data output formats.
 
 This work contributes to bridging the identified knowledge gap for a unified, mobile-centric normalization framework, with relevance for both Design Science Research (through the artifact and generated design knowledge) and industry (providing a practical tool for developers like Neurawave). While the plugin’s architectural principles may offer some generalizability, its specific performance and API effectiveness are necessarily context-bound to the tested mobile platforms and evolving third-party APIs.
 
