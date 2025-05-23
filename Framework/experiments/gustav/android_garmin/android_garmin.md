@@ -65,9 +65,12 @@
    ```
 
 3. **Experiment app steps to collect data**
-    - _In app navigation and steps to extract data
+    - _Steps taken to collect the health data_
    ```
-      In the experiment app, the timefields were selected. The startdate selected was 2025-05-21
+      The plugin experiment app was installed on the Samsung Galaxy S22 aswell as Health Sync, which is a third party app
+      needed for data synchronization between the Garmin Venu 2 and Health Connect. Then gathered data was synchronized using
+      Health Sync from the smartwatch to the device. After synchronization of the registered data, The experiment was initialized
+      using the experiment app for extraction of the data.
    ```
 
 4. **Observations During Testing**

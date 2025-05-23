@@ -8,8 +8,8 @@
 | Date | `2025-05-22`    |
 | Time | `01:51`         |
 | Tester Name | `Duc Anh Pham`  |
-| Testing Location | `Vaxjo, Sweden` |
-| Test Description | `Testing that the plugin can successfully extract and convert historical data for IOS infrastructure` |
+| Testing Location | `Vaxjo, Sweden` | 
+| Testing Description | `Testing that the plugin can successfully extract and convert historical data for IOS infrastructure` | 
 
 ## Device Configuration
 
@@ -56,35 +56,14 @@
       inspected for any visible damage or hinder of sensors that might affect the ability to provide data. The Apple Watch Series 9 was then connected to the iPhone 13, which was linked to a Mac laptop to establish a synchronized development environment.
 
 2. **Data Collection Process**
-    - _Steps taken to collect the health data_
+    - _Steps taken to prepare for the data collection process_
    ```
-   The Apple Watch Series 9 was worn on the left wrist throughout the day to collect heart rate and heart rate variability data during resting and walking activities.
-   Using HealthKit, the data is then synchronized between the recorded Apple Watch data and the Iphone 13 storage. After data was successfully synchronized and accessibly in the Iphones HealthKit storage.
-   The experiment app was initialized to extract the data.
-   ```
-
-3. **Experiment app steps to collect data**
-    - _In app navigation and steps to extract data
-   ```
-      Navigation steps in the experiments app:
-      - Open up layout UI in top right corner
-      - Click "Start Date" option, fill in 2025-05-21 12:00
-      - Click "End Date" option, fill in 2025-05-22 12:00
-      * Displayed: "Data Retrieval Module 605 records retrieved"
-      - Click "Fetch Historical Data"
-      - Open Menu in top left corner
-      - Click Conversion Metrics
-      * Displayed: "Conversion Module accuracy: 100%. Got 601 amount of heart rate records. 601 got validated. Got 4 amount of heart rate variability records. 4 got validated."
-      - Open Menu in top left corner
-      - Click "Performance Metrics"
-      * Displayed: "Performance Module total time: 226ms. Fetching raw data took 226 ms. Conversion to openMhealth took 0ms. Converted 605 objects.
-      - Open Menu in top left corner
-      - Click "Inspect Data"
-      - Click view JSON for Raw data, Converted object, Open Mhealth
-      * Displayed: Each data object for corresponding format, view images for more details 
+      The Apple Watch Series 9 was worn on the left wrist throughout the day to collect heart rate and heart rate variability data during resting and walking activities.
+      Using HealthKit, the data is then synchronized between the recorded Apple Watch data and the Iphone 13 storage. After data was successfully synchronized and accessibly in the Iphones HealthKit storage.
+      The experiment app was initialized to extract the data.
    ```
 
-4. **Observations During Testing**
+3. **Observations During Testing**
     - _Any notable observations during the testing process_
    ```
       The application, plugin and all hardware components worked smoothly throughout the entire process.
