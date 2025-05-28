@@ -32,13 +32,13 @@ fun HeartRateRecord.extractSamples(): List<Map<String, Any?>> {
 /** Converts record metadata to a serializable map. */
 fun HeartRateRecord.extractMetadata(): Map<String, Any?> {
     val result: Map<String, Any?> = mapOf(
-        "clientRecordId" to null,
-        "clientRecordVersion" to 0,
-        "dataOrigin" to "DataOrigin(packageName='com.fitbit.FitbitMobile')",
-        "device" to null,
+        "clientRecordId" to this.metadata.clientRecordId,
+        "clientRecordVersion" to this.metadata.clientRecordVersion,
+        "dataOrigin" to this.metadata.dataOrigin.toString(),
+        "device" to this.metadata.device.toString(),
         "id" to this.metadata.id,
         "lastModifiedTime" to this.metadata.lastModifiedTime.toString(),
-        "recordingMethod" to 2,
+        "recordingMethod" to this.metadata.recordingMethod,
     )
     return result
 }
